@@ -5,7 +5,11 @@ title: HardCaml Interactive Tutorials
 
 # HardCaml IOCamlJS Notebooks
 
+The following are executable IOCamlJS notebooks [(quick start)](quick-start.html).
+
 ## Tutorials
+
+Basic HardCaml tutorials.
 
 * [Introduction](introduction.html)
 * [Design Flow](design-flow.html)
@@ -14,6 +18,8 @@ title: HardCaml Interactive Tutorials
 * [Simulation](simulation.html)
 
 ## Comparison
+
+Comparison with other HDLs.
 
 * [Chisel](chisel.html)
 
