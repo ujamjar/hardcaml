@@ -1,8 +1,10 @@
 ---
 layout: default
-title: HardCaml interactive tutorials
+title: HardCaml Interactive Tutorials
 ---
 
-# HardCaml interactive tutorials
+# HardCaml Interactive Tutorials
+
+
 
 
