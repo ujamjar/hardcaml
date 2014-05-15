@@ -1,4 +1,4 @@
-# HardCaml - Register Transfer Level Hardware Design in OCaml
+# HardCaml 
 
 HardCaml is an OCaml library for designing hardware.
 

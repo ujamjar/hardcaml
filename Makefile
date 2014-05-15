@@ -21,6 +21,13 @@ all:
 	ocamlbuild -use-ocamlfind $(BUILD_OPTS) pa_hardcaml.cmo
 	ocamlbuild -use-ocamlfind $(BUILD_OPTS) HardCamlJS.cma
 
+hardcamljs:
+	make -C ../../iocamljs all \
+		OPT=1 EXT=".hardcaml" \
+		CAMLP4=1 LWT=1 JSOO=1 \
+		SYNTAX="js_of_ocaml.syntax lwt.syntax.options lwt.syntax hardcaml.syntax" \
+		PACKAGES="hardcaml hardcaml.js" MODULES="HardCaml HardCamlJS"
+
 ####################################################
 
 install: all

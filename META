@@ -10,8 +10,8 @@ package "syntax" (
   archive(syntax,toploop) = "pa_hardcaml.cmo"
 )
 
-package "wave" (
+package "js" (
   requires = "hardcaml,js_of_ocaml"
-  archive(byte) = "HardCaml_wave.cma"
+  archive(byte) = "HardCamlJS.cma"
 )
 
