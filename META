@@ -1,0 +1,17 @@
+version = "1.0"
+description = "HardCaml hardware design library"
+requires = "bigarray,dynlink"
+archive(byte) = "HardCaml.cma"
+archive(native) = "HardCaml.cmxa"
+
+package "syntax" (
+  requires = "hardcaml,camlp4"
+  archive(syntax,preprocessor) = "pa_hardcaml.cmo"
+  archive(syntax,toploop) = "pa_hardcaml.cmo"
+)
+
+package "wave" (
+  requires = "hardcaml,js_of_ocaml"
+  archive(byte) = "HardCaml_wave.cma"
+)
+

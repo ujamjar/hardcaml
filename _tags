@@ -1,0 +1,10 @@
+<src/*.cmx>: for-pack(HardCaml)
+
+<src/pa_hardcaml.ml>: syntax(camlp4o), package(camlp4.quotations.r), package(camlp4.extend)
+
+<js/wave.ml>: syntax(camlp4o), package(js_of_ocaml,js_of_ocaml.syntax)
+
+true: debug
+true: bin_annot
+<src>: include
+<js>: include
