@@ -4,8 +4,6 @@ title: HardCaml
 description: Register Transfer Level Hardware Design in OCaml
 ---
 
-# HardCaml IOCamlJS Notebooks
-
 The following are executable IOCamlJS notebooks [(quick start)](quick-start.html).
 
 ## Tutorials
