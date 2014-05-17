@@ -1,6 +1,7 @@
 ---
-layout: default
-title: HardCaml Interactive Tutorials
+layout: slate
+title: HardCaml
+description: Register Transfer Level Hardware Design in OCaml
 ---
 
 # HardCaml IOCamlJS Notebooks
