@@ -8,3 +8,5 @@ HardCaml is an OCaml library for designing hardware.
 * Convert to VHDL, Verilog, C
 * Write new modules to transform or analyse circuits, or provide new backends
 
+[Try it online!)(http://ujamjar.github.io/hardcaml)
+
