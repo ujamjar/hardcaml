@@ -17,7 +17,7 @@ Basic HardCaml tutorials.
 * [Sequential Logic](sequential.html)
 * [Simulation](simulation.html)
 * [Guarded DSL](guarded.html)
-* [Instantiation](instantation.html)
+* [Instantiation](instantiation.html)
 
 ## Comparison
 
