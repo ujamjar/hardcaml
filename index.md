@@ -18,6 +18,11 @@ Basic HardCaml tutorials.
 * [Guarded DSL](guarded.html)
 * [Instantiation](instantiation.html)
 
+## Examples
+
+* [Prefix networks](prefix-networks.html)
+* [Linear Feedback Shift Registers](lfsr.html)
+
 ## Comparison
 
 Comparison with other HDLs.
