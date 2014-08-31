@@ -321,7 +321,7 @@ var IPython = (function (IPython) {
                 that.split_cell();
                 that.control_key_active = false;
                 return false;                                               
-            } else if (that.control_key_active) {
+            } else if (event.which !== 229 && that.control_key_active) { /* work round a chromium bug */
                 that.control_key_active = false;
                 return true;
             }
