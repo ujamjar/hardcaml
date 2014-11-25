@@ -5,6 +5,8 @@
 
 <js/wave.ml>: syntax(camlp4o), package(js_of_ocaml,js_of_ocaml.syntax)
 
+<test/recipes.{ml,byte}>: syntax(camlp4o), package(unix,monad-custom)
+
 true: debug
 true: bin_annot
 true: safe_string
