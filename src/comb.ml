@@ -68,13 +68,23 @@ sig
     val lsbs : t -> t
     val lsb : t -> t
     val msbs : t -> t
+    val drop_bottom : t -> int -> t
+    val drop_top : t -> int -> t
+    val sel_bottom : t -> int -> t
+    val sel_top : t -> int -> t
+    val insert : t:t -> f:t -> int -> t
+    val sel : t -> (int * int) -> t
     val mux : t -> t list -> t
     val mux2 : t -> t -> t -> t
     val mux_init : t -> int -> (int -> t) -> t
+    val cases : t -> t -> (int * t) list -> t
+    val pmux : (t * t) list -> t -> t
     val ( &: ) : t -> t -> t
     val ( &:. ) : t -> int -> t
+    val (&&:) : t -> t -> t
     val ( |: ) : t -> t -> t
     val ( |:. ) : t -> int -> t
+    val (||:) : t -> t -> t
     val ( ^: ) : t -> t -> t
     val ( ^:. ) : t -> int -> t
     val ( ~: ) : t -> t
@@ -115,6 +125,8 @@ sig
     val to_sint64 : t -> int64
     val to_bstr : t -> string
     val bits : t -> t list
+    val to_array : t -> t array
+    val of_array : t array -> t
     val wire : int -> t
     val wireof : t -> t
     val ( <== ) : t -> t -> unit
@@ -141,6 +153,8 @@ sig
     val tree : int -> ('a list -> 'a) -> 'a list -> 'a
     val binary_to_onehot : t -> t
     val onehot_to_binary : t -> t
+    val binary_to_gray : t -> t
+    val gray_to_binary : t -> t
     val srand : int -> t
 
     module type TypedMath = sig
@@ -228,6 +242,21 @@ struct
     let msbs a = select a (width a - 1) 1
     let bit s n = select s n n
 
+    let drop_bottom x n = select x (width x - 1) n
+    let drop_top x n = select x (width x - 1 - n) 0
+    let sel_bottom x n = select x (n-1) 0
+    let sel_top x n = select x (width x - 1) (width x - n)
+    let insert ~t ~f n = 
+      let wt, wf = width t, width f in
+      if n < 0 then failwith "insert <0"
+      else if wt < (wf + n) then failwith "insert overflow"
+      else if wt = wf && n = 0 then f
+      else if n=0 then select t (wt - 1) wf @: f
+      else if wt = (wf + n) then f @: select t (wt - wf - 1) 0
+      else select t (wt - 1) (wf + n) @: f @: select t (n-1) 0
+
+    let sel x (h,l) = select x h l
+
     (* error checking *)   
     let assert_widths_same l msg = 
         let w = width (List.hd l) in
@@ -274,6 +303,18 @@ struct
         mux sel [b;a]
 
     let mux_init sel n f = mux sel (Array.to_list (Array.init n f))
+
+    let cases sel default l = 
+      let max = 1 + List.fold_left (fun acc (i,_) -> max i acc) 0 l in
+      let a = Array.make max default in
+      let () = List.iter (fun (i,x) -> a.(i) <- x) l in
+      if 1 lsl (width sel) = max then
+        mux sel (Array.to_list a)
+      else
+        mux sel (Array.to_list a @ [default])
+
+    let pmux list last = 
+      (List.fold_left (fun f (c, d) -> (fun s -> f (mux2 c d s))) (fun s -> s) list) last
 
     (* logical *)
     let (&:) a b = 
@@ -375,6 +416,9 @@ struct
         let a = Array.init (width s) (fun i -> bit s i) in
         List.rev (Array.to_list a)
 
+    let to_array b = Array.of_list (List.rev (bits b))
+    let of_array l = concat (List.rev (Array.to_list l))
+
     let wire = Bits.wire
 
     let (<==) = Bits.(<==) 
@@ -474,6 +518,9 @@ struct
         | 0 -> failwith "Cant reduce no signals"
         | _ -> List.fold_left (fun acc x -> op acc x) (List.hd s) (List.tl s)
 
+    let (||:) a b = (reduce (|:) (bits a)) |: (reduce (|:) (bits b))
+    let (&&:) a b = (reduce (|:) (bits a)) &: (reduce (|:) (bits b))
+
     let reverse a = concat (List.rev (bits a))
 
     let mod_counter max c = 
@@ -531,6 +578,17 @@ struct
                 | _ -> reduce (|:) g :: f (i+1)
         in
         concat List.(rev (f 0))
+
+    let binary_to_gray b = b ^: (srl b 1)
+    
+    let gray_to_binary b = 
+      let ue x = uresize x (width b) in
+      let rec f b mask = 
+        let b = b ^: (ue mask) in
+        if width mask = 1 then b
+        else f b (msbs mask)
+      in
+      f b (msbs b)
 
     (* complex constant generators *)
     let rec constd bits v = 

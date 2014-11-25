@@ -185,6 +185,24 @@ sig
     (** get most significant bits *)
     val msbs : t -> t
     
+    (** [drop_bottom s n] drop bottom [n] bits of [s] *)
+    val drop_bottom : t -> int -> t
+    
+    (** [drop_top s n] drop top [n] bits of [s] *)
+    val drop_top : t -> int -> t
+    
+    (** [sel_bottom s n] select bottom [n] bits of [s] *)
+    val sel_bottom : t -> int -> t
+    
+    (** [sel_top s n] select top [n] bits of [s] *)
+    val sel_top : t -> int -> t
+    
+    (** [insert ~t ~f n] insert [f] into [t] as postion [n] *)
+    val insert : t:t -> f:t -> int -> t
+    
+    (** *)
+    val sel : t -> (int * int) -> t
+
     (** multiplexer. 
      
         [let m = mux sel inputs in ...]
@@ -199,24 +217,35 @@ sig
         in turn be equal to the width of [m]. *)
     val mux : t -> t list -> t
     
-    (** 2 input multiplexer 
-     
-        [let m mux2 sel hi lo = ...]
+    (** [mux2 c t f] 2 input multiplexer.  Selects [t] if [c] is high otherwise [f].
         
-        Equivalent to [mux sel \[lo; hi\]]
-    *)
+        [t] and [f] must have same width and [c] must be 1 bit.
+
+        Equivalent to [mux c \[f; t\]] *)
     val mux2 : t -> t -> t -> t
     
     val mux_init : t -> int -> (int -> t) -> t
+
+    (** case mux *)
+    val cases : t -> t -> (int * t) list -> t
+
+    (** priority mux *)
+    val pmux : (t * t) list -> t -> t
 
     (** logical and *)
     val (&:) : t -> t -> t
     val (&:.) : t -> int -> t
 
+    (** a <>:. 0 &: b <>:. 0 *)
+    val (&&:) : t -> t -> t
+
     (** logical or *)
     val (|:) : t -> t -> t
     val (|:.) : t -> int -> t
     
+    (** a <>:. 0 |: b <>:. 0 *)
+    val (||:) : t -> t -> t
+
     (** logic xor *)
     val (^:) : t -> t -> t
     val (^:.) : t -> int -> t
@@ -303,6 +332,12 @@ sig
     (** convert signal to a list of bits, msb first *)
     val bits : t -> t list
     
+    (** [to_array s] convert signal [s] to array of bits with lsb at index 0 *)
+    val to_array : t -> t array
+
+    (** [of_array a] convert array [a] of bits to signal with lsb at index 0 *)
+    val of_array : t array -> t
+
     (** creates an unassigned wire *)
     val wire : int -> t
 
@@ -374,11 +409,17 @@ sig
     (** creates a tree of operations.  The arity of the operator is configurable *)
     val tree : int -> ('a list -> 'a) -> 'a list -> 'a
 
-    (** convert binary value to onehot *)
+    (** convert binary to onehot *)
     val binary_to_onehot : t -> t
 
-    (** convert onehot value to binary *)
+    (** convert onehot to binary *)
     val onehot_to_binary : t -> t
+
+    (** convert binary to gray code *)
+    val binary_to_gray : t -> t
+
+    (** convert gray code to binary *)
+    val gray_to_binary : t -> t
 
     (** create random constant vector of given size *)
     val srand : int -> t

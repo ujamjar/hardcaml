@@ -184,37 +184,37 @@ let abits_of_bstr' platform_bits (|.) (<<.) zero one get set create b =
 let bstr_of_abits' platform_bits (&.) (<<.) zero one get set width a = 
     if width = 0 then ""
     else
-        let b = String.make width '0' in
+        let b = Bytes.make width '0' in
         let rec build n =
             let word = n / platform_bits in
             let bit = n mod platform_bits in
             if ((get a word) &. (one <<. bit)) <> zero then
-                b.[width - n - 1] <- '1';
+                Bytes.set b (width - n - 1) '1';
             if n <> 0 then
                 build (n-1)
         in
         build (width-1);
-        b
+        Bytes.to_string b
 
 (* ... *)
 
 let abits_int32_of_bstr = abits_of_bstr' 32 (Int32.logor) (Int32.shift_left) 0l 1l 
     Array.get Array.set 
-    Array.create
+    Array.make
 
 let bstr_of_abits_int32 = bstr_of_abits' 32 (Int32.logand) (Int32.shift_left) 0l 1l
     Array.get Array.set 
 
 let abits_int64_of_bstr = abits_of_bstr' 64 (Int64.logor) (Int64.shift_left) 0L 1L 
     Array.get Array.set 
-    Array.create
+    Array.make
 
 let bstr_of_abits_int64 = bstr_of_abits' 64 (Int64.logand) (Int64.shift_left) 0L 1L
     Array.get Array.set 
 
 let abits_nint_of_bstr = abits_of_bstr' platform_bits (Nativeint.logor) (Nativeint.shift_left) 0n 1n 
     Array.get Array.set 
-    Array.create
+    Array.make
 
 let bstr_of_abits_nint = bstr_of_abits' platform_bits (Nativeint.logand) (Nativeint.shift_left) 0n 1n
     Array.get Array.set 

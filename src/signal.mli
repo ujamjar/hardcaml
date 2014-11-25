@@ -359,6 +359,9 @@ sig
     (** if statement *)
     val g_if : Types.signal -> statements -> statements -> statement
 
+    (** else if branch *)
+    val g_elif : Types.signal -> statements -> statements -> statements 
+
     (** if sel then [...] else [] *)
     val g_when : Types.signal -> statements -> statement
 
@@ -386,4 +389,130 @@ sig
         (variable * ('a cases -> statement) * ('a -> statement))
 
 end
+
+(** N read port by M write port memories *)
+module Multiram : sig
+  open Types
+
+  type 'a write = 
+      {
+          we : 'a;
+          wd : 'a;
+          wa : 'a;
+      }
+  type 'a read = 
+      {
+          re : 'a;
+          ra : 'a;
+      }
+
+  type ram = size:int -> we:signal -> wa:signal -> d:signal -> re:signal -> ra:signal -> signal
+
+  val ram : ?priority_write:bool -> ram:ram -> size:int -> spec:register -> 
+      wr:signal write array -> rd:signal read array -> signal array
+
+end
+
+(** (revised) statemachine generator *)
+module Statemachine : sig
+
+  val statemachine : ?encoding:[ `binary | `onehot | `gray ] ->
+    Types.register ->
+    Types.signal ->
+    'a list ->
+    ('a -> Types.signal) *                      (* is_state *)
+    ('a Guarded.cases -> Guarded.statement) *   (* switch *)
+    ('a -> Guarded.statement)                   (* next *)
+
+end
+
+module type Seq_spec = sig
+    val reg_spec : Types.register
+    val ram_spec : Types.register
+end
+
+module type Seq = sig
+
+    open Types
+
+    val reg : 
+        ?clk:signal -> ?clkl:signal ->
+        ?r:signal -> ?rl:signal -> ?rv:signal ->
+        ?c:signal -> ?cl:signal -> ?cv:signal ->
+        ?ge:signal ->
+        e:signal -> signal -> signal
+
+    val reg_fb : 
+        ?clk:signal -> ?clkl:signal ->
+        ?r:signal -> ?rl:signal -> ?rv:signal ->
+        ?c:signal -> ?cl:signal -> ?cv:signal ->
+        ?ge:signal ->
+        e:signal -> w:int -> (signal -> signal) -> signal
+
+    val pipeline : 
+        ?clk:signal -> ?clkl:signal ->
+        ?r:signal -> ?rl:signal -> ?rv:signal ->
+        ?c:signal -> ?cl:signal -> ?cv:signal ->
+        ?ge:signal ->
+        n:int -> e:signal -> signal -> signal
+
+    open Guarded
+
+    val g_reg : 
+        ?clk:signal -> ?clkl:signal ->
+        ?r:signal -> ?rl:signal -> ?rv:signal ->
+        ?c:signal -> ?cl:signal -> ?cv:signal ->
+        ?ge:signal ->
+        e:signal -> int -> variable
+
+    val g_pipeline : 
+        ?clk:signal -> ?clkl:signal ->
+        ?r:signal -> ?rl:signal -> ?rv:signal ->
+        ?c:signal -> ?cl:signal -> ?cv:signal ->
+        ?ge:signal ->
+        n:int -> e:signal -> int -> variable
+
+    val statemachine : 
+        ?clk:signal -> ?clkl:signal ->
+        ?r:signal -> ?rl:signal -> ?rv:signal ->
+        ?c:signal -> ?cl:signal -> ?cv:signal ->
+        ?ge:signal ->
+        e:signal -> 'a list -> 
+        (('a -> signal) * ('a cases -> statement) * ('a -> statement))
+
+    val memory : 
+        ?clk:signal -> ?clkl:signal ->
+        ?r:signal -> ?rl:signal -> ?rv:signal ->
+        ?c:signal -> ?cl:signal -> ?cv:signal ->
+        ?ge:signal ->
+        int -> we:signal -> wa:signal -> d:signal -> ra:signal -> signal
+
+    val ram_wbr : 
+        ?clk:signal -> ?clkl:signal ->
+        ?r:signal -> ?rl:signal -> ?rv:signal ->
+        ?c:signal -> ?cl:signal -> ?cv:signal ->
+        ?ge:signal ->
+        int -> we:signal -> wa:signal -> d:signal -> re:signal -> ra:signal -> signal
+
+    val ram_rbw : 
+        ?clk:signal -> ?clkl:signal ->
+        ?r:signal -> ?rl:signal -> ?rv:signal ->
+        ?c:signal -> ?cl:signal -> ?cv:signal ->
+        ?ge:signal ->
+        int -> we:signal -> wa:signal -> d:signal -> re:signal -> ra:signal -> signal
+
+    val multi_ram_wbr : ?priority_write:bool -> 
+      rd:signal Multiram.read array ->
+      wr:signal Multiram.write array ->
+      int -> signal array
+
+    val multi_ram_rbw : ?priority_write:bool -> 
+      rd:signal Multiram.read array ->
+      wr:signal Multiram.write array ->
+      int -> signal array
+
+end
+
+(** Generate register logic parameterised over reset/clear/enable types and defaults *)
+module Make_seq(S : Seq_spec) : Seq
 

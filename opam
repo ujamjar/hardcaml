@@ -11,5 +11,6 @@ remove: [
 depends: [
   "ocamlfind"
   "camlp4"
+  "js_of_ocaml"
 ]
 ocaml-version: [ >= "4.01.0" ]

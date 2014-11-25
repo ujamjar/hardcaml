@@ -699,6 +699,8 @@ struct
     let g_if sel on_true on_false = 
         G_if(sel, on_true, on_false)
 
+    let g_elif c t f = [ g_if c t f ]
+
     let g_when sel on_true = g_if sel on_true []
 
     let g_unless sel on_false = g_if sel [] on_false
@@ -873,6 +875,392 @@ struct
         in
         state_var, switch, next_state
 
+
+end
+
+module Multiram = struct
+  (* XXX can't remember if I tested this properly... *)
+  open Comb
+
+  let rec bin2oh s = 
+    let (&::) a b = repeat a (width b) &: b in
+    if width s = 1 then s @: ~: s 
+    else 
+        ((((msb s)) &:: bin2oh (lsbs s)) @: 
+      ((~: (msb s)) &:: bin2oh (lsbs s)))
+
+
+  let rec oh2bin s = 
+    let pairs s = 
+      let s = if width s mod 2 = 0 then s else gnd @: s in
+      let b = List.rev (bits s) in
+      Utils.zip (Utils.leven b) (Utils.lodd b)
+    in
+    let enc2_1 (a, b) = (b, a |: b) in
+    if width s = 1 then gnd
+    else if width s = 2 then bit s 1
+    else
+      let s, p = Utils.unzip (List.map enc2_1 (pairs s)) in
+      oh2bin (concat (List.rev p)) @: reduce (|:) s
+
+  let rec oh2bin_p s = 
+    let w = width s in
+    let l = Utils.nbits (w-1) in
+    let rec f b i = 
+      match b with
+      | [] -> empty (* shouldnt get here *)
+      | h::[] -> consti l i
+      | h::t -> mux2 h (consti l i) (f t (i+1))
+    in
+    f (List.rev (bits s)) 0
+
+  (* lvt multiport ram *)
+
+  type 'a write = 
+    {
+      we : 'a;
+      wd : 'a;
+      wa : 'a;
+    }
+  type 'a read = 
+    {
+      re : 'a;
+      ra : 'a;
+    }
+  type ram = size:int -> we:t -> wa:t -> d:t -> re:t -> ra:t -> t
+
+  let ram_1wr ~ram ~size ~wr ~rd = 
+    (* 1 write, n read ports *)
+    Array.map 
+      (fun rd ->
+        ram ~size 
+          ~we:wr.we ~wa:wr.wa ~d:wr.wd 
+          ~re:rd.re ~ra:rd.ra) rd
+
+  let lvt ~priority_write ~size ~spec ~wr ~rd = 
+    let n_wr, n_rd = Array.length wr, Array.length rd in
+    let bin2oh we s = Array.map ((&:) we) (Array.of_list (List.rev (bits (bin2oh s)))) in
+    let we1h = Array.map (fun wr -> bin2oh wr.we wr.wa) wr in
+    let regs = Array.init size (fun i -> 
+      let wes = Array.init n_wr (fun j -> we1h.(j).(i)) in
+      let we = reduce (|:) (Array.to_list wes) in
+      let oh2bin = if priority_write then oh2bin_p else oh2bin in
+      let d = oh2bin (concat (List.rev (Array.to_list wes))) in
+      Seq.reg spec we d)
+    in
+    let regs = Array.to_list regs in
+    Array.map (fun rd -> mux rd.ra regs) rd
+
+  let ram ?(priority_write=false) ~ram ~size ~spec ~wr ~rd = 
+    let n_wr, n_rd = Array.length wr, Array.length rd in
+    let banks = Array.map (fun wr -> ram_1wr ~ram ~size ~wr ~rd) wr in
+    let lvt = lvt ~priority_write ~size ~spec ~wr ~rd in
+    let lvt = Array.init n_rd (fun i -> Seq.reg spec rd.(i).re lvt.(i)) in
+
+    Array.init n_rd (fun i -> mux lvt.(i) 
+      (Array.to_list (Array.init n_wr (fun j -> banks.(j).(i))))) 
+
+end
+
+module Statemachine = struct
+
+  open Comb
+
+  (* new statemchine implementation *)
+  let statemachine_binary rspec enable states = 
+    let open Guarded in
+    (* assign a value to each state *)
+    let nstates = List.length states in
+    let ls = Utils.clog2 nstates in
+    let states = Utils.mapi (fun i s -> s, consti ls i) states in
+    (* state variable *)
+    let state_var = g_reg rspec enable ls in 
+    (* update state *)
+    let state_val s = 
+      try List.assoc s states 
+      with _ -> 
+        (* report that we couldn't find the state.  We cant show which
+          * one, as we don't know it's type (even if it will generally be 
+          * a string *)
+        failwith "couldn't find state"
+    in
+    let next_state s = state_var $== (state_val s) in
+    let state_var = state_var#q (*-- "state_binary"*) in
+    let switch cases = 
+      g_switch (state_var) 
+        (List.map (fun (s, c) -> state_val s, c) cases)
+    in
+    (fun s -> state_val s ==: state_var),
+    switch, next_state
+
+  let statemachine_onehot rspec enable states = 
+    let open Guarded in
+    let nstates = List.length states in
+    let onehot i = 
+      let module B = Bits.Comb.IntbitsList in
+      let ls = Utils.clog2 nstates in
+      constibl B.(select (binary_to_onehot (consti ls i)) (nstates-1) 0)
+    in
+    let states = Utils.mapi 
+      (fun i s -> s, (i, onehot i)) states 
+    in
+    let state_var = 
+      g_reg 
+        Types.({ rspec with (* must be reset to get into state 0 *)
+          reg_clear_value = one nstates;
+          reg_reset_value = one nstates; })
+      enable nstates in 
+    (* update state *)
+    let state_val s = 
+      try List.assoc s states 
+      with _ -> 
+        (* report that we couldn't find the state.  We cant show which
+          * one, as we don't know it's type (even if it will generally be 
+          * a string *)
+        failwith "couldn't find state"
+    in
+    let next_state s = state_var $== snd (state_val s) in
+    let state_var = state_var#q (*-- "state_onehot"*) in
+    let switch cases = 
+      g_proc
+        (List.map (fun (s, c) ->
+          let i, _ = state_val s in
+          g_when (bit state_var i) c) cases)
+    in
+    (fun s -> bit state_var (fst (state_val s))),
+    switch, next_state
+
+  let statemachine_gray rspec enable states = 
+    let open Guarded in
+    (* assign a value to each state *)
+    let nstates = List.length states in
+    let ls = Utils.clog2 nstates in
+    let gray i = 
+      let module B = Bits.Comb.IntbitsList in
+      constibl (B.binary_to_gray (B.consti ls i))
+    in
+    let states = Utils.mapi (fun i s -> s, gray i) states in
+    (* state variable *)
+    let state_var = g_reg rspec enable ls in 
+    (* update state *)
+    let state_val s = 
+      try List.assoc s states 
+      with _ -> 
+        (* report that we couldn't find the state.  We cant show which
+          * one, as we don't know it's type (even if it will generally be 
+          * a string *)
+        failwith "couldn't find state"
+    in
+    let next_state s = state_var $== (state_val s) in
+    let state_var = state_var#q (*-- "state_gray"*) in
+    let switch cases = 
+      g_switch state_var 
+        (List.map (fun (s, c) -> state_val s, c) cases)
+    in
+    (fun s -> state_val s ==: state_var),
+    switch, next_state
+
+  let statemachine ?(encoding=`binary) = 
+    match encoding with
+    | `binary -> statemachine_binary
+    | `onehot -> statemachine_onehot
+    | `gray -> statemachine_gray 
+
+end
+
+module type Seq_spec = sig
+    val reg_spec : Types.register
+    val ram_spec : Types.register
+end
+
+module type Seq = sig
+
+    open Types
+
+    val reg : 
+        ?clk:signal -> ?clkl:signal ->
+        ?r:signal -> ?rl:signal -> ?rv:signal ->
+        ?c:signal -> ?cl:signal -> ?cv:signal ->
+        ?ge:signal ->
+        e:signal -> signal -> signal
+
+    val reg_fb : 
+        ?clk:signal -> ?clkl:signal ->
+        ?r:signal -> ?rl:signal -> ?rv:signal ->
+        ?c:signal -> ?cl:signal -> ?cv:signal ->
+        ?ge:signal ->
+        e:signal -> w:int -> (signal -> signal) -> signal
+
+    val pipeline : 
+        ?clk:signal -> ?clkl:signal ->
+        ?r:signal -> ?rl:signal -> ?rv:signal ->
+        ?c:signal -> ?cl:signal -> ?cv:signal ->
+        ?ge:signal ->
+        n:int -> e:signal -> signal -> signal
+
+    open Guarded
+
+    val g_reg : 
+        ?clk:signal -> ?clkl:signal ->
+        ?r:signal -> ?rl:signal -> ?rv:signal ->
+        ?c:signal -> ?cl:signal -> ?cv:signal ->
+        ?ge:signal ->
+        e:signal -> int -> variable
+
+    val g_pipeline : 
+        ?clk:signal -> ?clkl:signal ->
+        ?r:signal -> ?rl:signal -> ?rv:signal ->
+        ?c:signal -> ?cl:signal -> ?cv:signal ->
+        ?ge:signal ->
+        n:int -> e:signal -> int -> variable
+
+    val statemachine : 
+        ?clk:signal -> ?clkl:signal ->
+        ?r:signal -> ?rl:signal -> ?rv:signal ->
+        ?c:signal -> ?cl:signal -> ?cv:signal ->
+        ?ge:signal ->
+        e:signal -> 'a list -> 
+        (('a -> signal) * ('a cases -> statement) * ('a -> statement))
+
+    val memory : 
+        ?clk:signal -> ?clkl:signal ->
+        ?r:signal -> ?rl:signal -> ?rv:signal ->
+        ?c:signal -> ?cl:signal -> ?cv:signal ->
+        ?ge:signal ->
+        int -> we:signal -> wa:signal -> d:signal -> ra:signal -> signal
+
+    val ram_wbr : 
+        ?clk:signal -> ?clkl:signal ->
+        ?r:signal -> ?rl:signal -> ?rv:signal ->
+        ?c:signal -> ?cl:signal -> ?cv:signal ->
+        ?ge:signal ->
+        int -> we:signal -> wa:signal -> d:signal -> re:signal -> ra:signal -> signal
+
+    val ram_rbw : 
+        ?clk:signal -> ?clkl:signal ->
+        ?r:signal -> ?rl:signal -> ?rv:signal ->
+        ?c:signal -> ?cl:signal -> ?cv:signal ->
+        ?ge:signal ->
+        int -> we:signal -> wa:signal -> d:signal -> re:signal -> ra:signal -> signal
+
+    val multi_ram_wbr : ?priority_write:bool -> 
+      rd:signal Multiram.read array ->
+      wr:signal Multiram.write array ->
+      int -> signal array
+
+    val multi_ram_rbw : ?priority_write:bool -> 
+      rd:signal Multiram.read array ->
+      wr:signal Multiram.write array ->
+      int -> signal array
+
+end
+
+module Make_seq(S : Seq_spec) = struct
+
+    let make_spec 
+        ?clk ?clkl 
+        ?r ?rl ?rv 
+        ?c ?cl ?cv 
+        ?ge spec =
+        let sel a b = 
+            match a with
+            | None -> b
+            | Some(x) -> x
+        in
+        Types.({
+            reg_clock       = sel clk  spec.reg_clock;
+            reg_clock_level = sel clkl spec.reg_clock_level;
+            reg_reset       = sel r    spec.reg_reset;
+            reg_reset_level = sel rl   spec.reg_reset_level;
+            reg_reset_value = sel rv   spec.reg_reset_value;
+            reg_clear       = sel c    spec.reg_clear;
+            reg_clear_level = sel cl   spec.reg_clear_level;
+            reg_clear_value = sel cv   spec.reg_clear_value;
+            reg_enable      = sel ge   spec.reg_enable;
+        })
+
+    let reg 
+        ?clk ?clkl 
+        ?r ?rl ?rv 
+        ?c ?cl ?cv 
+        ?ge ~e d =
+        let spec = make_spec ?clk ?clkl ?r ?rl ?rv ?c ?cl ?cv ?ge S.reg_spec in
+        Seq.reg spec e d
+
+    let reg_fb 
+        ?clk ?clkl 
+        ?r ?rl ?rv 
+        ?c ?cl ?cv 
+        ?ge ~e ~w f =
+        let spec = make_spec ?clk ?clkl ?r ?rl ?rv ?c ?cl ?cv ?ge S.reg_spec in
+        Seq.reg_fb spec e w f
+
+    let pipeline 
+        ?clk ?clkl 
+        ?r ?rl ?rv 
+        ?c ?cl ?cv 
+        ?ge ~n ~e d =
+        let spec = make_spec ?clk ?clkl ?r ?rl ?rv ?c ?cl ?cv ?ge S.reg_spec in
+        Seq.pipeline n spec e d
+
+    let g_reg
+        ?clk ?clkl 
+        ?r ?rl ?rv 
+        ?c ?cl ?cv 
+        ?ge ~e w =
+        let spec = make_spec ?clk ?clkl ?r ?rl ?rv ?c ?cl ?cv ?ge S.reg_spec in
+        Guarded.g_reg spec e w
+
+    let g_pipeline 
+        ?clk ?clkl 
+        ?r ?rl ?rv 
+        ?c ?cl ?cv 
+        ?ge ~n ~e w =
+        let spec = make_spec ?clk ?clkl ?r ?rl ?rv ?c ?cl ?cv ?ge S.reg_spec in
+        Guarded.g_pipeline n spec e w
+ 
+    let statemachine
+        ?clk ?clkl 
+        ?r ?rl ?rv 
+        ?c ?cl ?cv 
+        ?ge ~e states =
+        let spec = make_spec ?clk ?clkl ?r ?rl ?rv ?c ?cl ?cv ?ge S.reg_spec in
+        Statemachine.statemachine spec e states
+ 
+    let memory
+        ?clk ?clkl 
+        ?r ?rl ?rv 
+        ?c ?cl ?cv 
+        ?ge  
+        size ~we ~wa ~d ~ra =
+        let spec = make_spec ?clk ?clkl ?r ?rl ?rv ?c ?cl ?cv ?ge S.ram_spec in
+        Seq.memory ~size ~spec ~we ~w:wa ~d ~r:ra
+
+    let ram_wbr 
+        ?clk ?clkl 
+        ?r ?rl ?rv 
+        ?c ?cl ?cv 
+        ?ge  
+        size ~we ~wa ~d ~re ~ra =
+        let spec = make_spec ?clk ?clkl ?r ?rl ?rv ?c ?cl ?cv ?ge S.ram_spec in
+        Seq.ram_wbr ~size ~spec ~we ~wa ~d ~re ~ra
+
+    let ram_rbw 
+        ?clk ?clkl 
+        ?r ?rl ?rv 
+        ?c ?cl ?cv 
+        ?ge  
+        size ~we ~wa ~d ~re ~ra =
+        let spec = make_spec ?clk ?clkl ?r ?rl ?rv ?c ?cl ?cv ?ge S.ram_spec in
+        Seq.ram_rbw ~size ~spec ~we ~wa ~d ~re ~ra
+
+    let multi_ram_wbr ?priority_write ~rd ~wr size =
+        Multiram.ram ?priority_write ~ram:(Seq.ram_wbr ~spec:S.ram_spec)
+          ~size ~spec:S.reg_spec ~wr ~rd
+
+    let multi_ram_rbw ?priority_write ~rd ~wr size =
+        Multiram.ram ?priority_write ~ram:(Seq.ram_rbw ~spec:S.ram_spec)
+          ~size ~spec:S.reg_spec ~wr ~rd
 
 end
 

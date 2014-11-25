@@ -46,11 +46,11 @@ let rec sep s l =
 
 let str_map f s = 
     let l = String.length s in
-    let x = String.create l in
+    let x = Bytes.create l in
     for i=0 to l-1 do
-        x.[i] <- f s.[i]
+        Bytes.set x i (f s.[i])
     done;
-    x
+    Bytes.to_string x
 
 let is_alpha c = (c >= 'a' && c <= 'z') ||
                  (c >= 'A' && c <= 'Z')
@@ -1078,7 +1078,7 @@ struct
             (fun l s -> if is_inst s then s::l else l)
             [] (Circuit.outputs circ)
         in
-        List.iter (fun inst ->
+        List.iter (fun inst -> (* XXX only write instantiations once for each unique name *)
             let name = inst_name inst in
             try
                 match Circuit.Hierarchy.get database name with
