@@ -13,12 +13,12 @@ type env =
   }
 type 'a recipe = Recipe of (t -> env -> (t * env * 'a)) 
 
-let delay clr d = reg Signal.Types.{ r_sync with reg_clear_value=clr; } enable d
-let delayEn clr enable d = reg Signal.Types.{ r_sync with reg_clear_value=clr; } enable d
-let delayFb clr f = reg_fb Signal.Types.{ r_sync with reg_clear_value=clr } enable (width clr) f
+let delay clr d = reg Signal.Types.({ r_sync with reg_clear_value=clr; }) enable d
+let delayEn clr enable d = reg Signal.Types.({ r_sync with reg_clear_value=clr; }) enable d
+let delayFb clr f = reg_fb Signal.Types.({ r_sync with reg_clear_value=clr }) enable (width clr) f
 let setReset s r = delayFb gnd (fun q -> (s |: q) &: (~: r))
 
-module Monad = (struct
+module Monad = struct
 
   let return a = 
     Recipe(fun start env -> (start, env, a))
@@ -33,12 +33,7 @@ module Monad = (struct
 
   let (>>) m f = bind m (fun _ -> f)
 
-end : sig
-  val return : 'a -> 'a recipe
-  val bind : 'a recipe -> ('a -> 'b recipe) -> 'b recipe
-  val (>>=) : 'a recipe -> ('a -> 'b recipe) -> 'b recipe
-  val (>>) : 'a recipe -> 'b recipe -> 'b recipe
-end)
+end 
 
 open Monad
 
