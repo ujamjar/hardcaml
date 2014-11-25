@@ -1,3 +1,4 @@
+<src/*.ml>: package(bytes)
 <src/*.cmx>: for-pack(HardCaml)
 
 <src/pa_hardcaml.ml>: syntax(camlp4o), package(camlp4.quotations.r), package(camlp4.extend)
