@@ -37,31 +37,45 @@ end
 
 open Monad
 
-let skip = Recipe(fun start env -> (delay gnd start), env, ())
+let skip = Recipe(fun start env -> (delay gnd start) -- "skip_fin", env, ())
 
 let rec wait = function
   | 0 -> return ()
   | n -> skip >> wait (n-1)
 
-let parallel_composition (Recipe p) (Recipe q) = Recipe(fun start env ->
+let gen_par_fin comb_fin fin' fin = 
+  let fin = setReset fin' fin in
+  if comb_fin then fin' |: fin else fin
+
+let par2 ?(comb_fin=true) (Recipe p) (Recipe q) = Recipe(fun start env ->
   let (fin0, env0, a) = p start env in
   let (fin1, env1, b) = q start env0 in
   let fin = wire 1 in
-  let () = fin <== ((setReset fin0 fin) &: (setReset fin1 fin)) in
+  let () = fin <== (gen_par_fin comb_fin fin0 fin &: gen_par_fin comb_fin fin1 fin) in
   (fin, env1, (a,b)))
 
-let (|||) = parallel_composition
+let (|||) p q = par2 ~comb_fin:true p q
+
+let par ?(comb_fin=true) r = Recipe(fun start env ->
+  let finl, env, al = List.fold_left 
+    (fun (finl,env,al) (Recipe r) ->
+      let fin, env, a = r start env in
+      (fin::finl,env,a::al)) ([],env,[]) r
+  in
+  let fin = wire 1 -- "par_fin" in
+  let () = fin <== reduce (&:) (List.map (fun fin' -> gen_par_fin comb_fin fin' fin) finl) in
+  (fin, env, List.rev al))
 
 let cond c (Recipe p) (Recipe q) = Recipe(fun start env ->
   let (fin0, env0, _) = p (start &: c) env in
   let (fin1, env1, _) = p (start &: (~: c)) env in
-  ((fin0 |: fin1), env1, ()))
+  ((fin0 |: fin1) -- "cond_fin", env1, ()))
 
-let iter c (Recipe p) = Recipe(fun start env ->
-  let ready = wire 1 in
-  let (fin, env', b) = p (c &: ready) env in
+let iter c (Recipe p) = Recipe(fun start env -> 
+  let ready = wire 1 -- "iter_ready" in
+  let (fin, env', b) = p ((c &: ready) -- "iter_start") env in
   let () = ready <== (start |: fin) in
-  ((~: c) &: ready, env', b))
+  (((~: c) &: ready) -- "iter_fin", env', b))
 
 let forever p = iter vdd p
 let waitWhile a = iter a skip
@@ -107,8 +121,8 @@ let addInps env al =
   in
   { env with writerInps = VMap.merge merge (ofList al) env.writerInps }
 
-let newVar n = Recipe (fun start env ->
-  let out = wire n in
+let newVar ?name n = Recipe (fun start env ->
+  let out = match name with None -> wire n | Some(x) -> (wire n) -- x in
   let v, env' = createVar env out in
   (start, env', v))
 
@@ -148,7 +162,7 @@ module Same(X : Interface.S) = struct
   let while_ f a p = read a >>= fun b -> iter (f b) p
 end    
 
-module Var = Same(struct
+module SVar = Same(struct
   type 'a t = 'a
   let t = "var", 0
   let map f a = f a
@@ -156,7 +170,7 @@ module Var = Same(struct
   let to_list a = [a]
 end)
 
-module List = Same(struct
+module SList = Same(struct
   type 'a t = 'a list
   let t = []
   let map = List.map
@@ -164,7 +178,7 @@ module List = Same(struct
   let to_list a = a
 end)
 
-module Array = Same(struct
+module SArray = Same(struct
   type 'a t = 'a array
   let t = [||]
   let map = Array.map
@@ -172,7 +186,7 @@ module Array = Same(struct
   let to_list = Array.to_list
 end)
 
-module Tuple2 = Same(struct
+module STuple2 = Same(struct
   type 'a t = 'a * 'a
   let t = ("a",0), ("b", 0)
   let map f (a,b) = (f a, f b)
@@ -180,7 +194,7 @@ module Tuple2 = Same(struct
   let to_list (a,b) = [ a; b ]
 end)
 
-module Tuple3 = Same(struct
+module STuple3 = Same(struct
   type 'a t = 'a * 'a * 'a
   let t = ("a",0), ("b", 0), ("c", 0)
   let map f (a,b,c) = (f a, f b, f c)

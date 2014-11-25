@@ -14,15 +14,16 @@ end
 
 val skip : unit recipe
 val wait : int -> unit recipe
+val par2 : ?comb_fin:bool -> 'a recipe -> 'b recipe -> ('a * 'b) recipe
 val (|||) : 'a recipe -> 'b recipe -> ('a * 'b) recipe
+val par : ?comb_fin:bool -> 'a recipe list -> 'a list recipe
 val cond : t -> 'a recipe -> 'b recipe -> unit recipe
 val iter : t -> 'a recipe -> 'a recipe
 val forever : 'a recipe -> 'a recipe
 val waitWhile : t -> unit recipe 
 val waitUntil : t -> unit recipe 
 val follow : t -> 'a recipe -> t * 'a 
-val createVar : env -> t -> var * env 
-val newVar : int -> var recipe 
+val newVar : ?name:string -> int -> var recipe 
 val readVar : var -> t recipe 
 val assign : (var * t) list -> unit recipe 
 val writeVar : var -> t -> unit recipe 
@@ -42,9 +43,9 @@ module type Same = sig
 end
 
 module Same(X : Interface.S) : Same with type 'a same = 'a X.t
-module Var : Same with type 'a same = 'a
-module List : Same with type 'a same = 'a list
-module Array : Same with type 'a same = 'a array
-module Tuple2 : Same with type 'a same = 'a * 'a
-module Tuple3 : Same with type 'a same = 'a * 'a * 'a
+module SVar : Same with type 'a same = 'a
+module SList : Same with type 'a same = 'a list
+module SArray : Same with type 'a same = 'a array
+module STuple2 : Same with type 'a same = 'a * 'a
+module STuple3 : Same with type 'a same = 'a * 'a * 'a
 
