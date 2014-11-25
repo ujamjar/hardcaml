@@ -1,5 +1,5 @@
 # Edit this for your own project dependencies
-OPAM_DEPENDS="ocamlfind camlp4 js_of_ocaml"
+OPAM_DEPENDS="ocamlfind bytes camlp4 js_of_ocaml"
 
 # install OCaml + OPAM
 case "$OCAML_VERSION,$OPAM_VERSION" in
