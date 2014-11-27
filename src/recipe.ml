@@ -68,7 +68,7 @@ let par ?(comb_fin=true) r = Recipe(fun start env ->
 
 let cond c (Recipe p) (Recipe q) = Recipe(fun start env ->
   let (fin0, env0, _) = p (start &: c) env in
-  let (fin1, env1, _) = p (start &: (~: c)) env in
+  let (fin1, env1, _) = q (start &: (~: c)) env in
   ((fin0 |: fin1) -- "cond_fin", env1, ()))
 
 let iter c (Recipe p) = Recipe(fun start env -> 
@@ -85,7 +85,6 @@ let follow start (Recipe r) =
   let initialEnv = 
     {
       freshId = 0;
-      (*readerInps = VMap.empty; (* we'll add a wire as we go *)*)
       writerInps = VMap.empty;
       outs = VMap.empty;
     }
@@ -97,11 +96,11 @@ let follow start (Recipe r) =
       let inps = VMap.find v env.writerInps in 
       let enable = reduce (|:) (List.map fst inps) in
       let value = reduce (|:) (List.map (fun (e,v) -> mux2 e v (zero (width v))) inps) in
-        (* repeat e (width v) &: v) inps) in (* or mux2 e v (zero n) *) *)
       o <== (delayEn (zero (width o)) enable value)
     with _ ->
-      Printf.printf "unassign var; defaulting to zero";
-      o <== (zero (width o)) (* unassign variable *)
+      (* this can lead to combinatorial loops, so perhaps an exception would be better *)
+      Printf.printf "unassigned var; defaulting to zero\n";
+      o <== (zero (width o)) (* unassigned variable *)
   ) env.outs;
   fin, a
 
@@ -142,6 +141,7 @@ module type Same = sig
   type 'a same 
   val smap : (var -> t) -> var same -> t same
   val szip : var same -> t same -> (var * t) list
+  val newVar : unit -> var same recipe
   val read : var same -> t same recipe
   val rewrite : (t same -> t same) -> var same -> var same -> unit recipe
   val apply : (t same -> t same) -> var same -> unit recipe
@@ -160,6 +160,22 @@ module Same(X : Interface.S) = struct
   let set a b = rewrite (fun _ -> b) a a
   let ifte f a p q = read a >>= fun b -> cond (f b) p q
   let while_ f a p = read a >>= fun b -> iter (f b) p
+
+  let newVar () = 
+    let mkvar n b l = newVar ~name:("newVar_" ^ n) b >>= fun v -> return ((n,v)::l) in
+    let rec f m l =
+      match m,l with
+      | None,[] -> failwith "Same.newVar: no elements"
+      | None,(n,b)::t -> 
+        f (Some(mkvar n b [])) t
+      | Some(m),(n,b)::t ->
+        f (Some(m >>= mkvar n b)) t
+      | Some(m),[] -> m
+    in
+    let m = f None X.(to_list t) in
+    m >>= fun l -> return (X.map (fun (n,_) -> 
+      try List.assoc n l with Not_found -> failwith ("Not_found " ^ n)) X.t)
+
 end    
 
 module SVar = Same(struct
@@ -170,6 +186,7 @@ module SVar = Same(struct
   let to_list a = [a]
 end)
 
+(* not so sure these are particularly useful; interfaces can do the job better *)
 module SList = Same(struct
   type 'a t = 'a list
   let t = []
