@@ -1,7 +1,10 @@
 # NOTE; it's not quite possible to run in native code, as we don't have
 # a shared version of libasmrun.
 
-cosim.cmo: cosim.ml
+cosim.cmi: cosim.mli
+	ocamlfind c -c -package ctypes.foreign cosim.mli
+
+cosim.cmo: cosim.ml cosim.cmi
 	ocamlfind c -c -package ctypes.foreign cosim.ml
 
 cosim_o.o: cosim.cmo
@@ -9,9 +12,6 @@ cosim_o.o: cosim.cmo
 
 cosim_c.o: cosim.c
 	gcc -c `iverilog-vpi --cflags` -g cosim.c -o cosim_c.o
-
-cosim_m.o: cosim.c
-	gcc -c -g -DMAIN -I/usr/include/iverilog cosim.c -o cosim_m.o
 
 LIB=`opam config var lib`
 LIBOCAML=${LIB}/ocaml

@@ -204,6 +204,9 @@ module Vpi = struct
     let _vpi_at_APV               = find "_vpi_at_APV"
   end
 
+  type ('a,'b) struct_field = ('a, ('b, [ `Struct ]) structured) field
+  type ('a,'b) union_field = ('a, ('b, [ `Union ]) structured) field
+
   module Handle = struct
     type __t
     let __t : __t structure typ = structure "__vpiHandle"
@@ -216,6 +219,7 @@ module Vpi = struct
     let type_ = field t "type" pli_int32
     let sysfunctype = field t "sysfunctype" pli_int32
     let tfname = field t "tfname" string
+    type callback_t = (unit ptr -> int32)
     let callback_t = funptr (ptr void @-> returning pli_int32)
     let calltf = field t "calltf" callback_t
     let compiletf = field t "compiletf" callback_t
@@ -239,10 +243,10 @@ module Vpi = struct
   module Vlog_info = struct
     type t
     let t : t structure typ = structure "t_vpi_vlog_info"
-    let argc = field t "type" pli_int32
-    let argv = field t "argv" (ptr (ptr char))
-    let product = field t "product" (ptr char)
-    let version = field t "version" (ptr char)
+    let argc = field t "argc" pli_int32
+    let argv = field t "argv" (ptr string) (* xxx array string? *)
+    let product = field t "product" string
+    let version = field t "version" string
     let () = seal t
   end
 
@@ -276,7 +280,7 @@ module Vpi = struct
   module Value = struct
     type v
     let v : v union typ = union "u_value"
-    let str = field v "str" (ptr char)
+    let str = field v "str" string
     let scalar = field v "scalar" pli_int32
     let integer = field v "integer" pli_int32
     let real = field v "real" double
@@ -323,16 +327,17 @@ module Vpi = struct
     let t : t structure typ = structure "t_vpi_error_info"
     let state = field t "state" pli_int32
     let level = field t "level" pli_int32
-    let message = field t "message" (ptr char)
-    let product = field t "product" (ptr char)
-    let code = field t "code" (ptr char)
-    let file = field t "file" (ptr char)
+    let message = field t "message" string
+    let product = field t "product" string
+    let code = field t "code" string
+    let file = field t "file" string
     let line = field t "line" pli_int32
     let () = seal t
   end
 
   (* types in vpi interface *)
   let typedef x = x, ptr x
+  type vpiHandle = Handle.__t structure ptr 
   let vpiHandle = Handle.t
   let s_vpi_systf_data, p_vpi_systf_data = typedef Systf_data.t
   let s_vpi_vlog_info, p_vpi_vlog_info = typedef Vlog_info.t
