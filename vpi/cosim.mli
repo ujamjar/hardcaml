@@ -202,6 +202,7 @@ module Vpi : sig
     type __t
     val __t : __t structure typ
     val t : __t structure ptr typ
+    val null : __t structure ptr
   end
   module Systf_data : sig
     type t

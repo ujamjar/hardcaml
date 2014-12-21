@@ -1,6 +1,8 @@
 # NOTE; it's not quite possible to run in native code, as we don't have
 # a shared version of libasmrun.
 
+all: test.vpi
+
 cosim.cmi: cosim.mli
 	ocamlfind c -c -package ctypes.foreign cosim.mli
 

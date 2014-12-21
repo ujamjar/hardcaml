@@ -211,6 +211,7 @@ module Vpi = struct
     type __t
     let __t : __t structure typ = structure "__vpiHandle"
     let t = ptr __t
+    let null = from_voidp __t null
   end
 
   module Systf_data = struct
@@ -414,12 +415,65 @@ module Vpi = struct
 
 end
 
+let u64_of_u32 v = 
+  let v = Unsigned.(UInt64.of_int64 @@ Int64.of_int32 @@ UInt32.to_int32 v) in
+  let mask = Unsigned.UInt64.of_int64 0xFFFFFFFFL in
+  Unsigned.UInt64.Infix.(v land mask)
+
+let get_time () =
+  let open Vpi in
+  let time = make Time.t in
+  let () = setf time Time.type_ Constants.vpiSimTime in
+  let () = vpi_get_time Handle.null (addr time) in
+  let high = u64_of_u32 (getf time Time.high) in
+  let low = u64_of_u32 (getf time Time.low) in
+  Unsigned.UInt64.Infix.((high lsl 32) lor low)
+
+let vpi_fold c0 c1 f arg = 
+  let open Vpi in
+  let handle = vpi_handle c0 Handle.null in
+  let iter = vpi_iterate c1 handle in
+  let rec scan arg = 
+    let handle = vpi_scan iter in
+    if handle = Handle.null then arg
+    else scan (f arg handle)
+  in
+  if iter = Handle.null then arg else scan arg
+
+let once_only f = 
+  let first = ref true in
+  (fun a -> 
+    if !first then begin
+      first := false;
+      f a
+    end else begin
+      failwith "task must be called once only"
+    end)
+
+let at_time_0 f = 
+  (fun a ->
+    if get_time () = Unsigned.UInt64.zero then f a
+    else failwith "task must be called at time 0 only")
+
+let from_task _ = 
+  let open Vpi in
+  let open Constants in
+  let signals = vpi_fold vpiSysTfCall vpiArgument
+    (fun l h ->
+      (vpi_get_str vpiName h,
+       vpi_get (Int32.to_int vpiSize) h,
+       vpi_get (Int32.to_int vpiType) h) :: l)
+    []
+  in
+  List.iter (fun (n,s,t) -> Printf.printf "%s[%li]:%li\n%!" n s t) (List.rev signals);
+  0l
+
 (* function called at vpi startup.  
  * here we get to register functions *)
 let init_vpi () = 
   let task = allocate Vpi.Systf_data.t Vpi.Systf_data.empty in
-  let () = setf (!@ task) Vpi.Systf_data.tfname "$hello" in
-  let () = setf (!@ task) Vpi.Systf_data.calltf (fun _ -> Printf.printf "hello world!\n%!"; 0l) in
+  let () = setf (!@ task) Vpi.Systf_data.tfname "$from_task" in
+  let () = setf (!@ task) Vpi.Systf_data.calltf (once_only @@ at_time_0 @@ from_task) in
   let _ = Vpi.vpi_register_systf task in
   ()
 
