@@ -261,6 +261,7 @@ module Vpi : sig
     val t : t structure typ
     val format : (int32, t) struct_field
     val value : (v union, t) struct_field
+    val null : t structure ptr
   end
   module Delay : sig
     type t
@@ -333,4 +334,8 @@ module Vpi : sig
   val vpip_set_return_value : int -> unit
   val vpip_calc_clog2 : vpiHandle -> Vecval.t structure
 end
-val init_vpi : unit -> unit
+
+module Cosim : sig
+  val init_vpi : unit -> unit
+end
+
