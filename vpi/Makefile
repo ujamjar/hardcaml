@@ -3,14 +3,20 @@
 
 all: test.vpi
 
-cosim.cmi: cosim.mli
+vpi.cmi: vpi.mli
+	ocamlfind c -c -package ctypes.foreign vpi.mli
+
+vpi.cmo: vpi.ml vpi.cmi
+	ocamlfind c -c -package ctypes.foreign vpi.ml
+
+cosim.cmi: cosim.mli vpi.cmi
 	ocamlfind c -c -package ctypes.foreign cosim.mli
 
-cosim.cmo: cosim.ml cosim.cmi
+cosim.cmo: cosim.ml cosim.cmi vpi.cmi
 	ocamlfind c -c -package ctypes.foreign cosim.ml
 
-cosim_o.o: cosim.cmo
-	ocamlfind c -output-obj -package ctypes.foreign -linkpkg -o cosim_o.o cosim.cmo
+cosim_o.o: vpi.cmo cosim.cmo
+	ocamlfind c -output-obj -package ctypes.foreign -linkpkg -o cosim_o.o vpi.cmo cosim.cmo
 
 cosim_c.o: cosim.c
 	gcc -c `iverilog-vpi --cflags` -g cosim.c -o cosim_c.o
