@@ -8,7 +8,7 @@
 #
 ########################################
 
-.PHONY: clean all install uninstall 
+.PHONY: clean all vpi iocamljs install uninstall 
 
 BUILD_OPTS=
 
@@ -17,11 +17,31 @@ PA_HARDCAML_TGT = _build/src/pa_hardcaml.cmo _build/src/pa_hardcaml.cmi
 HARDCAML_JS_TGT = _build/HardCamlJS.cmi _build/HardCamlJS.cma 
 
 all: 
-	ocamlbuild -use-ocamlfind $(BUILD_OPTS) HardCaml.cma HardCaml.cmxa
+	ocamlbuild -use-ocamlfind $(BUILD_OPTS) HardCaml.cma 
+	ocamlbuild -use-ocamlfind $(BUILD_OPTS) HardCaml.cmxa
 	ocamlbuild -use-ocamlfind $(BUILD_OPTS) pa_hardcaml.cmo
-	ocamlbuild -use-ocamlfind $(BUILD_OPTS) HardCamlJS.cma
+	ocamlbuild -use-ocamlfind $(BUILD_OPTS) HardCamlJS.cma   
 
-hardcamljs:
+# icarus verilog VPI cosim interface
+vpi: 
+	ocamlbuild -use-ocamlfind $(BUILD_OPTS) cosim_icarus.cmo vpi.cmo
+	ocamlfind c -output-obj -package ctypes.foreign -linkpkg -o cosim_o.o \
+		_build/HardCaml.cma _build/vpi/vpi.cmo _build/vpi/cosim_icarus.cmo
+	mv cosim_o.o _build/vpi/cosim_o.o
+	$(CC) -c `iverilog-vpi --cflags` -g vpi/cosim_c.c -o _build/vpi/cosim_c.o
+	$(CC) -o _build/vpi/cosim.vpi \
+		`iverilog-vpi --ldflags` \
+		_build/vpi/cosim_o.o _build/vpi/cosim_c.o \
+		-L`opam config var lib`/ocaml \
+		-L`opam config var lib`/ctypes \
+		-lunix -lbigarray -lcamlstr \
+		-lctypes_stubs -lctypes-foreign-base_stubs \
+		-lcamlrun_shared -lffi -ldl -lm \
+		`iverilog-vpi --ldlibs` \
+		-Wl,-E
+
+# iocamljs notebook kernel
+iocamljs:
 	make -C ../../iocamljs all \
 		OPT=1 EXT=".hardcaml" \
 		CAMLP4=1 LWT=1 JSOO=1 \
@@ -32,8 +52,9 @@ hardcamljs:
 
 install: all
 	$(SUDO) ocamlfind install hardcaml META \
-		$(HARDCAML_TGT) $(HARDCAML_JS_TGT) $(PA_HARDCAML_TGT)
-
+		$(HARDCAML_TGT) $(HARDCAML_JS_TGT) $(PA_HARDCAML_TGT) \
+		_build/vpi/cosim.vpi tools/hardcaml_cosim.sh
+	
 uninstall:
 	$(SUDO) ocamlfind remove hardcaml
 

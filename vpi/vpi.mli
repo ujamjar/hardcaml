@@ -207,7 +207,7 @@ module Systf_data : sig
   val t : t structure typ
   val type_ : (int32, t) struct_field
   val sysfunctype : (int32, t) struct_field
-  val tfname : (bytes, t) struct_field
+  val tfname : (string, t) struct_field
   type callback_t = (unit ptr -> int32)
   val callback_t : callback_t typ
   val calltf : (callback_t, t) struct_field
@@ -231,6 +231,7 @@ module Time : sig
   val high : (Unsigned.uint32, t) struct_field
   val low : (Unsigned.uint32, t) struct_field
   val real : (float, t) struct_field
+  val null : t structure ptr
 end
 module Vecval : sig
   type t
@@ -300,12 +301,12 @@ type cfile_t
 val cfile_t : cfile_t structure typ
 
 val vpi_register_systf : Systf_data.t structure ptr -> unit
-val vpi_mcd_open : bytes -> Unsigned.uint32
+val vpi_mcd_open : string -> Unsigned.uint32
 val vpi_mcd_close : Unsigned.uint32 -> Unsigned.uint32
-val vpi_mcd_name : Unsigned.uint32 -> bytes
+val vpi_mcd_name : Unsigned.uint32 -> string
 val vpi_flush : unit -> int32
 val vpi_mcd_flush : Unsigned.uint32 -> int32
-val vpi_fopen : bytes -> bytes -> int32
+val vpi_fopen : string -> string -> int32
 val vpi_get_file : int32 -> cfile_t structure ptr
 val vpi_register_cb : Cb_data.t structure ptr -> vpiHandle
 val vpi_remove_cb : vpiHandle -> int32
@@ -315,10 +316,10 @@ val vpi_handle : int32 -> vpiHandle -> vpiHandle
 val vpi_iterate : int32 -> vpiHandle -> vpiHandle
 val vpi_scan : vpiHandle -> vpiHandle
 val vpi_handle_by_index : vpiHandle -> int32 -> vpiHandle
-val vpi_handle_by_name : bytes -> vpiHandle -> vpiHandle
+val vpi_handle_by_name : string -> vpiHandle -> vpiHandle
 val vpi_get_time : vpiHandle -> Time.t structure ptr -> unit
 val vpi_get : int -> vpiHandle -> int32
-val vpi_get_str : int32 -> vpiHandle -> bytes
+val vpi_get_str : int32 -> vpiHandle -> string
 val vpi_get_value : vpiHandle -> Value.t structure ptr -> unit
 val vpi_put_value : vpiHandle -> Value.t structure ptr -> Time.t structure ptr -> int32 -> vpiHandle
 val vpi_free_object : vpiHandle -> int32
@@ -328,6 +329,6 @@ val vpi_put_delays : vpiHandle -> Delay.t structure ptr -> unit
 val vpi_put_userdata : vpiHandle -> unit ptr -> int32
 val vpi_get_userdata : vpiHandle -> unit ptr
 val vpi_chk_error : Error_info.t structure ptr -> int32
-val vpip_format_strength : bytes -> Value.t structure ptr -> Unsigned.uint32 -> unit
+val vpip_format_strength : string -> Value.t structure ptr -> Unsigned.uint32 -> unit
 val vpip_set_return_value : int -> unit
 val vpip_calc_clog2 : vpiHandle -> Vecval.t structure

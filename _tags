@@ -5,6 +5,8 @@
 
 <js/wave.ml>: syntax(camlp4o), package(js_of_ocaml,js_of_ocaml.syntax)
 
+<vpi/*.{ml,mli}>: package(ctypes.foreign)
+
 <test/recipes.{ml,byte}>: syntax(camlp4o), package(unix,hardcaml.syntax,monad-custom)
 
 true: debug
@@ -12,3 +14,4 @@ true: bin_annot
 true: safe_string
 <src>: include
 <js>: include
+<vpi>: include

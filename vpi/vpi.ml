@@ -255,6 +255,8 @@ module Time = struct
   let low = field t "low" pli_uint32
   let real = field t "real" double
   let () = seal t
+
+  let null = from_voidp t null
 end
 
 module Vecval = struct
