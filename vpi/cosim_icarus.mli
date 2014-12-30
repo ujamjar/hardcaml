@@ -13,12 +13,13 @@ val register_callback :
   reason:int32 -> time:Vpi.Time.t structure ptr -> (Vpi.Cb_data.t structure ptr -> int32) -> unit
 val time_0 : Vpi.Time.t structure
 
-type cosim_state = (string * Vpi.vpiHandle) list
+module SMap : Map.S with type key = string
+type cosim_state = Vpi.vpiHandle SMap.t
 
 val set_values : cosim_state -> HardCaml.Cosim.delta_message -> unit
 val get_values : cosim_state -> HardCaml.Cosim.delta_message -> HardCaml.Cosim.response_message
 
-val init_state : Vpi.vpiHandle -> cosim_state
+val init_state : HardCaml.Cosim.init_message -> cosim_state
 
 val run_cosim : (Unix.file_descr * cosim_state) -> Vpi.Cb_data.t structure ptr -> int32
 val hardcaml_cosim : Vpi.Systf_data.callback_t

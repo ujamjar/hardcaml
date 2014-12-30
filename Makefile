@@ -53,7 +53,7 @@ iocamljs:
 install: all
 	$(SUDO) ocamlfind install hardcaml META \
 		$(HARDCAML_TGT) $(HARDCAML_JS_TGT) $(PA_HARDCAML_TGT) \
-		_build/vpi/cosim.vpi tools/hardcaml_cosim.sh
+		_build/vpi/cosim.vpi tools/hardcaml_cosim.sh tools/hardcaml_vvp.sh
 	
 uninstall:
 	$(SUDO) ocamlfind remove hardcaml

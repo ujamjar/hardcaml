@@ -1,8 +1,9 @@
 (*
- * * '$hardcaml_cosim' task in testbench is given all signals
  * * hardcaml spawns icarus with testbench and vpi module
+ * * vpi installs a callback at time 0 which does set up
  * * comms channel set up to host over tcp socket
- * * hardcaml sends control messages repeatedly which can...
+ * * sim object queried to find ports
+ * * hardcaml sends control messages repeatedly which ...
  *  - set inputs (ie clock, module inputs)
  *  - read outputs and send values back
  *  - advance time to the next callback
@@ -100,7 +101,12 @@ open Vpi
 open Constants
 open HardCaml.Cosim
 
-type cosim_state = (string * Vpi.vpiHandle) list
+module SMap = Map.Make(struct
+  type t = string
+  let compare = compare
+end)
+
+type cosim_state = Vpi.vpiHandle SMap.t
 
 let vpi_recv_ctrl socket = Comms.recv socket
 let vpi_get_ctrl data = 
@@ -108,22 +114,17 @@ let vpi_get_ctrl data =
   | Finish -> ignore @@ vpi_control vpiFinish; failwith "finished"
   | Run(control) -> control
 
-let vpi_send_response socket (resp : response_message) = 
-  Comms.send socket (Marshal.to_bytes resp [])
-let hardcaml_recv_response socket  = 
-  (Marshal.from_bytes (Comms.recv socket) 0 : response_message)
-
 (* set values *)
 let set_values state message = 
   List.iter 
     (fun (name,bin_value) ->
-      let handle = List.assoc name state in
+      let handle = SMap.find name state in
       let value = make Value.t in
       let () = setf value Value.format vpiBinStrVal in
       let data = make Value.v in
       let () = setf data Value.str bin_value in
       let () = setf value Value.value data in
-      let _ = vpi_put_value handle (addr value) Time.null vpiNoDelay in
+      let _ = vpi_put_value handle (addr value) (addr time_0) vpiNoDelay in (* IntertailDelay? *)
       ()) 
     message.sets
 
@@ -131,7 +132,7 @@ let set_values state message =
 let get_values state message = 
   List.map 
     (fun name ->
-      let handle = List.assoc name state in
+      let handle = SMap.find name state in
       let value = make Value.t in
       let () = setf value Value.format vpiBinStrVal in
       let () = vpi_get_value handle (addr value) in
@@ -139,37 +140,57 @@ let get_values state message =
       name, value) 
     message.gets
 
-let init_state handle = 
-  vpi_fold handle vpiArgument 
-    (fun l h -> (vpi_get_str vpiName h, h)::l) []
+let init_state ports = 
+  let add_port map handle = 
+    let name = vpi_get_str vpiName handle in
+    if List.mem name ports then SMap.add name handle map
+    else map
+  in
+  (* find all nets and regs in the (supposed to be only) top level module *)
+  vpi_fold Handle.null vpiModule
+    (fun map h -> 
+      (* Note; may need to filter on name of top module ... *)
+      let map = vpi_fold h vpiNet add_port map in
+      let map = vpi_fold h vpiReg add_port map in
+      map
+    ) SMap.empty
+
+let reason = cbAfterDelay (* cbReadWriteSynch? *)
 
 let rec run_cosim (client,state) _ = 
   let open Printf in
+  (* get message from server *)
   let message = vpi_get_ctrl (vpi_recv_ctrl client) in
-  printf "delta_time = %Li\n%!" message.delta_time;
-  List.iter (fun (s,v) -> printf "set %s = %s\n%!" s v) message.sets;
-  List.iter (fun s -> printf "get %s\n%!" s) message.gets;
+  (* set values *)
   let () = set_values state message in
+  (* get values *)
   let gets = get_values state message in
-  let _ = vpi_send_response client gets in
+  (* response message to server *)
+  let _ = 
+    if gets <> [] then  
+      ignore @@ Comms.send client (Marshal.to_bytes (gets : response_message) []) 
+  in
+  (* schedule next callback *)
   let time = addr (set_time (Unsigned.UInt64.of_int64 message.delta_time)) in
-  register_callback ~reason:cbAfterDelay ~time (run_cosim (client,state));
+  register_callback ~reason ~time (run_cosim (client,state));
   0l
 
 let hardcaml_cosim _ = 
-  let state = init_state (vpi_handle vpiSysTfCall Handle.null) in
   let client = Comms.create_client net_addr net_port in
   let _ = at_exit (fun _ -> Unix.close client) in
   (* say hello *)
   let _ = Comms.send_string client "hello hardcaml" in
-  let () = Comms.recv_string_is client "hello vpi" in
-  register_callback ~reason:cbAfterDelay ~time:(addr time_0) (run_cosim (client,state));
+  (* get back list of ports from server *)
+  let ports = (Marshal.from_bytes (Comms.recv client) 0 : init_message) in
+  (* find the ports in simulation object *)
+  let state = init_state ports in
+  (* start simulation at time 0 *)
+  register_callback ~reason ~time:(addr time_0) (run_cosim (client,state));
   0l
 
-(* function called at vpi startup.  
-* here we get to register functions *)
+(* function called at vpi startup. *)
 let init_vpi () = 
-  register_task "$hardcaml_cosim" (once_only @@ at_time_0 @@ hardcaml_cosim) 
+  register_callback ~reason ~time:(addr time_0) hardcaml_cosim
 
 let () = Callback.register "init_vpi" init_vpi
 

@@ -1,5 +1,6 @@
 (* Icarus Verilog Cosimulation interface *)
 
+(* run sets, then gets then schedule next callback at time+delta_time *)
 type delta_message = 
   {
     sets : (string * string) list;
@@ -7,6 +8,10 @@ type delta_message =
     delta_time : int64;
   }
 
+(* expected inputs and outputs *)
+type init_message = string list 
+
+(* control message *)
 type control_message = 
   | Finish
   | Run of delta_message
@@ -31,5 +36,14 @@ end
 
 val control : Unix.file_descr -> control_message -> response_message
 val cycle : Unix.file_descr -> delta_message -> response_message
-val start : string -> Unix.file_descr
+val write_testbench : ?dump_file:string -> (string -> unit) -> Circuit.t -> unit
+val compile : string -> string -> unit
+val derive_clocks_and_resets : Circuit.t -> string list * string list
+val compile_and_load_sim : ?dump_file:string -> Circuit.t -> unit
+
+module Make(B : Comb.S) : sig
+  val make : ?dump_file:string -> Circuit.t -> B.t Cyclesim.Api.cyclesim
+end
+
+
 
