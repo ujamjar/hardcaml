@@ -1,30 +1,42 @@
-#require "hardcaml"
-
 open HardCaml
 open Signal.Comb
 open Signal.Seq
 
-let f a b = 
-  let c = a +: b in
-  let d = reg r_full enable c in
-  c, d
+module I = interface 
+  clock[1] reset[1] clear[1] enable a[2] b[2]
+end
 
-let c, d = f (input "a" 2) (input "b" 2)
-let c, d = output "c" c, output "d" d
+module O = interface
+  c[2] d[2]
+end
 
-let circ = Circuit.make "testadd" [ c; d ]
+let reg i enable d = 
+  reg Signal.Types.{ r_full with
+    reg_clock = i.I.clock;
+    reg_reset = i.I.reset;
+    reg_clear = i.I.clear;
+  } enable d
+
+let f i = 
+  let c = i.I.a +: i.I.b in
+  let d = reg i enable c in
+  O.{ c; d }
 
 module B = Bits.Comb.IntbitsList
-module Co = Cosim.Make(B)
+module G = Interface.Gen(B)(I)(O)
+module Gc = Interface.Gen_cosim(B)(I)(O)
 module S = Cyclesim.Api
 
-let sim = Co.make ~dump_file:"testadd.vcd" circ
+open I
+open O
 
-let clear = S.in_port sim "clear"
-let enable = S.in_port sim "enable"
-let a = S.in_port sim "a"
-let b = S.in_port sim "b"
-let c = S.out_port sim "c"
-let d = S.out_port sim "d"
+module Vcd = Vcd_ext.Make(B)
+
+let _,sim0,i,o = G.make "cosimtest" f
+let sim0 = Vcd.gtkwave ~args:"-S test/gwShowall.tcl" sim0
+let _,sim1,_,_ = Gc.make "cosimtest" f
+
+module Cs = Cyclesim.Make(B)
+let sim = Cs.combine sim0 sim1
 
 

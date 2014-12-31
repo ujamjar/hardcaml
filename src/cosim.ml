@@ -72,56 +72,22 @@ let control server message =
   | Run ({ gets; }) when gets=[] -> []
   | _ -> (Marshal.from_bytes (Comms.recv server) 0 : response_message)
 
-(* Perform a clock cycle.  What we expect at time 't'
- * 1) clock goes high.  All dependant process execute (@ 't+0') 
- * 2) Inputs are set.  Combinatorial logic updates. (@ 't+0')
- * 3) clock goes low.  Outputs are read. (@ 't+5')
- *
- * It seems the event queue is re-evaluated even if time does not increase, 
- * which is what we need to happen to model a standard update cycle.
- *
- * If this scheme doesn't work out, it's quite possible to update the
- * clock at a slight time offset (ie model setup/hold times)
- *
- * Notes;
- *
- * I wanted to do the same as cocotb and not require a test harness.
- * It seems this only works when driving verilog 'regs' as inputs,
- * which also seems to be true of cocotb which is strange.  At least we
- * can do without the system task and do that bit automatically.
- *)
-let cycle server message =
-  let _ = control server
-    (Run { sets = [ "clock", "1" ]; gets = []; delta_time = 0L; })
-  in
-  let _ = control server 
-   (Run { sets = message.sets; gets = []; delta_time = 5L; })
-  in
-  let res = control server
-    (Run { sets = [ "clock", "0" ]; gets = message.gets; delta_time = 5L; })
-  in
-  res
-
 let testbench_name name = name ^ "_hardcaml_testbench"
 let instance_name name = "the_hardcaml_" ^ name
 
-let write_testbench ?dump_file os circuit = 
-  let cname = Circuit.name circuit in
-  let inputs = Circuit.inputs circuit in
-  let outputs = Circuit.outputs circuit in
-  let name s = List.hd (Signal.Types.names s) in
+let write_testbench ?dump_file ~name ~inputs ~outputs os = 
   
   let declare net s = 
-    let width = Signal.Types.width s in
+    let width = snd s in
     os ("  " ^ net ^ " ");
     if width > 1 then begin
       os "["; os (string_of_int (width - 1)); os ":0] "
     end;
-    os (name s);
+    os (fst s);
     os ";\n"
   in
 
-  os ("module " ^ cname ^ "_hardcaml_testbench;\n");
+  os ("module " ^ name ^ "_hardcaml_testbench;\n");
   List.iter (declare "reg") inputs;
   List.iter (declare "wire") outputs;
   begin
@@ -129,21 +95,29 @@ let write_testbench ?dump_file os circuit =
     | Some(dump_file) -> begin
       os "  initial begin\n";
       os ("    $dumpfile(\"" ^ dump_file ^ "\");\n");
-      os ("    $dumpvars(0, " ^ instance_name cname ^ ");\n");
+      os ("    $dumpvars(0, " ^ instance_name name ^ ");\n");
       os "  end\n";
     end
     | None -> ()
   end;
-  os ("  " ^ cname ^ " " ^ instance_name cname ^ " (");
-  let ports = List.map (fun s -> "." ^ name s ^ "(" ^ name s ^ ")") (inputs @ outputs) in
+  os ("  " ^ name ^ " " ^ instance_name name ^ " (");
+  let ports = List.map (fun s -> "." ^ fst s ^ "(" ^ fst s ^ ")") (inputs @ outputs) in
   os (String.concat ", "  ports);
   os ");\n";
   os "endmodule"
 
+let write_testbench_from_circuit ?dump_file os circuit = 
+  let open Signal.Types in
+  let cname = Circuit.name circuit in
+  let name s = List.hd (Signal.Types.names s) in
+  let inputs = List.map (fun s -> name s, width s) (Circuit.inputs circuit) in
+  let outputs = List.map (fun s -> name s, width s) (Circuit.outputs circuit) in
+  write_testbench ?dump_file ~name:cname ~inputs ~outputs os
+
 let compile verilog vvp = 
-  match Unix.system ("iverilog -o " ^ vvp ^ " " ^ verilog) with
+  match Unix.system ("iverilog -o " ^ vvp ^ " " ^ (String.concat " " verilog)) with
   | Unix.WEXITED(0) -> ()
-  | _ -> failwith ("Failed to compile " ^ verilog ^ " to " ^ vvp)
+  | _ -> failwith ("Failed to compile verilog to vvp")
 
 let derive_clocks_and_resets circuit =
   let open Signal.Types in
@@ -178,10 +152,10 @@ let compile_and_load_sim ?dump_file circuit =
   (* write RTL and testbench *)
   let verilog_file = open_out verilog_file_name in
   let () = Rtl.Verilog.write (output_string verilog_file) circuit in
-  let () = write_testbench ?dump_file (output_string verilog_file) circuit in
+  let () = write_testbench_from_circuit ?dump_file (output_string verilog_file) circuit in
   let () = close_out verilog_file in
   (* compile *)
-  let () = compile verilog_file_name vvp_file_name in
+  let () = compile [verilog_file_name] vvp_file_name in
   (* load simulation *)
   load_sim vvp_file_name
 
@@ -200,59 +174,40 @@ module Make(B : Comb.S) = struct
     if is_legal s 0 then s
     else String.map (fun c -> if is_legal_char c then c else '0') s
 
-  (* create simulator *)
-  let make ?dump_file circuit = 
-    let open Signal.Types in
-    let inputs = Circuit.inputs circuit in
-    let outputs = Circuit.outputs circuit in
-    let port_name s = 
-      match names s with
-      | [n] -> n
-      | _ -> failwith "not a port_name"
-    in
-
+  let init_sim start_sim inputs outputs = 
     (* create server *)
     let server = Comms.create_server net_addr net_port in
     let _ = at_exit (fun _ -> Unix.close server) in
-    
-    (* load simulation *)
-    let () = compile_and_load_sim ?dump_file circuit in
-    
+
+    (* start simulator *)
+    let () = start_sim () in
+
     (* wait for connection *)
     let server = Comms.accept_client server in
     
     (* say hello *)
     let () = Comms.recv_string_is server "hello hardcaml" in
-    let ports = List.map port_name (inputs @ outputs) in
-    let _ = Comms.send server (Marshal.to_bytes ports []) in
+    let _ = Comms.send server (Marshal.to_bytes (List.map fst (inputs@outputs)) []) in
  
     (* set all input ports to zero *)
     let _ = control server 
-      (Run { sets = List.map (fun s -> port_name s, B.to_bstr (B.zero (width s))) inputs;
+      (Run { sets = List.map (fun (n,w) -> n, B.to_bstr (B.zero w)) inputs;
              gets = []; delta_time = 0L })
     in
 
-    (* create simulation object *)
-    let clocks, resets = derive_clocks_and_resets circuit in
-    let gen_port s = port_name s, ref (B.zero (width s)) in
-  
-    let inputs = 
-      let cr = clocks @ resets in
-      (* inputs without clocks and resets *)
-      let inputs = List.filter (fun s -> not (List.mem (port_name s) cr)) inputs in
-      (* associate with ref *)
-      List.map (fun s -> s, gen_port s) inputs
-    in
-    let outputs = List.map (fun s -> s, gen_port s) outputs in
+    server
 
-    Printf.printf "clocks: %s\n" (String.concat ", " clocks);
-    Printf.printf "resets: %s\n" (String.concat ", " resets);
+  let make_sim_obj server clocks resets inputs outputs = 
 
+    let inputs = List.map (fun (n,b) -> n, ref (B.zero b)) inputs in
+    let outputs = List.map (fun (n,b) -> n, ref (B.zero b)) outputs in
+
+    (* clock cycle update *)
     let clocks_1 = List.map (fun n -> n,"1") clocks in
     let clocks_0 = List.map (fun n -> n,"0") clocks in
-    let get_outputs = List.map (fun (s,(n,v)) -> n) outputs in
+    let get_outputs = List.map (fun (n,v) -> n) outputs in
     let fcycle () = 
-      let set_inputs = List.map (fun (s,(n,v)) -> n, B.to_bstr !v) inputs in
+      let set_inputs = List.map (fun (n,v) -> n, B.to_bstr !v) inputs in
       let _ = control server
         (Run { sets = clocks_1; gets = []; delta_time = 0L; })
       in
@@ -263,10 +218,11 @@ module Make(B : Comb.S) = struct
         (Run { sets = clocks_0; gets = get_outputs; delta_time = 5L; })
       in
       List.iter2 
-        (fun (_,(n,v)) (n',v') -> assert (n = n'); v := B.const (legalise_value v'))
+        (fun (n,v) (n',v') -> assert (n = n'); v := B.const (legalise_value v'))
         outputs res
     in
 
+    (* reset update *)
     let resets_1 = List.map (fun n -> n,"1") resets in
     let resets_0 = List.map (fun n -> n,"0") resets in
     let freset () = 
@@ -279,14 +235,51 @@ module Make(B : Comb.S) = struct
       ()
     in
 
+    (* simulation object *)
     Cyclesim.Api.({
-      sim_in_ports = List.map snd inputs;
-      sim_out_ports = List.map snd outputs;
+      sim_in_ports = inputs;
+      sim_out_ports = outputs;
       sim_internal_ports = [];
       sim_reset = freset;
       sim_cycle = fcycle;
       sim_cycle_comb = (fun () -> ());
     })
+
+  (* create simulator from hardcaml circuit *)
+  let make ?dump_file circuit = 
+    let open Signal.Types in
+
+    (* query circuit for ports *)
+    let port_name s = 
+      match names s with
+      | [n] -> n
+      | _ -> failwith "not a port_name"
+    in
+    let get_port s = port_name s, width s in
+    let inputs = List.map get_port (Circuit.inputs circuit) in
+    let outputs = List.map get_port (Circuit.outputs circuit) in
+ 
+    (* initialize server and simulation *)
+    let server = init_sim (fun () -> compile_and_load_sim ?dump_file circuit) inputs outputs in
+
+    (* create simulation object *)
+    let clocks, resets = derive_clocks_and_resets circuit in
+ 
+    (* remove clocks and resets from input ports *)
+    let inputs = 
+      let cr = clocks @ resets in
+      (* inputs without clocks and resets *)
+      List.filter (fun (n,_) -> not (List.mem n cr)) inputs 
+    in
+
+    make_sim_obj server clocks resets inputs outputs
+
+  let load ~clocks ~resets ~inputs ~outputs vvp_file =
+    (* initialize server and simulation *)
+    let server = init_sim (fun () -> load_sim vvp_file) inputs outputs in
+
+    (* create simulation object *)
+    make_sim_obj server clocks resets inputs outputs
 
 end
 
