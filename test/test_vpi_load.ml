@@ -1,4 +1,3 @@
-#require "hardcaml"
 open HardCaml
 
 let clocks = ["clock",1]
@@ -6,10 +5,10 @@ let resets = ["reset",1]
 let inputs = ["a",2; "b",3]
 let outputs = ["c",4; "d",5]
 
-let verilog_file_name = "test/test.v"
-let testbench_file_name = "test/testbench.v"
-let vvp_file_name = "test/test.vvp"
-let vcd_file_name = "test/vpi_load.vcd"
+let verilog_file_name = "test.v"
+let testbench_file_name = "testbench.v"
+let vvp_file_name = "test.vvp"
+let vcd_file_name = "vpi_load.vcd"
 let module_name = "test"
 
 (* write testbench *)
@@ -25,9 +24,7 @@ module B = Bits.Comb.IntbitsList
 module Co = Cosim.Make(B)
 module S = Cyclesim.Api
 
-let sim = Co.load 
-  ~clocks:(List.map fst clocks) ~resets:(List.map fst resets)
-  ~inputs ~outputs vvp_file_name
+let sim = Co.load ~clocks ~resets ~inputs ~outputs vvp_file_name
 (*
 let () = 
   S.reset sim;

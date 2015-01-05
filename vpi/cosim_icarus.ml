@@ -118,7 +118,7 @@ let vpi_get_ctrl data =
 let set_values state message = 
   List.iter 
     (fun (name,bin_value) ->
-      let handle = SMap.find name state in
+      let handle = try SMap.find name state with Not_found -> failwith ("set_values: " ^ name) in
       let value = make Value.t in
       let () = setf value Value.format vpiBinStrVal in
       let data = make Value.v in
@@ -132,7 +132,7 @@ let set_values state message =
 let get_values state message = 
   List.map 
     (fun name ->
-      let handle = SMap.find name state in
+      let handle = try SMap.find name state with Not_found -> failwith ("get_values: " ^ name) in
       let value = make Value.t in
       let () = setf value Value.format vpiBinStrVal in
       let () = vpi_get_value handle (addr value) in

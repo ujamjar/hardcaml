@@ -8,6 +8,8 @@
  *
  *)
 
+(** Circuit interfaces as module - used with camlp4 extension *)
+
 module type S = sig
   type 'a t 
   val t : (string * int) t

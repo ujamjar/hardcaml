@@ -8,6 +8,8 @@
  *
  *)
 
+(** Simplified HardCaml API that includes tri-states - used for toplevel module generation *)
+
 type name = string
 type id = int
 type width = int

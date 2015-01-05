@@ -37,6 +37,6 @@ let sim0 = Vcd.gtkwave ~args:"-S test/gwShowall.tcl" sim0
 let _,sim1,_,_ = Gc.make "cosimtest" f
 
 module Cs = Cyclesim.Make(B)
-let sim = Cs.combine sim0 sim1
+let sim = Cs.combine_relaxed sim0 sim1
 
 

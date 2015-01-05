@@ -197,14 +197,14 @@ module Make(B : Comb.S) = struct
 
     server
 
-  let make_sim_obj server clocks resets inputs outputs = 
+  let make_sim_obj ~server ~clocks ~resets ~inputs ~outputs = 
 
     let inputs = List.map (fun (n,b) -> n, ref (B.zero b)) inputs in
     let outputs = List.map (fun (n,b) -> n, ref (B.zero b)) outputs in
 
     (* clock cycle update *)
-    let clocks_1 = List.map (fun n -> n,"1") clocks in
-    let clocks_0 = List.map (fun n -> n,"0") clocks in
+    let clocks_1 = List.map (fun (n,_) -> n,"1") clocks in
+    let clocks_0 = List.map (fun (n,_) -> n,"0") clocks in
     let get_outputs = List.map (fun (n,v) -> n) outputs in
     let fcycle () = 
       let set_inputs = List.map (fun (n,v) -> n, B.to_bstr !v) inputs in
@@ -223,8 +223,8 @@ module Make(B : Comb.S) = struct
     in
 
     (* reset update *)
-    let resets_1 = List.map (fun n -> n,"1") resets in
-    let resets_0 = List.map (fun n -> n,"0") resets in
+    let resets_1 = List.map (fun (n,_) -> n,"1") resets in
+    let resets_0 = List.map (fun (n,_) -> n,"0") resets in
     let freset () = 
       let _ = control server
         (Run { sets = resets_1; gets = []; delta_time = 10L; })
@@ -272,14 +272,15 @@ module Make(B : Comb.S) = struct
       List.filter (fun (n,_) -> not (List.mem n cr)) inputs 
     in
 
-    make_sim_obj server clocks resets inputs outputs
+    let clocks, resets = List.map (fun n -> n,1) clocks, List.map (fun n -> n,1) resets in
+    make_sim_obj ~server ~clocks ~resets ~inputs ~outputs
 
   let load ~clocks ~resets ~inputs ~outputs vvp_file =
     (* initialize server and simulation *)
-    let server = init_sim (fun () -> load_sim vvp_file) inputs outputs in
+    let server = init_sim (fun () -> load_sim vvp_file) (clocks@resets@inputs) outputs in
 
     (* create simulation object *)
-    make_sim_obj server clocks resets inputs outputs
+    make_sim_obj ~server ~clocks ~resets ~inputs ~outputs
 
 end
 

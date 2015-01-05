@@ -10,7 +10,7 @@
 
 (** VCD file generation *)
 
-(** Make vcd generator  from a simulator *)
+(** Make vcd generator from a simulator *)
 module Make : functor (S : Comb.S) -> 
 (sig
 

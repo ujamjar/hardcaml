@@ -8,7 +8,9 @@
  *
  *)
 
-(** Make vcd generator  from a simulator *)
+(** VCD generation for gtkwave*)
+
+(** Drive the gtkwave waveform viewer *)
 module Make : functor (S : Comb.S) -> 
 (sig
 

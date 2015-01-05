@@ -8,7 +8,7 @@
  *
  *)
 
-(* VCD (Verilog Change Dump) generation *)
+(** VCD (Verilog Change Dump) generation *)
 module Make(S : Comb.S) = 
 struct
 

@@ -48,6 +48,9 @@ iocamljs:
 		SYNTAX="js_of_ocaml.syntax lwt.syntax.options lwt.syntax hardcaml.syntax" \
 		PACKAGES="hardcaml hardcaml.js" MODULES="HardCaml HardCamlJS"
 
+doc:
+	ocamlbuild -use-ocamlfind $(BUILD_OPTS) HardCaml.docdir/index.html
+
 ####################################################
 
 install: all

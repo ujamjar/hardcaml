@@ -391,7 +391,7 @@ struct
 
     exception Sim_comparison_failure of int * string * string * string
 
-    let combine s0 s1 = 
+    let combine_strict s0 s1 = 
         let ip0,ip1 = List.sort compare s0.sim_in_ports,
                       List.sort compare s1.sim_in_ports in
         let op0,op1 = List.sort compare s0.sim_out_ports,
@@ -426,6 +426,72 @@ struct
             sim_cycle = cycle;
             sim_reset = reset;
         }
+
+    let combine_relaxed s0 s1 = 
+      let ip0 = s0.sim_in_ports in
+      let ip1 = s1.sim_in_ports in
+      let op0 = s0.sim_out_ports in
+      let op1 = s1.sim_out_ports in
+
+      let module S = Set.Make(String) in
+      let si = S.elements (List.fold_left (fun s (n,_) -> S.add n s) S.empty (ip0 @ ip1)) in
+      let so = S.elements (List.fold_left (fun s (n,_) -> S.add n s) S.empty (op0 @ op1)) in
+      
+      let try_find n s = try Some(List.assoc n s) with _ -> None in
+
+      let inputs, copy_inputs =
+        let l = List.map 
+          (fun n ->
+            match try_find n ip0, try_find n ip1 with
+            | Some(x), Some(y) -> (n,x), (fun () -> y := !x)
+            | Some(x), None -> (n,x), (fun () -> ())
+            | None, Some(y) -> (n,y), (fun () -> ())
+            | _ -> failwith ("input port not found: " ^ n)
+          ) si
+        in
+        List.map fst l, List.map snd l
+      in
+
+      let cycle_no = ref 0 in
+      let check n x y = 
+        if !x <> !y then
+          raise (Sim_comparison_failure(!cycle_no, n, 
+                        Bits.to_string !x, 
+                        Bits.to_string !y))
+      in
+      let outputs, check_outputs = 
+        let l = List.map 
+          (fun n ->
+            match try_find n op0, try_find n op1 with
+            | Some(x), Some(y) -> (n,x), (fun () -> check n x y)
+            | Some(x), None -> (n,x), (fun () -> ())
+            | None, Some(y) -> (n,y), (fun () -> ())
+            | _ -> failwith ("output port not found: " ^ n)
+          ) so
+        in
+        List.map fst l, List.map snd l
+      in
+
+      let cycle () = 
+        List.iter (fun f -> f()) copy_inputs;
+        s0.sim_cycle();
+        s1.sim_cycle();
+        List.iter (fun f -> f()) check_outputs;
+        incr cycle_no
+      in
+      let cycle_comb() = 
+        s0.sim_cycle_comb();
+        s1.sim_cycle_comb()
+      in
+      let reset () = s0.sim_reset(); s1.sim_reset() in
+      {
+        sim_in_ports = inputs;
+        sim_out_ports = outputs;
+        sim_internal_ports = [];
+        sim_cycle_comb = cycle_comb;
+        sim_cycle = cycle;
+        sim_reset = reset;
+      }
 
     let obj sim = 
         object

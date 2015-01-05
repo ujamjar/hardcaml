@@ -64,9 +64,10 @@ module Make(B : Comb.S) : sig
   
   val init_sim : (unit -> unit) -> (string * int) list -> (string * int) list -> Unix.file_descr
 
-  val make_sim_obj : Unix.file_descr -> 
-    string list -> string list ->
-    (string * int) list -> (string * int) list ->
+  val make_sim_obj : 
+    server:Unix.file_descr -> 
+    clocks:(string * int) list -> resets:(string * int) list -> 
+    inputs:(string * int) list -> outputs:(string * int) list ->
     B.t Cyclesim.Api.cyclesim
 
   (** create simulator from hardcaml circuit *)
@@ -74,7 +75,7 @@ module Make(B : Comb.S) : sig
 
   (** load icarus vvp simulation *) 
   val load : 
-    clocks:string list -> resets:string list -> 
+    clocks:(string * int) list -> resets:(string * int) list -> 
     inputs:(string * int) list -> outputs:(string * int) list ->
     string -> B.t Cyclesim.Api.cyclesim
 

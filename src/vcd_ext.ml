@@ -8,7 +8,7 @@
  *
  *)
 
-(* VCD (Verilog Change Dump) generation *)
+(* Drive gtkwave *)
 module Make(S : Comb.S) = 
 struct
 

@@ -8,6 +8,8 @@
  *
  *)
 
+(** Fixed point arithmetic *)
+
 module Make(B : Comb.S) : sig
 
     type unsigned

@@ -81,8 +81,16 @@ sig
 
     exception Sim_comparison_failure of int * string * string * string
 
-    (** combine 2 simulators.  raise Sim_comparison_failure on error *)
-    val combine : cyclesim -> cyclesim -> cyclesim
+    (** combine 2 simulators.  The inputs are set on the 1st simulator and
+        copied to the 2nd.  Outputs are checked and any differences cause
+        a Sim_comparison_failure exception. *)
+    val combine_strict : cyclesim -> cyclesim -> cyclesim
+
+    (** combine 2 simulators.  Similar to combine_strict except the 
+        simulators may have different sets of input and output ports.
+        Copying and checking only occurs on signals which exist in 
+        both simulators. *)
+    val combine_relaxed : cyclesim -> cyclesim -> cyclesim
 
     val obj : cyclesim ->
         < cycle : unit;

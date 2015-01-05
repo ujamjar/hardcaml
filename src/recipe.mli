@@ -1,3 +1,7 @@
+(** Hardware generation in an imperative style *)
+
+(** create sequential hardware designs using [if], [while] and [assignment] *)
+
 open Signal.Comb
 
 type var

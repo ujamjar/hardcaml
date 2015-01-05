@@ -8,6 +8,8 @@
  *
  *)
 
+(** Library functions for structural API *)
+
 open Structural 
 
 val reg : clock:signal -> en:signal -> signal -> signal

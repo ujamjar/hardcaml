@@ -8,7 +8,7 @@
  *
  *)
 
-(** Utility functions used by the camlp5 syntax extention. *)
+(** Utility functions used by the (old) camlp5 syntax extention. (DEPRECIATED) *)
 
 type 'a ports =
     {
