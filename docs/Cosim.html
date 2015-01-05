@@ -1,0 +1,144 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<link rel="stylesheet" href="style.css" type="text/css">
+<meta content="text/html; charset=iso-8859-1" http-equiv="Content-Type">
+<link rel="Start" href="index.html">
+<link rel="previous" href="Structural_lib.html">
+<link rel="Up" href="index.html">
+<link title="Index of types" rel=Appendix href="index_types.html">
+<link title="Index of exceptions" rel=Appendix href="index_exceptions.html">
+<link title="Index of values" rel=Appendix href="index_values.html">
+<link title="Index of class methods" rel=Appendix href="index_methods.html">
+<link title="Index of classes" rel=Appendix href="index_classes.html">
+<link title="Index of modules" rel=Appendix href="index_modules.html">
+<link title="Index of module types" rel=Appendix href="index_module_types.html">
+<link title="Utils" rel="Chapter" href="Utils.html">
+<link title="Comb" rel="Chapter" href="Comb.html">
+<link title="Bits" rel="Chapter" href="Bits.html">
+<link title="Signal" rel="Chapter" href="Signal.html">
+<link title="Syntax" rel="Chapter" href="Syntax.html">
+<link title="Circuit" rel="Chapter" href="Circuit.html">
+<link title="Rtl" rel="Chapter" href="Rtl.html">
+<link title="Fixed" rel="Chapter" href="Fixed.html">
+<link title="Const_prop" rel="Chapter" href="Const_prop.html">
+<link title="Transform" rel="Chapter" href="Transform.html">
+<link title="Cyclesim" rel="Chapter" href="Cyclesim.html">
+<link title="Vcd" rel="Chapter" href="Vcd.html">
+<link title="Vcd_ext" rel="Chapter" href="Vcd_ext.html">
+<link title="Interface" rel="Chapter" href="Interface.html">
+<link title="Recipe" rel="Chapter" href="Recipe.html">
+<link title="Xilinx" rel="Chapter" href="Xilinx.html">
+<link title="C" rel="Chapter" href="C.html">
+<link title="Structural" rel="Chapter" href="Structural.html">
+<link title="Structural_lib" rel="Chapter" href="Structural_lib.html">
+<link title="Cosim" rel="Chapter" href="Cosim.html"><title>Cosim</title>
+</head>
+<body>
+<div class="navbar"><a class="pre" href="Structural_lib.html" title="Structural_lib">Previous</a>
+&nbsp;<a class="up" href="index.html" title="Index">Up</a>
+&nbsp;</div>
+<h1>Module <a href="type_Cosim.html">Cosim</a></h1>
+
+<pre><span class="keyword">module</span> Cosim: <code class="code">sig</code> <a href="Cosim.html">..</a> <code class="code">end</code></pre><div class="info module top">
+Icarus Verilog Cosimulation interface<br>
+</div>
+<hr width="100%">
+
+<pre><code><span id="TYPEdelta_message"><span class="keyword">type</span> <code class="type"></code>delta_message</span> = {</code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTdelta_message.sets">sets</span>&nbsp;: <code class="type">(string * string) list</code>;</code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTdelta_message.gets">gets</span>&nbsp;: <code class="type">string list</code>;</code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTdelta_message.delta_time">delta_time</span>&nbsp;: <code class="type">int64</code>;</code></td>
+
+</tr></table>
+}
+
+<div class="info ">
+run <code class="code">sets</code>, then <code class="code">gets</code> then schedule next callback at cur_time+<code class="code">delta_time</code><br>
+</div>
+
+
+<pre><span id="TYPEinit_message"><span class="keyword">type</span> <code class="type"></code>init_message</span> = <code class="type">string list</code> </pre>
+<div class="info ">
+expected inputs and outputs<br>
+</div>
+
+
+<pre><code><span id="TYPEcontrol_message"><span class="keyword">type</span> <code class="type"></code>control_message</span> = </code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTcontrol_message.Finish"><span class="constructor">Finish</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTcontrol_message.Run"><span class="constructor">Run</span></span> <span class="keyword">of</span> <code class="type"><a href="Cosim.html#TYPEdelta_message">delta_message</a></code></code></td>
+
+</tr></table>
+
+<div class="info ">
+control message<br>
+</div>
+
+
+<pre><span id="TYPEresponse_message"><span class="keyword">type</span> <code class="type"></code>response_message</span> = <code class="type">(string * string) list</code> </pre>
+<div class="info ">
+response message<br>
+</div>
+
+
+<pre><span id="VALnet_addr"><span class="keyword">val</span> net_addr</span> : <code class="type">string</code></pre>
+<pre><span id="VALnet_port"><span class="keyword">val</span> net_port</span> : <code class="type">int</code></pre>
+<pre><span class="keyword">module</span> <a href="Cosim.Comms.html">Comms</a>: <code class="code">sig</code> <a href="Cosim.Comms.html">..</a> <code class="code">end</code></pre><div class="info">
+basic TCP communications between client (simulation) and server (hardcaml)
+</div>
+
+<pre><span id="VALcontrol"><span class="keyword">val</span> control</span> : <code class="type">Unix.file_descr -> <a href="Cosim.html#TYPEcontrol_message">control_message</a> -> <a href="Cosim.html#TYPEresponse_message">response_message</a></code></pre><div class="info ">
+send a control message to the simulation<br>
+</div>
+
+<pre><span id="VALwrite_testbench"><span class="keyword">val</span> write_testbench</span> : <code class="type">?dump_file:string -><br>       name:string -><br>       inputs:(string * int) list -><br>       outputs:(string * int) list -> (string -> unit) -> unit</code></pre><div class="info ">
+write test harness<br>
+</div>
+
+<pre><span id="VALwrite_testbench_from_circuit"><span class="keyword">val</span> write_testbench_from_circuit</span> : <code class="type">?dump_file:string -> (string -> unit) -> <a href="Circuit.html#TYPEt">Circuit.t</a> -> unit</code></pre><div class="info ">
+write test hardness derivied from a hardcaml circuit<br>
+</div>
+
+<pre><span id="VALcompile"><span class="keyword">val</span> compile</span> : <code class="type">string list -> string -> unit</code></pre><div class="info ">
+compile verilog files to a vvp simulation object<br>
+</div>
+
+<pre><span id="VALderive_clocks_and_resets"><span class="keyword">val</span> derive_clocks_and_resets</span> : <code class="type"><a href="Circuit.html#TYPEt">Circuit.t</a> -> string list * string list</code></pre><div class="info ">
+find clocks and resets in a hardcaml circuit<br>
+</div>
+
+<pre><span id="VALload_sim"><span class="keyword">val</span> load_sim</span> : <code class="type">string -> unit</code></pre><div class="info ">
+load vvp file into simulator along with vpi object<br>
+</div>
+
+<pre><span id="VALcompile_and_load_sim"><span class="keyword">val</span> compile_and_load_sim</span> : <code class="type">?dump_file:string -> <a href="Circuit.html#TYPEt">Circuit.t</a> -> unit</code></pre><div class="info ">
+compile circuit and load simulation<br>
+</div>
+
+<pre><span class="keyword">module</span> <a href="Cosim.Make.html">Make</a>: <div class="sig_block"><code class="code">functor (</code><code class="code">B</code><code class="code"> : </code><code class="type"><a href="Comb.S.html">Comb.S</a></code><code class="code">) -&gt; </code><code class="code">sig</code> <a href="Cosim.Make.html">..</a> <code class="code">end</code></div></pre></body></html>

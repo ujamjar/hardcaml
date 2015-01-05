@@ -1,0 +1,88 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<link rel="stylesheet" href="style.css" type="text/css">
+<meta content="text/html; charset=iso-8859-1" http-equiv="Content-Type">
+<link rel="Start" href="index.html">
+<link rel="previous" href="Cyclesim.Api.html">
+<link rel="Up" href="Cyclesim.html">
+<link title="Index of types" rel=Appendix href="index_types.html">
+<link title="Index of exceptions" rel=Appendix href="index_exceptions.html">
+<link title="Index of values" rel=Appendix href="index_values.html">
+<link title="Index of class methods" rel=Appendix href="index_methods.html">
+<link title="Index of classes" rel=Appendix href="index_classes.html">
+<link title="Index of modules" rel=Appendix href="index_modules.html">
+<link title="Index of module types" rel=Appendix href="index_module_types.html">
+<link title="Utils" rel="Chapter" href="Utils.html">
+<link title="Comb" rel="Chapter" href="Comb.html">
+<link title="Bits" rel="Chapter" href="Bits.html">
+<link title="Signal" rel="Chapter" href="Signal.html">
+<link title="Syntax" rel="Chapter" href="Syntax.html">
+<link title="Circuit" rel="Chapter" href="Circuit.html">
+<link title="Rtl" rel="Chapter" href="Rtl.html">
+<link title="Fixed" rel="Chapter" href="Fixed.html">
+<link title="Const_prop" rel="Chapter" href="Const_prop.html">
+<link title="Transform" rel="Chapter" href="Transform.html">
+<link title="Cyclesim" rel="Chapter" href="Cyclesim.html">
+<link title="Vcd" rel="Chapter" href="Vcd.html">
+<link title="Vcd_ext" rel="Chapter" href="Vcd_ext.html">
+<link title="Interface" rel="Chapter" href="Interface.html">
+<link title="Recipe" rel="Chapter" href="Recipe.html">
+<link title="Xilinx" rel="Chapter" href="Xilinx.html">
+<link title="C" rel="Chapter" href="C.html">
+<link title="Structural" rel="Chapter" href="Structural.html">
+<link title="Structural_lib" rel="Chapter" href="Structural_lib.html">
+<link title="Cosim" rel="Chapter" href="Cosim.html"><title>Cyclesim.Make</title>
+</head>
+<body>
+<div class="navbar"><a class="pre" href="Cyclesim.Api.html" title="Cyclesim.Api">Previous</a>
+&nbsp;<a class="up" href="Cyclesim.html" title="Cyclesim">Up</a>
+&nbsp;</div>
+<h1>Functor <a href="type_Cyclesim.Make.html">Cyclesim.Make</a></h1>
+
+<pre><span class="keyword">module</span> Make: <div class="sig_block"><code class="code">functor (</code><code class="code">Bits</code><code class="code"> : </code><code class="type"><a href="Comb.S.html">Comb.S</a></code><code class="code">) -&gt; </code><code class="code">sig</code> <a href="Cyclesim.Make.html">..</a> <code class="code">end</code><code class="type">  with type t = <a href="Bits.html">Bits</a>.t</code></div></pre><div class="info module top">
+Generate a simulator using the given Bits API<br>
+</div>
+<table border="0" cellpadding="3" width="100%">
+<tr>
+<td align="left" valign="top" width="1%%"><b>Parameters: </b></td>
+<td>
+<table class="paramstable">
+<tr>
+<td align="center" valign="top" width="15%">
+<code>Bits</code></td>
+<td align="center" valign="top">:</td>
+<td><code class="type"><a href="Comb.S.html">Comb.S</a></code>
+</table>
+</td>
+</tr>
+</table>
+<hr width="100%">
+
+<pre><span id="TYPEt"><span class="keyword">type</span> <code class="type"></code>t</span> = <code class="type">Bits.t</code> </pre>
+
+
+<pre><span id="TYPEcyclesim"><span class="keyword">type</span> <code class="type"></code>cyclesim</span> = <code class="type"><a href="Cyclesim.Make.html#TYPEt">t</a> <a href="Cyclesim.Api.html#TYPEcyclesim">Cyclesim.Api.cyclesim</a></code> </pre>
+
+
+<pre><span id="TYPEget_internal"><span class="keyword">type</span> <code class="type"></code>get_internal</span> = <code class="type">(<a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a> -> bool) option</code> </pre>
+
+
+<pre><span id="TYPErun_inst"><span class="keyword">type</span> <code class="type"></code>run_inst</span> = <code class="type"><a href="Signal.Types.html#TYPEinstantiation">Signal.Types.instantiation</a> -> <a href="Cyclesim.Make.html#TYPEt">t</a> list -> <a href="Cyclesim.Make.html#TYPEt">t</a> list</code> </pre>
+
+
+<pre><span id="TYPEget_inst"><span class="keyword">type</span> <code class="type"></code>get_inst</span> = <code class="type">string -> <a href="Cyclesim.Make.html#TYPErun_inst">run_inst</a> option</code> </pre>
+
+
+<pre><span id="VALmake"><span class="keyword">val</span> make</span> : <code class="type">?log:(string -> unit) -><br>       ?internal:<a href="Cyclesim.Make.html#TYPEget_internal">get_internal</a> -><br>       ?inst:<a href="Cyclesim.Make.html#TYPEget_inst">get_inst</a> -> <a href="Circuit.html#TYPEt">Circuit.t</a> -> <a href="Cyclesim.Make.html#TYPEcyclesim">cyclesim</a></code></pre><div class="info ">
+construct a simulator from a circuit<br>
+</div>
+
+<pre><span id="EXCEPTIONSim_comparison_failure"><span class="keyword">exception</span> Sim_comparison_failure</span> <span class="keyword">of</span> <code class="type">int * string * string * string</code></pre>
+
+<pre><span id="VALcombine"><span class="keyword">val</span> combine</span> : <code class="type"><a href="Cyclesim.Make.html#TYPEcyclesim">cyclesim</a> -> <a href="Cyclesim.Make.html#TYPEcyclesim">cyclesim</a> -> <a href="Cyclesim.Make.html#TYPEcyclesim">cyclesim</a></code></pre><div class="info ">
+combine 2 simulators.  raise Sim_comparison_failure on error<br>
+</div>
+
+<pre><span id="VALobj"><span class="keyword">val</span> obj</span> : <code class="type"><a href="Cyclesim.Make.html#TYPEcyclesim">cyclesim</a> -><br>       < cycle : unit; port : string -> <a href="Cyclesim.Make.html#TYPEt">t</a> Pervasives.ref;<br>         reset : unit ></code></pre>
+<pre><span class="keyword">module</span> <a href="Cyclesim.Make.InstOps.html">InstOps</a>: <code class="code">sig</code> <a href="Cyclesim.Make.InstOps.html">..</a> <code class="code">end</code></pre></body></html>

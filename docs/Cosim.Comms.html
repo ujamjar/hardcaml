@@ -1,0 +1,55 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<link rel="stylesheet" href="style.css" type="text/css">
+<meta content="text/html; charset=iso-8859-1" http-equiv="Content-Type">
+<link rel="Start" href="index.html">
+<link rel="next" href="Cosim.Make.html">
+<link rel="Up" href="Cosim.html">
+<link title="Index of types" rel=Appendix href="index_types.html">
+<link title="Index of exceptions" rel=Appendix href="index_exceptions.html">
+<link title="Index of values" rel=Appendix href="index_values.html">
+<link title="Index of class methods" rel=Appendix href="index_methods.html">
+<link title="Index of classes" rel=Appendix href="index_classes.html">
+<link title="Index of modules" rel=Appendix href="index_modules.html">
+<link title="Index of module types" rel=Appendix href="index_module_types.html">
+<link title="Utils" rel="Chapter" href="Utils.html">
+<link title="Comb" rel="Chapter" href="Comb.html">
+<link title="Bits" rel="Chapter" href="Bits.html">
+<link title="Signal" rel="Chapter" href="Signal.html">
+<link title="Syntax" rel="Chapter" href="Syntax.html">
+<link title="Circuit" rel="Chapter" href="Circuit.html">
+<link title="Rtl" rel="Chapter" href="Rtl.html">
+<link title="Fixed" rel="Chapter" href="Fixed.html">
+<link title="Const_prop" rel="Chapter" href="Const_prop.html">
+<link title="Transform" rel="Chapter" href="Transform.html">
+<link title="Cyclesim" rel="Chapter" href="Cyclesim.html">
+<link title="Vcd" rel="Chapter" href="Vcd.html">
+<link title="Vcd_ext" rel="Chapter" href="Vcd_ext.html">
+<link title="Interface" rel="Chapter" href="Interface.html">
+<link title="Recipe" rel="Chapter" href="Recipe.html">
+<link title="Xilinx" rel="Chapter" href="Xilinx.html">
+<link title="C" rel="Chapter" href="C.html">
+<link title="Structural" rel="Chapter" href="Structural.html">
+<link title="Structural_lib" rel="Chapter" href="Structural_lib.html">
+<link title="Cosim" rel="Chapter" href="Cosim.html"><title>Cosim.Comms</title>
+</head>
+<body>
+<div class="navbar">&nbsp;<a class="up" href="Cosim.html" title="Cosim">Up</a>
+&nbsp;<a class="post" href="Cosim.Make.html" title="Cosim.Make">Next</a>
+</div>
+<h1>Module <a href="type_Cosim.Comms.html">Cosim.Comms</a></h1>
+
+<pre><span class="keyword">module</span> Comms: <code class="code">sig</code> <a href="Cosim.Comms.html">..</a> <code class="code">end</code></pre><div class="info module top">
+basic TCP communications between client (simulation) and server (hardcaml)<br>
+</div>
+<hr width="100%">
+
+<pre><span id="VALcreate_client"><span class="keyword">val</span> create_client</span> : <code class="type">string -> int -> Unix.file_descr</code></pre>
+<pre><span id="VALcreate_server"><span class="keyword">val</span> create_server</span> : <code class="type">string -> int -> Unix.file_descr</code></pre>
+<pre><span id="VALaccept_client"><span class="keyword">val</span> accept_client</span> : <code class="type">Unix.file_descr -> Unix.file_descr</code></pre>
+<pre><span id="VALsend"><span class="keyword">val</span> send</span> : <code class="type">Unix.file_descr -> Bytes.t -> int</code></pre>
+<pre><span id="VALrecv"><span class="keyword">val</span> recv</span> : <code class="type">Unix.file_descr -> Bytes.t</code></pre>
+<pre><span id="VALsend_string"><span class="keyword">val</span> send_string</span> : <code class="type">Unix.file_descr -> string -> int</code></pre>
+<pre><span id="VALrecv_string"><span class="keyword">val</span> recv_string</span> : <code class="type">Unix.file_descr -> string</code></pre>
+<pre><span id="VALrecv_string_is"><span class="keyword">val</span> recv_string_is</span> : <code class="type">Unix.file_descr -> string -> unit</code></pre></body></html>

@@ -1,0 +1,231 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<link rel="stylesheet" href="style.css" type="text/css">
+<meta content="text/html; charset=iso-8859-1" http-equiv="Content-Type">
+<link rel="Start" href="index.html">
+<link rel="next" href="Comb.html">
+<link rel="Up" href="index.html">
+<link title="Index of types" rel=Appendix href="index_types.html">
+<link title="Index of exceptions" rel=Appendix href="index_exceptions.html">
+<link title="Index of values" rel=Appendix href="index_values.html">
+<link title="Index of class methods" rel=Appendix href="index_methods.html">
+<link title="Index of classes" rel=Appendix href="index_classes.html">
+<link title="Index of modules" rel=Appendix href="index_modules.html">
+<link title="Index of module types" rel=Appendix href="index_module_types.html">
+<link title="Utils" rel="Chapter" href="Utils.html">
+<link title="Comb" rel="Chapter" href="Comb.html">
+<link title="Bits" rel="Chapter" href="Bits.html">
+<link title="Signal" rel="Chapter" href="Signal.html">
+<link title="Syntax" rel="Chapter" href="Syntax.html">
+<link title="Circuit" rel="Chapter" href="Circuit.html">
+<link title="Rtl" rel="Chapter" href="Rtl.html">
+<link title="Fixed" rel="Chapter" href="Fixed.html">
+<link title="Const_prop" rel="Chapter" href="Const_prop.html">
+<link title="Transform" rel="Chapter" href="Transform.html">
+<link title="Cyclesim" rel="Chapter" href="Cyclesim.html">
+<link title="Vcd" rel="Chapter" href="Vcd.html">
+<link title="Vcd_ext" rel="Chapter" href="Vcd_ext.html">
+<link title="Interface" rel="Chapter" href="Interface.html">
+<link title="Recipe" rel="Chapter" href="Recipe.html">
+<link title="Xilinx" rel="Chapter" href="Xilinx.html">
+<link title="C" rel="Chapter" href="C.html">
+<link title="Structural" rel="Chapter" href="Structural.html">
+<link title="Structural_lib" rel="Chapter" href="Structural_lib.html">
+<link title="Cosim" rel="Chapter" href="Cosim.html"><title>Utils</title>
+</head>
+<body>
+<div class="navbar">&nbsp;<a class="up" href="index.html" title="Index">Up</a>
+&nbsp;<a class="post" href="Comb.html" title="Comb">Next</a>
+</div>
+<h1>Module <a href="type_Utils.html">Utils</a></h1>
+
+<pre><span class="keyword">module</span> Utils: <code class="code">sig</code> <a href="Utils.html">..</a> <code class="code">end</code></pre><div class="info module top">
+Utility functions<br>
+</div>
+<hr width="100%">
+
+<pre><code><span id="TYPEsigned"><span class="keyword">type</span> <code class="type"></code>signed</span> = </code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTsigned.Signed"><span class="constructor">Signed</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTsigned.Unsigned"><span class="constructor">Unsigned</span></span></code></td>
+
+</tr></table>
+
+<div class="info ">
+sign designator<br>
+</div>
+
+
+<pre><span id="VALplatform_bits"><span class="keyword">val</span> platform_bits</span> : <code class="type">int</code></pre>
+<pre><span id="VAL(|>)"><span class="keyword">val</span> (|&gt;)</span> : <code class="type">'a -> ('a -> 'b) -> 'b</code></pre><div class="info ">
+x |&gt; f applies f to x<br>
+</div>
+
+<pre><span id="VAL(>>)"><span class="keyword">val</span> (&gt;&gt;)</span> : <code class="type">('a -> 'b) -> ('b -> 'c) -> 'a -> 'c</code></pre><div class="info ">
+forward composition<br>
+</div>
+
+<pre><span id="VAL(<<)"><span class="keyword">val</span> (&lt;&lt;)</span> : <code class="type">('a -> 'b) -> ('c -> 'a) -> 'c -> 'b</code></pre><div class="info ">
+reverse composition<br>
+</div>
+
+<pre><span id="VAL($)"><span class="keyword">val</span> ($)</span> : <code class="type">('a -> 'b) -> 'a -> 'b</code></pre><div class="info ">
+function chaining (avoiding brackets)<br>
+</div>
+
+<pre><span id="VALlist_of_string"><span class="keyword">val</span> list_of_string</span> : <code class="type">string -> char list</code></pre><div class="info ">
+converts a string to a list of chars<br>
+</div>
+
+<pre><span id="VALint_of_hchar"><span class="keyword">val</span> int_of_hchar</span> : <code class="type">char -> int</code></pre><div class="info ">
+Integer to hex character (0..15)<br>
+</div>
+
+<pre><span id="VALint_of_bchar"><span class="keyword">val</span> int_of_bchar</span> : <code class="type">char -> int</code></pre><div class="info ">
+0 or 1 -&gt; '0' or '1'<br>
+</div>
+
+<pre><span id="VALint_of_bstr"><span class="keyword">val</span> int_of_bstr</span> : <code class="type">string -> int</code></pre><div class="info ">
+converts a binary string to an integer<br>
+</div>
+
+<pre><span id="VALint32_of_bstr"><span class="keyword">val</span> int32_of_bstr</span> : <code class="type">string -> int32</code></pre><div class="info ">
+converts a binary string to an integer<br>
+</div>
+
+<pre><span id="VALint64_of_bstr"><span class="keyword">val</span> int64_of_bstr</span> : <code class="type">string -> int64</code></pre><div class="info ">
+converts a binary string to an integer<br>
+</div>
+
+<pre><span id="VALnativeint_of_bstr"><span class="keyword">val</span> nativeint_of_bstr</span> : <code class="type">string -> nativeint</code></pre><div class="info ">
+converts a binary string to an integer<br>
+</div>
+
+<pre><span id="VALbstr_of_int"><span class="keyword">val</span> bstr_of_int</span> : <code class="type">int -> int -> string</code></pre><div class="info ">
+converts an int to a binary string<br>
+</div>
+
+<pre><span id="VALbstr_of_int32"><span class="keyword">val</span> bstr_of_int32</span> : <code class="type">int -> Int32.t -> string</code></pre>
+<pre><span id="VALbstr_of_int64"><span class="keyword">val</span> bstr_of_int64</span> : <code class="type">int -> Int64.t -> string</code></pre>
+<pre><span id="VALbstr_of_nint"><span class="keyword">val</span> bstr_of_nint</span> : <code class="type">int -> Nativeint.t -> string</code></pre>
+<pre><span id="VALintbitslist_of_bstr"><span class="keyword">val</span> intbitslist_of_bstr</span> : <code class="type">string -> int list</code></pre><div class="info ">
+convert binary string to int bits list<br>
+</div>
+
+<pre><span id="VALbstr_of_intbitslist"><span class="keyword">val</span> bstr_of_intbitslist</span> : <code class="type">int list -> string</code></pre><div class="info ">
+convert a list of bits (from type IntbitsList) to binary string<br>
+</div>
+
+<pre><span id="VALint_of_hstr"><span class="keyword">val</span> int_of_hstr</span> : <code class="type">string -> int</code></pre><div class="info ">
+Convert a hexidecimal string to an integer<br>
+</div>
+
+<pre><span id="VALbstr_of_hstr"><span class="keyword">val</span> bstr_of_hstr</span> : <code class="type"><a href="Utils.html#TYPEsigned">signed</a> -> int -> string -> string</code></pre><div class="info ">
+Convert a string in hexadecimal notation to a binary string. 
+    If the hex string is shorter than the required width, and the value 
+    is signed, the result is sign extended.<br>
+</div>
+
+<pre><span id="VALhstr_of_bstr"><span class="keyword">val</span> hstr_of_bstr</span> : <code class="type"><a href="Utils.html#TYPEsigned">signed</a> -> string -> string</code></pre><div class="info ">
+convert a binary string to a hex string<br>
+</div>
+
+<pre><span id="VALabits_int32_of_bstr"><span class="keyword">val</span> abits_int32_of_bstr</span> : <code class="type">string -> int32 array</code></pre><div class="info ">
+binary string to array of int32<br>
+</div>
+
+<pre><span id="VALbstr_of_abits_int32"><span class="keyword">val</span> bstr_of_abits_int32</span> : <code class="type">int -> int32 array -> string</code></pre><div class="info ">
+array of int32 to binary string<br>
+</div>
+
+<pre><span id="VALabits_int64_of_bstr"><span class="keyword">val</span> abits_int64_of_bstr</span> : <code class="type">string -> int64 array</code></pre><div class="info ">
+binary string to array of int32<br>
+</div>
+
+<pre><span id="VALbstr_of_abits_int64"><span class="keyword">val</span> bstr_of_abits_int64</span> : <code class="type">int -> int64 array -> string</code></pre><div class="info ">
+array of int32 to binary string<br>
+</div>
+
+<pre><span id="VALabits_nint_of_bstr"><span class="keyword">val</span> abits_nint_of_bstr</span> : <code class="type">string -> nativeint array</code></pre><div class="info ">
+binary string to array of int32<br>
+</div>
+
+<pre><span id="VALbstr_of_abits_nint"><span class="keyword">val</span> bstr_of_abits_nint</span> : <code class="type">int -> nativeint array -> string</code></pre><div class="info ">
+array of int32 to binary string<br>
+</div>
+
+<pre><span id="VALnbits"><span class="keyword">val</span> nbits</span> : <code class="type">int -> int</code></pre><div class="info ">
+number of bits required to represent the given int<br>
+</div>
+
+<pre><span id="VALclog2"><span class="keyword">val</span> clog2</span> : <code class="type">int -> int</code></pre><div class="info ">
+ceil(log(2,n)), n&gt;=0<br>
+</div>
+
+<pre><span id="VALpow2"><span class="keyword">val</span> pow2</span> : <code class="type">int -> int</code></pre><div class="info ">
+2^n<br>
+</div>
+
+<pre><span id="VALrange"><span class="keyword">val</span> range</span> : <code class="type">int -> int list</code></pre><div class="info ">
+create list from <code class="code">0...N</code><br>
+</div>
+
+<pre><span id="VALlselect"><span class="keyword">val</span> lselect</span> : <code class="type">'a list -> int -> int -> 'a list</code></pre><div class="info ">
+select elements from list; head of list first<br>
+</div>
+
+<pre><span id="VALleven"><span class="keyword">val</span> leven</span> : <code class="type">'a list -> 'a list</code></pre><div class="info ">
+get even elements of list<br>
+</div>
+
+<pre><span id="VALlodd"><span class="keyword">val</span> lodd</span> : <code class="type">'a list -> 'a list</code></pre><div class="info ">
+get odd elements of list<br>
+</div>
+
+<pre><span id="VALlinit"><span class="keyword">val</span> linit</span> : <code class="type">int -> (int -> 'a) -> 'a list</code></pre>
+<pre><span id="VALzip"><span class="keyword">val</span> zip</span> : <code class="type">'a list -> 'b list -> ('a * 'b) list</code></pre><div class="info ">
+create list of pairs from two lists<br>
+</div>
+
+<pre><span id="VALunzip"><span class="keyword">val</span> unzip</span> : <code class="type">('a * 'b) list -> 'a list * 'b list</code></pre><div class="info ">
+split list of pairs into two separate lists<br>
+</div>
+
+<pre><span id="VALpairs"><span class="keyword">val</span> pairs</span> : <code class="type">'a list -> ('a * 'a) list</code></pre><div class="info ">
+create pairs from list<br>
+</div>
+
+<pre><span id="VALiteri"><span class="keyword">val</span> iteri</span> : <code class="type">(int -> 'a -> unit) -> 'a list -> unit</code></pre><div class="info ">
+iterate over list with index<br>
+</div>
+
+<pre><span id="VALmapi"><span class="keyword">val</span> mapi</span> : <code class="type">(int -> 'a -> 'b) -> 'a list -> 'b list</code></pre><div class="info ">
+map over list with index<br>
+</div>
+
+<pre><span id="VALiter2"><span class="keyword">val</span> iter2</span> : <code class="type">('a -> 'b -> unit) -> 'a list -> 'b list -> unit</code></pre><div class="info ">
+iterate over two lists calling the given function<br>
+</div>
+
+<pre><span id="VALmap2"><span class="keyword">val</span> map2</span> : <code class="type">('a -> 'b -> 'c) -> 'a list -> 'b list -> 'c list</code></pre><div class="info ">
+map over two lists calling the given function<br>
+</div>
+
+<pre><span id="VALmemoize"><span class="keyword">val</span> memoize</span> : <code class="type">('a -> 'b) -> 'a -> 'b</code></pre><div class="info ">
+memoization of a value<br>
+</div>
+
+<pre><span id="VALsplit_pow2"><span class="keyword">val</span> split_pow2</span> : <code class="type">'a list -> 'a list * 'a list</code></pre><div class="info ">
+split list on power of two boundary<br>
+</div>
+</body></html>

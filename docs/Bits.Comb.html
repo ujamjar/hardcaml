@@ -1,0 +1,79 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<link rel="stylesheet" href="style.css" type="text/css">
+<meta content="text/html; charset=iso-8859-1" http-equiv="Content-Type">
+<link rel="Start" href="index.html">
+<link rel="previous" href="Bits.ArraybitsBuilder.html">
+<link rel="Up" href="Bits.html">
+<link title="Index of types" rel=Appendix href="index_types.html">
+<link title="Index of exceptions" rel=Appendix href="index_exceptions.html">
+<link title="Index of values" rel=Appendix href="index_values.html">
+<link title="Index of class methods" rel=Appendix href="index_methods.html">
+<link title="Index of classes" rel=Appendix href="index_classes.html">
+<link title="Index of modules" rel=Appendix href="index_modules.html">
+<link title="Index of module types" rel=Appendix href="index_module_types.html">
+<link title="Utils" rel="Chapter" href="Utils.html">
+<link title="Comb" rel="Chapter" href="Comb.html">
+<link title="Bits" rel="Chapter" href="Bits.html">
+<link title="Signal" rel="Chapter" href="Signal.html">
+<link title="Syntax" rel="Chapter" href="Syntax.html">
+<link title="Circuit" rel="Chapter" href="Circuit.html">
+<link title="Rtl" rel="Chapter" href="Rtl.html">
+<link title="Fixed" rel="Chapter" href="Fixed.html">
+<link title="Const_prop" rel="Chapter" href="Const_prop.html">
+<link title="Transform" rel="Chapter" href="Transform.html">
+<link title="Cyclesim" rel="Chapter" href="Cyclesim.html">
+<link title="Vcd" rel="Chapter" href="Vcd.html">
+<link title="Vcd_ext" rel="Chapter" href="Vcd_ext.html">
+<link title="Interface" rel="Chapter" href="Interface.html">
+<link title="Recipe" rel="Chapter" href="Recipe.html">
+<link title="Xilinx" rel="Chapter" href="Xilinx.html">
+<link title="C" rel="Chapter" href="C.html">
+<link title="Structural" rel="Chapter" href="Structural.html">
+<link title="Structural_lib" rel="Chapter" href="Structural_lib.html">
+<link title="Cosim" rel="Chapter" href="Cosim.html"><title>Bits.Comb</title>
+</head>
+<body>
+<div class="navbar"><a class="pre" href="Bits.ArraybitsBuilder.html" title="Bits.ArraybitsBuilder">Previous</a>
+&nbsp;<a class="up" href="Bits.html" title="Bits">Up</a>
+&nbsp;</div>
+<h1>Module <a href="type_Bits.Comb.html">Bits.Comb</a></h1>
+
+<pre><span class="keyword">module</span> Comb: <code class="code">sig</code> <a href="Bits.Comb.html">..</a> <code class="code">end</code></pre><div class="info module top">
+Implemented API's<br>
+</div>
+<hr width="100%">
+
+<pre><span class="keyword">module</span> <a href="Bits.Comb.IntbitsList.html">IntbitsList</a>: <code class="type"><a href="Comb.S.html">Comb.S</a></code><code class="type">  with type t = int list</code></pre><div class="info">
+bits described as lists of ints ie <code class="code">0;1;1;1;0</code> - width implicit as length of list
+</div>
+
+<pre><span class="keyword">module</span> <a href="Bits.Comb.Intbits.html">Intbits</a>: <code class="type"><a href="Comb.S.html">Comb.S</a></code><code class="type">  with type t = int*int</code></pre><div class="info">
+bits described with ocamls ints and a width (&lt;=31)
+</div>
+
+<pre><span class="keyword">module</span> <a href="Bits.Comb.Int32bits.html">Int32bits</a>: <code class="type"><a href="Comb.S.html">Comb.S</a></code><code class="type">  with type t = int32*int</code></pre><div class="info">
+bits described using int32 and a width (&lt;=32)
+</div>
+
+<pre><span class="keyword">module</span> <a href="Bits.Comb.Int64bits.html">Int64bits</a>: <code class="type"><a href="Comb.S.html">Comb.S</a></code><code class="type">  with type t = int64*int</code></pre><div class="info">
+bits described using int64 and a width (&lt;=64)
+</div>
+
+<pre><span class="keyword">module</span> <a href="Bits.Comb.Nativeintbits.html">Nativeintbits</a>: <code class="type"><a href="Comb.S.html">Comb.S</a></code><code class="type">  with type t = nativeint*int</code></pre><div class="info">
+bits described using nativeint and a width (max size platform dependant)
+</div>
+
+<pre><span class="keyword">module</span> <a href="Bits.Comb.ArraybitsInt32.html">ArraybitsInt32</a>: <code class="type"><a href="Comb.S.html">Comb.S</a></code><code class="type">  with type t = int32 array * int</code></pre><div class="info">
+bits described using array of int32
+</div>
+
+<pre><span class="keyword">module</span> <a href="Bits.Comb.ArraybitsInt64.html">ArraybitsInt64</a>: <code class="type"><a href="Comb.S.html">Comb.S</a></code><code class="type">  with type t = int64 array * int</code></pre><div class="info">
+bits described using array of int64
+</div>
+
+<pre><span class="keyword">module</span> <a href="Bits.Comb.ArraybitsNativeint.html">ArraybitsNativeint</a>: <code class="type"><a href="Comb.S.html">Comb.S</a></code><code class="type">  with type t = nativeint array * int</code></pre><div class="info">
+bits described using array of nativeint
+</div>
+</body></html>

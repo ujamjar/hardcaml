@@ -1,0 +1,489 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<link rel="stylesheet" href="style.css" type="text/css">
+<meta content="text/html; charset=iso-8859-1" http-equiv="Content-Type">
+<link rel="Start" href="index.html">
+<link rel="previous" href="Bits.Comb.IntbitsList.html">
+<link rel="next" href="Bits.Comb.Int32bits.html">
+<link rel="Up" href="Bits.Comb.html">
+<link title="Index of types" rel=Appendix href="index_types.html">
+<link title="Index of exceptions" rel=Appendix href="index_exceptions.html">
+<link title="Index of values" rel=Appendix href="index_values.html">
+<link title="Index of class methods" rel=Appendix href="index_methods.html">
+<link title="Index of classes" rel=Appendix href="index_classes.html">
+<link title="Index of modules" rel=Appendix href="index_modules.html">
+<link title="Index of module types" rel=Appendix href="index_module_types.html">
+<link title="Utils" rel="Chapter" href="Utils.html">
+<link title="Comb" rel="Chapter" href="Comb.html">
+<link title="Bits" rel="Chapter" href="Bits.html">
+<link title="Signal" rel="Chapter" href="Signal.html">
+<link title="Syntax" rel="Chapter" href="Syntax.html">
+<link title="Circuit" rel="Chapter" href="Circuit.html">
+<link title="Rtl" rel="Chapter" href="Rtl.html">
+<link title="Fixed" rel="Chapter" href="Fixed.html">
+<link title="Const_prop" rel="Chapter" href="Const_prop.html">
+<link title="Transform" rel="Chapter" href="Transform.html">
+<link title="Cyclesim" rel="Chapter" href="Cyclesim.html">
+<link title="Vcd" rel="Chapter" href="Vcd.html">
+<link title="Vcd_ext" rel="Chapter" href="Vcd_ext.html">
+<link title="Interface" rel="Chapter" href="Interface.html">
+<link title="Recipe" rel="Chapter" href="Recipe.html">
+<link title="Xilinx" rel="Chapter" href="Xilinx.html">
+<link title="C" rel="Chapter" href="C.html">
+<link title="Structural" rel="Chapter" href="Structural.html">
+<link title="Structural_lib" rel="Chapter" href="Structural_lib.html">
+<link title="Cosim" rel="Chapter" href="Cosim.html"><title>Bits.Comb.Intbits</title>
+</head>
+<body>
+<div class="navbar"><a class="pre" href="Bits.Comb.IntbitsList.html" title="Bits.Comb.IntbitsList">Previous</a>
+&nbsp;<a class="up" href="Bits.Comb.html" title="Bits.Comb">Up</a>
+&nbsp;<a class="post" href="Bits.Comb.Int32bits.html" title="Bits.Comb.Int32bits">Next</a>
+</div>
+<h1>Module <a href="type_Bits.Comb.Intbits.html">Bits.Comb.Intbits</a></h1>
+
+<pre><span class="keyword">module</span> Intbits: <code class="type"><a href="Comb.S.html">Comb.S</a></code><code class="type">  with type t = int*int</code></pre><div class="info module top">
+bits described with ocamls ints and a width (&lt;=31)<br>
+</div>
+<hr width="100%">
+
+<pre><span id="TYPEt"><span class="keyword">type</span> <code class="type"></code>t</span> </pre>
+
+
+<pre><span id="VALempty"><span class="keyword">val</span> empty</span> : <code class="type"><a href="Comb.S.html#TYPEt">t</a></code></pre><div class="info ">
+the empty signal<br>
+</div>
+
+<pre><span id="VAL(--)"><span class="keyword">val</span> (--)</span> : <code class="type"><a href="Comb.S.html#TYPEt">t</a> -> string -> <a href="Comb.S.html#TYPEt">t</a></code></pre><div class="info ">
+names a signal
+<p>
+
+        <code class="code">let a = a -- "a" in ...</code>
+<p>
+
+        signals may have multiple names.<br>
+</div>
+
+<pre><span id="VALwidth"><span class="keyword">val</span> width</span> : <code class="type"><a href="Comb.S.html#TYPEt">t</a> -> int</code></pre><div class="info ">
+returns the width (number of bits) of a signal.
+<p>
+
+        <code class="code">let w = width s in ...</code><br>
+</div>
+
+<pre><span id="VALconstb"><span class="keyword">val</span> constb</span> : <code class="type">string -> <a href="Comb.S.html#TYPEt">t</a></code></pre><div class="info ">
+convert binary string to constant<br>
+</div>
+
+<pre><span id="VALconsti"><span class="keyword">val</span> consti</span> : <code class="type">int -> int -> <a href="Comb.S.html#TYPEt">t</a></code></pre><div class="info ">
+convert integer to constant<br>
+</div>
+
+<pre><span id="VALconsti32"><span class="keyword">val</span> consti32</span> : <code class="type">int -> int32 -> <a href="Comb.S.html#TYPEt">t</a></code></pre>
+<pre><span id="VALconsti64"><span class="keyword">val</span> consti64</span> : <code class="type">int -> int64 -> <a href="Comb.S.html#TYPEt">t</a></code></pre>
+<pre><span id="VALconsthu"><span class="keyword">val</span> consthu</span> : <code class="type">int -> string -> <a href="Comb.S.html#TYPEt">t</a></code></pre><div class="info ">
+convert unsigned hex string to constant<br>
+</div>
+
+<pre><span id="VALconsths"><span class="keyword">val</span> consths</span> : <code class="type">int -> string -> <a href="Comb.S.html#TYPEt">t</a></code></pre><div class="info ">
+convert signed hex string to constant<br>
+</div>
+
+<pre><span id="VALconstd"><span class="keyword">val</span> constd</span> : <code class="type">int -> string -> <a href="Comb.S.html#TYPEt">t</a></code></pre><div class="info ">
+convert decimal string to constant<br>
+</div>
+
+<pre><span id="VALconstv"><span class="keyword">val</span> constv</span> : <code class="type">string -> <a href="Comb.S.html#TYPEt">t</a></code></pre><div class="info ">
+convert verilog style string to constant<br>
+</div>
+
+<pre><span id="VALconstibl"><span class="keyword">val</span> constibl</span> : <code class="type">int list -> <a href="Comb.S.html#TYPEt">t</a></code></pre><div class="info ">
+convert IntbitsList to constant<br>
+</div>
+
+<pre><span id="VALconst"><span class="keyword">val</span> const</span> : <code class="type">string -> <a href="Comb.S.html#TYPEt">t</a></code></pre><div class="info ">
+convert verilog style or binary string to constant<br>
+</div>
+
+<pre><span id="VALconcat"><span class="keyword">val</span> concat</span> : <code class="type"><a href="Comb.S.html#TYPEt">t</a> list -> <a href="Comb.S.html#TYPEt">t</a></code></pre><div class="info ">
+concatenates a list of signals - the msb of the head of the list will
+        become the msb of the result. 
+<p>
+
+        <code class="code">let c = concat [a; b; c] in ...</code><br>
+</div>
+
+<pre><span id="VALconcat_e"><span class="keyword">val</span> concat_e</span> : <code class="type"><a href="Comb.S.html#TYPEt">t</a> list -> <a href="Comb.S.html#TYPEt">t</a></code></pre><div class="info ">
+same as <code class="code">concat</code> except empty signals are first filtered out<br>
+</div>
+
+<pre><span id="VAL(@:)"><span class="keyword">val</span> (@:)</span> : <code class="type"><a href="Comb.S.html#TYPEt">t</a> -> <a href="Comb.S.html#TYPEt">t</a> -> <a href="Comb.S.html#TYPEt">t</a></code></pre><div class="info ">
+concatenate two signals. 
+<p>
+
+        <code class="code">let c = a @: b in ...</code>
+<p>
+
+        equivalent to <code class="code">concat [a;b]</code><br>
+</div>
+
+<pre><span id="VALvdd"><span class="keyword">val</span> vdd</span> : <code class="type"><a href="Comb.S.html#TYPEt">t</a></code></pre><div class="info ">
+logic 1<br>
+</div>
+
+<pre><span id="VALgnd"><span class="keyword">val</span> gnd</span> : <code class="type"><a href="Comb.S.html#TYPEt">t</a></code></pre><div class="info ">
+logic 0<br>
+</div>
+
+<pre><span id="VALzero"><span class="keyword">val</span> zero</span> : <code class="type">int -> <a href="Comb.S.html#TYPEt">t</a></code></pre><div class="info ">
+<code class="code">zero w</code> makes a the zero valued constant of width <code class="code">w</code><br>
+</div>
+
+<pre><span id="VALones"><span class="keyword">val</span> ones</span> : <code class="type">int -> <a href="Comb.S.html#TYPEt">t</a></code></pre><div class="info ">
+<code class="code">one w</code> makes a one valued constant of width <code class="code">w</code><br>
+</div>
+
+<pre><span id="VALone"><span class="keyword">val</span> one</span> : <code class="type">int -> <a href="Comb.S.html#TYPEt">t</a></code></pre><div class="info ">
+<code class="code">ones w</code> makes a constant of all ones of width <code class="code">w</code><br>
+</div>
+
+<pre><span id="VALselect"><span class="keyword">val</span> select</span> : <code class="type"><a href="Comb.S.html#TYPEt">t</a> -> int -> int -> <a href="Comb.S.html#TYPEt">t</a></code></pre><div class="info ">
+<code class="code">select s hi lo</code> selects bits in the range <code class="code">hi</code>...<code class="code">lo</code> inclusive from s.
+        The selection indices must fall within the range of <code class="code">s</code> and <code class="code">hi</code> &gt;= <code class="code">lo</code>.<br>
+</div>
+
+<pre><span id="VALselect_e"><span class="keyword">val</span> select_e</span> : <code class="type"><a href="Comb.S.html#TYPEt">t</a> -> int -> int -> <a href="Comb.S.html#TYPEt">t</a></code></pre><div class="info ">
+same as <code class="code">select</code> except invalid indices return <code class="code">empty</code><br>
+</div>
+
+<pre><span id="VALbit"><span class="keyword">val</span> bit</span> : <code class="type"><a href="Comb.S.html#TYPEt">t</a> -> int -> <a href="Comb.S.html#TYPEt">t</a></code></pre><div class="info ">
+select a single bit<br>
+</div>
+
+<pre><span id="VALmsb"><span class="keyword">val</span> msb</span> : <code class="type"><a href="Comb.S.html#TYPEt">t</a> -> <a href="Comb.S.html#TYPEt">t</a></code></pre><div class="info ">
+get most significant bit<br>
+</div>
+
+<pre><span id="VALlsbs"><span class="keyword">val</span> lsbs</span> : <code class="type"><a href="Comb.S.html#TYPEt">t</a> -> <a href="Comb.S.html#TYPEt">t</a></code></pre><div class="info ">
+get least significant bits<br>
+</div>
+
+<pre><span id="VALlsb"><span class="keyword">val</span> lsb</span> : <code class="type"><a href="Comb.S.html#TYPEt">t</a> -> <a href="Comb.S.html#TYPEt">t</a></code></pre><div class="info ">
+get least significant bit<br>
+</div>
+
+<pre><span id="VALmsbs"><span class="keyword">val</span> msbs</span> : <code class="type"><a href="Comb.S.html#TYPEt">t</a> -> <a href="Comb.S.html#TYPEt">t</a></code></pre><div class="info ">
+get most significant bits<br>
+</div>
+
+<pre><span id="VALdrop_bottom"><span class="keyword">val</span> drop_bottom</span> : <code class="type"><a href="Comb.S.html#TYPEt">t</a> -> int -> <a href="Comb.S.html#TYPEt">t</a></code></pre><div class="info ">
+<code class="code">drop_bottom s n</code> drop bottom <code class="code">n</code> bits of <code class="code">s</code><br>
+</div>
+
+<pre><span id="VALdrop_top"><span class="keyword">val</span> drop_top</span> : <code class="type"><a href="Comb.S.html#TYPEt">t</a> -> int -> <a href="Comb.S.html#TYPEt">t</a></code></pre><div class="info ">
+<code class="code">drop_top s n</code> drop top <code class="code">n</code> bits of <code class="code">s</code><br>
+</div>
+
+<pre><span id="VALsel_bottom"><span class="keyword">val</span> sel_bottom</span> : <code class="type"><a href="Comb.S.html#TYPEt">t</a> -> int -> <a href="Comb.S.html#TYPEt">t</a></code></pre><div class="info ">
+<code class="code">sel_bottom s n</code> select bottom <code class="code">n</code> bits of <code class="code">s</code><br>
+</div>
+
+<pre><span id="VALsel_top"><span class="keyword">val</span> sel_top</span> : <code class="type"><a href="Comb.S.html#TYPEt">t</a> -> int -> <a href="Comb.S.html#TYPEt">t</a></code></pre><div class="info ">
+<code class="code">sel_top s n</code> select top <code class="code">n</code> bits of <code class="code">s</code><br>
+</div>
+
+<pre><span id="VALinsert"><span class="keyword">val</span> insert</span> : <code class="type">t:<a href="Comb.S.html#TYPEt">t</a> -> f:<a href="Comb.S.html#TYPEt">t</a> -> int -> <a href="Comb.S.html#TYPEt">t</a></code></pre><div class="info ">
+<code class="code">insert ~t ~f n</code> insert <code class="code">f</code> into <code class="code">t</code> as postion <code class="code">n</code><br>
+</div>
+
+<pre><span id="VALsel"><span class="keyword">val</span> sel</span> : <code class="type"><a href="Comb.S.html#TYPEt">t</a> -> int * int -> <a href="Comb.S.html#TYPEt">t</a></code></pre><div class="info ">
+</div>
+
+<pre><span id="VALmux"><span class="keyword">val</span> mux</span> : <code class="type"><a href="Comb.S.html#TYPEt">t</a> -> <a href="Comb.S.html#TYPEt">t</a> list -> <a href="Comb.S.html#TYPEt">t</a></code></pre><div class="info ">
+multiplexer. 
+<p>
+
+        <code class="code">let m = mux sel inputs in ...</code>
+<p>
+
+        Given <code class="code">l</code> = <code class="code">List.length inputs</code> and <code class="code">w</code> = <code class="code">width sel</code> the following conditions must hold.
+<p>
+
+        <code class="code">l</code> &lt;= 2**<code class="code">w</code>, <code class="code">l</code> &gt;= 2
+<p>
+
+        If <code class="code">l</code> &lt; 2**<code class="code">w</code>, the last input is repeated.
+<p>
+
+        All inputs provided must have the same width, which will
+        in turn be equal to the width of <code class="code">m</code>.<br>
+</div>
+
+<pre><span id="VALmux2"><span class="keyword">val</span> mux2</span> : <code class="type"><a href="Comb.S.html#TYPEt">t</a> -> <a href="Comb.S.html#TYPEt">t</a> -> <a href="Comb.S.html#TYPEt">t</a> -> <a href="Comb.S.html#TYPEt">t</a></code></pre><div class="info ">
+<code class="code">mux2 c t f</code> 2 input multiplexer.  Selects <code class="code">t</code> if <code class="code">c</code> is high otherwise <code class="code">f</code>.
+<p>
+
+        <code class="code">t</code> and <code class="code">f</code> must have same width and <code class="code">c</code> must be 1 bit.
+<p>
+
+        Equivalent to <code class="code">mux c [f; t]</code><br>
+</div>
+
+<pre><span id="VALmux_init"><span class="keyword">val</span> mux_init</span> : <code class="type"><a href="Comb.S.html#TYPEt">t</a> -> int -> (int -> <a href="Comb.S.html#TYPEt">t</a>) -> <a href="Comb.S.html#TYPEt">t</a></code></pre>
+<pre><span id="VALcases"><span class="keyword">val</span> cases</span> : <code class="type"><a href="Comb.S.html#TYPEt">t</a> -> <a href="Comb.S.html#TYPEt">t</a> -> (int * <a href="Comb.S.html#TYPEt">t</a>) list -> <a href="Comb.S.html#TYPEt">t</a></code></pre><div class="info ">
+case mux<br>
+</div>
+
+<pre><span id="VALpmux"><span class="keyword">val</span> pmux</span> : <code class="type">(<a href="Comb.S.html#TYPEt">t</a> * <a href="Comb.S.html#TYPEt">t</a>) list -> <a href="Comb.S.html#TYPEt">t</a> -> <a href="Comb.S.html#TYPEt">t</a></code></pre><div class="info ">
+priority mux<br>
+</div>
+
+<pre><span id="VAL(&:)"><span class="keyword">val</span> (&amp;:)</span> : <code class="type"><a href="Comb.S.html#TYPEt">t</a> -> <a href="Comb.S.html#TYPEt">t</a> -> <a href="Comb.S.html#TYPEt">t</a></code></pre><div class="info ">
+logical and<br>
+</div>
+
+<pre><span id="VAL(&:.)"><span class="keyword">val</span> (&amp;:.)</span> : <code class="type"><a href="Comb.S.html#TYPEt">t</a> -> int -> <a href="Comb.S.html#TYPEt">t</a></code></pre>
+<pre><span id="VAL(&&:)"><span class="keyword">val</span> (&amp;&amp;:)</span> : <code class="type"><a href="Comb.S.html#TYPEt">t</a> -> <a href="Comb.S.html#TYPEt">t</a> -> <a href="Comb.S.html#TYPEt">t</a></code></pre><div class="info ">
+a &lt;&gt;:. 0 &amp;: b &lt;&gt;:. 0<br>
+</div>
+
+<pre><span id="VAL(|:)"><span class="keyword">val</span> (|:)</span> : <code class="type"><a href="Comb.S.html#TYPEt">t</a> -> <a href="Comb.S.html#TYPEt">t</a> -> <a href="Comb.S.html#TYPEt">t</a></code></pre><div class="info ">
+logical or<br>
+</div>
+
+<pre><span id="VAL(|:.)"><span class="keyword">val</span> (|:.)</span> : <code class="type"><a href="Comb.S.html#TYPEt">t</a> -> int -> <a href="Comb.S.html#TYPEt">t</a></code></pre>
+<pre><span id="VAL(||:)"><span class="keyword">val</span> (||:)</span> : <code class="type"><a href="Comb.S.html#TYPEt">t</a> -> <a href="Comb.S.html#TYPEt">t</a> -> <a href="Comb.S.html#TYPEt">t</a></code></pre><div class="info ">
+a &lt;&gt;:. 0 |: b &lt;&gt;:. 0<br>
+</div>
+
+<pre><span id="VAL(^:)"><span class="keyword">val</span> (^:)</span> : <code class="type"><a href="Comb.S.html#TYPEt">t</a> -> <a href="Comb.S.html#TYPEt">t</a> -> <a href="Comb.S.html#TYPEt">t</a></code></pre><div class="info ">
+logic xor<br>
+</div>
+
+<pre><span id="VAL(^:.)"><span class="keyword">val</span> (^:.)</span> : <code class="type"><a href="Comb.S.html#TYPEt">t</a> -> int -> <a href="Comb.S.html#TYPEt">t</a></code></pre>
+<pre><span id="VAL(~:)"><span class="keyword">val</span> (~:)</span> : <code class="type"><a href="Comb.S.html#TYPEt">t</a> -> <a href="Comb.S.html#TYPEt">t</a></code></pre><div class="info ">
+logical not<br>
+</div>
+
+<pre><span id="VAL(+:)"><span class="keyword">val</span> (+:)</span> : <code class="type"><a href="Comb.S.html#TYPEt">t</a> -> <a href="Comb.S.html#TYPEt">t</a> -> <a href="Comb.S.html#TYPEt">t</a></code></pre><div class="info ">
+addition<br>
+</div>
+
+<pre><span id="VAL(+:.)"><span class="keyword">val</span> (+:.)</span> : <code class="type"><a href="Comb.S.html#TYPEt">t</a> -> int -> <a href="Comb.S.html#TYPEt">t</a></code></pre>
+<pre><span id="VAL(-:)"><span class="keyword">val</span> (-:)</span> : <code class="type"><a href="Comb.S.html#TYPEt">t</a> -> <a href="Comb.S.html#TYPEt">t</a> -> <a href="Comb.S.html#TYPEt">t</a></code></pre><div class="info ">
+subtraction<br>
+</div>
+
+<pre><span id="VAL(-:.)"><span class="keyword">val</span> (-:.)</span> : <code class="type"><a href="Comb.S.html#TYPEt">t</a> -> int -> <a href="Comb.S.html#TYPEt">t</a></code></pre>
+<pre><span id="VALnegate"><span class="keyword">val</span> negate</span> : <code class="type"><a href="Comb.S.html#TYPEt">t</a> -> <a href="Comb.S.html#TYPEt">t</a></code></pre><div class="info ">
+negation<br>
+</div>
+
+<pre><span id="VAL( *: )"><span class="keyword">val</span> ( *: )</span> : <code class="type"><a href="Comb.S.html#TYPEt">t</a> -> <a href="Comb.S.html#TYPEt">t</a> -> <a href="Comb.S.html#TYPEt">t</a></code></pre><div class="info ">
+unsigned multiplication<br>
+</div>
+
+<pre><span id="VAL( *+ )"><span class="keyword">val</span> ( *+ )</span> : <code class="type"><a href="Comb.S.html#TYPEt">t</a> -> <a href="Comb.S.html#TYPEt">t</a> -> <a href="Comb.S.html#TYPEt">t</a></code></pre><div class="info ">
+signed multiplication<br>
+</div>
+
+<pre><span id="VAL(==:)"><span class="keyword">val</span> (==:)</span> : <code class="type"><a href="Comb.S.html#TYPEt">t</a> -> <a href="Comb.S.html#TYPEt">t</a> -> <a href="Comb.S.html#TYPEt">t</a></code></pre><div class="info ">
+equality<br>
+</div>
+
+<pre><span id="VAL(==:.)"><span class="keyword">val</span> (==:.)</span> : <code class="type"><a href="Comb.S.html#TYPEt">t</a> -> int -> <a href="Comb.S.html#TYPEt">t</a></code></pre>
+<pre><span id="VAL(<>:)"><span class="keyword">val</span> (&lt;&gt;:)</span> : <code class="type"><a href="Comb.S.html#TYPEt">t</a> -> <a href="Comb.S.html#TYPEt">t</a> -> <a href="Comb.S.html#TYPEt">t</a></code></pre><div class="info ">
+inequality<br>
+</div>
+
+<pre><span id="VAL(<>:.)"><span class="keyword">val</span> (&lt;&gt;:.)</span> : <code class="type"><a href="Comb.S.html#TYPEt">t</a> -> int -> <a href="Comb.S.html#TYPEt">t</a></code></pre>
+<pre><span id="VAL(<:)"><span class="keyword">val</span> (&lt;:)</span> : <code class="type"><a href="Comb.S.html#TYPEt">t</a> -> <a href="Comb.S.html#TYPEt">t</a> -> <a href="Comb.S.html#TYPEt">t</a></code></pre><div class="info ">
+less than<br>
+</div>
+
+<pre><span id="VAL(<:.)"><span class="keyword">val</span> (&lt;:.)</span> : <code class="type"><a href="Comb.S.html#TYPEt">t</a> -> int -> <a href="Comb.S.html#TYPEt">t</a></code></pre>
+<pre><span id="VALlt"><span class="keyword">val</span> lt</span> : <code class="type"><a href="Comb.S.html#TYPEt">t</a> -> <a href="Comb.S.html#TYPEt">t</a> -> <a href="Comb.S.html#TYPEt">t</a></code></pre>
+<pre><span id="VAL(>:)"><span class="keyword">val</span> (&gt;:)</span> : <code class="type"><a href="Comb.S.html#TYPEt">t</a> -> <a href="Comb.S.html#TYPEt">t</a> -> <a href="Comb.S.html#TYPEt">t</a></code></pre><div class="info ">
+greater than<br>
+</div>
+
+<pre><span id="VAL(>:.)"><span class="keyword">val</span> (&gt;:.)</span> : <code class="type"><a href="Comb.S.html#TYPEt">t</a> -> int -> <a href="Comb.S.html#TYPEt">t</a></code></pre>
+<pre><span id="VAL(<=:)"><span class="keyword">val</span> (&lt;=:)</span> : <code class="type"><a href="Comb.S.html#TYPEt">t</a> -> <a href="Comb.S.html#TYPEt">t</a> -> <a href="Comb.S.html#TYPEt">t</a></code></pre><div class="info ">
+less than or equal to<br>
+</div>
+
+<pre><span id="VAL(<=:.)"><span class="keyword">val</span> (&lt;=:.)</span> : <code class="type"><a href="Comb.S.html#TYPEt">t</a> -> int -> <a href="Comb.S.html#TYPEt">t</a></code></pre>
+<pre><span id="VAL(>=:)"><span class="keyword">val</span> (&gt;=:)</span> : <code class="type"><a href="Comb.S.html#TYPEt">t</a> -> <a href="Comb.S.html#TYPEt">t</a> -> <a href="Comb.S.html#TYPEt">t</a></code></pre><div class="info ">
+greater than or equal to<br>
+</div>
+
+<pre><span id="VAL(>=:.)"><span class="keyword">val</span> (&gt;=:.)</span> : <code class="type"><a href="Comb.S.html#TYPEt">t</a> -> int -> <a href="Comb.S.html#TYPEt">t</a></code></pre>
+<pre><span id="VAL(<+)"><span class="keyword">val</span> (&lt;+)</span> : <code class="type"><a href="Comb.S.html#TYPEt">t</a> -> <a href="Comb.S.html#TYPEt">t</a> -> <a href="Comb.S.html#TYPEt">t</a></code></pre><div class="info ">
+signed less than<br>
+</div>
+
+<pre><span id="VAL(<+.)"><span class="keyword">val</span> (&lt;+.)</span> : <code class="type"><a href="Comb.S.html#TYPEt">t</a> -> int -> <a href="Comb.S.html#TYPEt">t</a></code></pre>
+<pre><span id="VAL(>+)"><span class="keyword">val</span> (&gt;+)</span> : <code class="type"><a href="Comb.S.html#TYPEt">t</a> -> <a href="Comb.S.html#TYPEt">t</a> -> <a href="Comb.S.html#TYPEt">t</a></code></pre><div class="info ">
+signed greater than<br>
+</div>
+
+<pre><span id="VAL(>+.)"><span class="keyword">val</span> (&gt;+.)</span> : <code class="type"><a href="Comb.S.html#TYPEt">t</a> -> int -> <a href="Comb.S.html#TYPEt">t</a></code></pre>
+<pre><span id="VAL(<=+)"><span class="keyword">val</span> (&lt;=+)</span> : <code class="type"><a href="Comb.S.html#TYPEt">t</a> -> <a href="Comb.S.html#TYPEt">t</a> -> <a href="Comb.S.html#TYPEt">t</a></code></pre><div class="info ">
+signed less than or equal to<br>
+</div>
+
+<pre><span id="VAL(<=+.)"><span class="keyword">val</span> (&lt;=+.)</span> : <code class="type"><a href="Comb.S.html#TYPEt">t</a> -> int -> <a href="Comb.S.html#TYPEt">t</a></code></pre>
+<pre><span id="VAL(>=+)"><span class="keyword">val</span> (&gt;=+)</span> : <code class="type"><a href="Comb.S.html#TYPEt">t</a> -> <a href="Comb.S.html#TYPEt">t</a> -> <a href="Comb.S.html#TYPEt">t</a></code></pre><div class="info ">
+signed greated than or equal to<br>
+</div>
+
+<pre><span id="VAL(>=+.)"><span class="keyword">val</span> (&gt;=+.)</span> : <code class="type"><a href="Comb.S.html#TYPEt">t</a> -> int -> <a href="Comb.S.html#TYPEt">t</a></code></pre>
+<pre><span id="VALto_string"><span class="keyword">val</span> to_string</span> : <code class="type"><a href="Comb.S.html#TYPEt">t</a> -> string</code></pre><div class="info ">
+create string from signal<br>
+</div>
+
+<pre><span id="VALto_int"><span class="keyword">val</span> to_int</span> : <code class="type"><a href="Comb.S.html#TYPEt">t</a> -> int</code></pre><div class="info ">
+get value as unsigned int (if possible)<br>
+</div>
+
+<pre><span id="VALto_sint"><span class="keyword">val</span> to_sint</span> : <code class="type"><a href="Comb.S.html#TYPEt">t</a> -> int</code></pre><div class="info ">
+get value as signed int (if possible)<br>
+</div>
+
+<pre><span id="VALto_int32"><span class="keyword">val</span> to_int32</span> : <code class="type"><a href="Comb.S.html#TYPEt">t</a> -> int32</code></pre>
+<pre><span id="VALto_sint32"><span class="keyword">val</span> to_sint32</span> : <code class="type"><a href="Comb.S.html#TYPEt">t</a> -> int32</code></pre>
+<pre><span id="VALto_int64"><span class="keyword">val</span> to_int64</span> : <code class="type"><a href="Comb.S.html#TYPEt">t</a> -> int64</code></pre>
+<pre><span id="VALto_sint64"><span class="keyword">val</span> to_sint64</span> : <code class="type"><a href="Comb.S.html#TYPEt">t</a> -> int64</code></pre>
+<pre><span id="VALto_bstr"><span class="keyword">val</span> to_bstr</span> : <code class="type"><a href="Comb.S.html#TYPEt">t</a> -> string</code></pre><div class="info ">
+create binary string from signal<br>
+</div>
+
+<pre><span id="VALbits"><span class="keyword">val</span> bits</span> : <code class="type"><a href="Comb.S.html#TYPEt">t</a> -> <a href="Comb.S.html#TYPEt">t</a> list</code></pre><div class="info ">
+convert signal to a list of bits, msb first<br>
+</div>
+
+<pre><span id="VALto_array"><span class="keyword">val</span> to_array</span> : <code class="type"><a href="Comb.S.html#TYPEt">t</a> -> <a href="Comb.S.html#TYPEt">t</a> array</code></pre><div class="info ">
+<code class="code">to_array s</code> convert signal <code class="code">s</code> to array of bits with lsb at index 0<br>
+</div>
+
+<pre><span id="VALof_array"><span class="keyword">val</span> of_array</span> : <code class="type"><a href="Comb.S.html#TYPEt">t</a> array -> <a href="Comb.S.html#TYPEt">t</a></code></pre><div class="info ">
+<code class="code">of_array a</code> convert array <code class="code">a</code> of bits to signal with lsb at index 0<br>
+</div>
+
+<pre><span id="VALwire"><span class="keyword">val</span> wire</span> : <code class="type">int -> <a href="Comb.S.html#TYPEt">t</a></code></pre><div class="info ">
+creates an unassigned wire<br>
+</div>
+
+<pre><span id="VALwireof"><span class="keyword">val</span> wireof</span> : <code class="type"><a href="Comb.S.html#TYPEt">t</a> -> <a href="Comb.S.html#TYPEt">t</a></code></pre><div class="info ">
+creates an assigned wire<br>
+</div>
+
+<pre><span id="VAL(<==)"><span class="keyword">val</span> (&lt;==)</span> : <code class="type"><a href="Comb.S.html#TYPEt">t</a> -> <a href="Comb.S.html#TYPEt">t</a> -> unit</code></pre><div class="info ">
+assigns to wire<br>
+</div>
+
+<pre><span id="VALassign"><span class="keyword">val</span> assign</span> : <code class="type"><a href="Comb.S.html#TYPEt">t</a> -> <a href="Comb.S.html#TYPEt">t</a> -> unit</code></pre>
+<pre><span id="VALinput"><span class="keyword">val</span> input</span> : <code class="type">string -> int -> <a href="Comb.S.html#TYPEt">t</a></code></pre><div class="info ">
+creates an input<br>
+</div>
+
+<pre><span id="VALoutput"><span class="keyword">val</span> output</span> : <code class="type">string -> <a href="Comb.S.html#TYPEt">t</a> -> <a href="Comb.S.html#TYPEt">t</a></code></pre><div class="info ">
+creates an output<br>
+</div>
+
+<pre><span id="VALclock"><span class="keyword">val</span> clock</span> : <code class="type"><a href="Comb.S.html#TYPEt">t</a></code></pre><div class="info ">
+global clock<br>
+</div>
+
+<pre><span id="VALreset"><span class="keyword">val</span> reset</span> : <code class="type"><a href="Comb.S.html#TYPEt">t</a></code></pre><div class="info ">
+global asynchronous reset<br>
+</div>
+
+<pre><span id="VALclear"><span class="keyword">val</span> clear</span> : <code class="type"><a href="Comb.S.html#TYPEt">t</a></code></pre><div class="info ">
+global synchronous clear<br>
+</div>
+
+<pre><span id="VALenable"><span class="keyword">val</span> enable</span> : <code class="type"><a href="Comb.S.html#TYPEt">t</a></code></pre><div class="info ">
+global enable<br>
+</div>
+
+<pre><span id="VALrepeat"><span class="keyword">val</span> repeat</span> : <code class="type"><a href="Comb.S.html#TYPEt">t</a> -> int -> <a href="Comb.S.html#TYPEt">t</a></code></pre><div class="info ">
+repeat signal n times<br>
+</div>
+
+<pre><span id="VALsplit"><span class="keyword">val</span> split</span> : <code class="type"><a href="Comb.S.html#TYPEt">t</a> -> <a href="Comb.S.html#TYPEt">t</a> * <a href="Comb.S.html#TYPEt">t</a></code></pre><div class="info ">
+split signal in half<br>
+</div>
+
+<pre><span id="VALsll"><span class="keyword">val</span> sll</span> : <code class="type"><a href="Comb.S.html#TYPEt">t</a> -> int -> <a href="Comb.S.html#TYPEt">t</a></code></pre><div class="info ">
+shift left logical<br>
+</div>
+
+<pre><span id="VALsrl"><span class="keyword">val</span> srl</span> : <code class="type"><a href="Comb.S.html#TYPEt">t</a> -> int -> <a href="Comb.S.html#TYPEt">t</a></code></pre><div class="info ">
+shift right logical<br>
+</div>
+
+<pre><span id="VALsra"><span class="keyword">val</span> sra</span> : <code class="type"><a href="Comb.S.html#TYPEt">t</a> -> int -> <a href="Comb.S.html#TYPEt">t</a></code></pre><div class="info ">
+shift right arithmetic<br>
+</div>
+
+<pre><span id="VALlog_shift"><span class="keyword">val</span> log_shift</span> : <code class="type">(<a href="Comb.S.html#TYPEt">t</a> -> int -> <a href="Comb.S.html#TYPEt">t</a>) -> <a href="Comb.S.html#TYPEt">t</a> -> <a href="Comb.S.html#TYPEt">t</a> -> <a href="Comb.S.html#TYPEt">t</a></code></pre><div class="info ">
+shift by variable amount<br>
+</div>
+
+<pre><span id="VALuresize"><span class="keyword">val</span> uresize</span> : <code class="type"><a href="Comb.S.html#TYPEt">t</a> -> int -> <a href="Comb.S.html#TYPEt">t</a></code></pre><div class="info ">
+unsigned resize<br>
+</div>
+
+<pre><span id="VALsresize"><span class="keyword">val</span> sresize</span> : <code class="type"><a href="Comb.S.html#TYPEt">t</a> -> int -> <a href="Comb.S.html#TYPEt">t</a></code></pre><div class="info ">
+signed resize<br>
+</div>
+
+<pre><span id="VALue"><span class="keyword">val</span> ue</span> : <code class="type"><a href="Comb.S.html#TYPEt">t</a> -> <a href="Comb.S.html#TYPEt">t</a></code></pre><div class="info ">
+unsigned resize by +1 bit<br>
+</div>
+
+<pre><span id="VALse"><span class="keyword">val</span> se</span> : <code class="type"><a href="Comb.S.html#TYPEt">t</a> -> <a href="Comb.S.html#TYPEt">t</a></code></pre><div class="info ">
+signed resize by +1 bit<br>
+</div>
+
+<pre><span id="VALreduce"><span class="keyword">val</span> reduce</span> : <code class="type">(<a href="Comb.S.html#TYPEt">t</a> -> <a href="Comb.S.html#TYPEt">t</a> -> <a href="Comb.S.html#TYPEt">t</a>) -> <a href="Comb.S.html#TYPEt">t</a> list -> <a href="Comb.S.html#TYPEt">t</a></code></pre><div class="info ">
+fold 'op' though list<br>
+</div>
+
+<pre><span id="VALreverse"><span class="keyword">val</span> reverse</span> : <code class="type"><a href="Comb.S.html#TYPEt">t</a> -> <a href="Comb.S.html#TYPEt">t</a></code></pre><div class="info ">
+reverse bits<br>
+</div>
+
+<pre><span id="VALmod_counter"><span class="keyword">val</span> mod_counter</span> : <code class="type">int -> <a href="Comb.S.html#TYPEt">t</a> -> <a href="Comb.S.html#TYPEt">t</a></code></pre><div class="info ">
+Counts from 0 to (max-1) then from zero again.  
+        If max == 1&lt;&lt;n, then a comparator is not generated and overflow arithmetic used instead<br>
+</div>
+
+<pre><span id="VALtree"><span class="keyword">val</span> tree</span> : <code class="type">int -> ('a list -> 'a) -> 'a list -> 'a</code></pre><div class="info ">
+creates a tree of operations.  The arity of the operator is configurable<br>
+</div>
+
+<pre><span id="VALbinary_to_onehot"><span class="keyword">val</span> binary_to_onehot</span> : <code class="type"><a href="Comb.S.html#TYPEt">t</a> -> <a href="Comb.S.html#TYPEt">t</a></code></pre><div class="info ">
+convert binary to onehot<br>
+</div>
+
+<pre><span id="VALonehot_to_binary"><span class="keyword">val</span> onehot_to_binary</span> : <code class="type"><a href="Comb.S.html#TYPEt">t</a> -> <a href="Comb.S.html#TYPEt">t</a></code></pre><div class="info ">
+convert onehot to binary<br>
+</div>
+
+<pre><span id="VALbinary_to_gray"><span class="keyword">val</span> binary_to_gray</span> : <code class="type"><a href="Comb.S.html#TYPEt">t</a> -> <a href="Comb.S.html#TYPEt">t</a></code></pre><div class="info ">
+convert binary to gray code<br>
+</div>
+
+<pre><span id="VALgray_to_binary"><span class="keyword">val</span> gray_to_binary</span> : <code class="type"><a href="Comb.S.html#TYPEt">t</a> -> <a href="Comb.S.html#TYPEt">t</a></code></pre><div class="info ">
+convert gray code to binary<br>
+</div>
+
+<pre><span id="VALsrand"><span class="keyword">val</span> srand</span> : <code class="type">int -> <a href="Comb.S.html#TYPEt">t</a></code></pre><div class="info ">
+create random constant vector of given size<br>
+</div>
+
+<pre><span class="keyword">module type</span> <a href="Comb.S.TypedMath.html">TypedMath</a> = <code class="code">sig</code> <a href="Comb.S.TypedMath.html">..</a> <code class="code">end</code></pre>
+<pre><span class="keyword">module</span> <a href="Comb.S.Unsigned.html">Unsigned</a>: <code class="type"><a href="Comb.S.TypedMath.html">TypedMath</a></code><code class="type"> </code></pre>
+<pre><span class="keyword">module</span> <a href="Comb.S.Signed.html">Signed</a>: <code class="type"><a href="Comb.S.TypedMath.html">TypedMath</a></code><code class="type"> </code></pre></body></html>

@@ -1,0 +1,70 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<link rel="stylesheet" href="style.css" type="text/css">
+<meta content="text/html; charset=iso-8859-1" http-equiv="Content-Type">
+<link rel="Start" href="index.html">
+<link rel="Up" href="Bits.html">
+<link title="Index of types" rel=Appendix href="index_types.html">
+<link title="Index of exceptions" rel=Appendix href="index_exceptions.html">
+<link title="Index of values" rel=Appendix href="index_values.html">
+<link title="Index of class methods" rel=Appendix href="index_methods.html">
+<link title="Index of classes" rel=Appendix href="index_classes.html">
+<link title="Index of modules" rel=Appendix href="index_modules.html">
+<link title="Index of module types" rel=Appendix href="index_module_types.html">
+<link title="Utils" rel="Chapter" href="Utils.html">
+<link title="Comb" rel="Chapter" href="Comb.html">
+<link title="Bits" rel="Chapter" href="Bits.html">
+<link title="Signal" rel="Chapter" href="Signal.html">
+<link title="Syntax" rel="Chapter" href="Syntax.html">
+<link title="Circuit" rel="Chapter" href="Circuit.html">
+<link title="Rtl" rel="Chapter" href="Rtl.html">
+<link title="Fixed" rel="Chapter" href="Fixed.html">
+<link title="Const_prop" rel="Chapter" href="Const_prop.html">
+<link title="Transform" rel="Chapter" href="Transform.html">
+<link title="Cyclesim" rel="Chapter" href="Cyclesim.html">
+<link title="Vcd" rel="Chapter" href="Vcd.html">
+<link title="Vcd_ext" rel="Chapter" href="Vcd_ext.html">
+<link title="Interface" rel="Chapter" href="Interface.html">
+<link title="Recipe" rel="Chapter" href="Recipe.html">
+<link title="Xilinx" rel="Chapter" href="Xilinx.html">
+<link title="C" rel="Chapter" href="C.html">
+<link title="Structural" rel="Chapter" href="Structural.html">
+<link title="Structural_lib" rel="Chapter" href="Structural_lib.html">
+<link title="Cosim" rel="Chapter" href="Cosim.html"><title>Bits.ArraybitsBase</title>
+</head>
+<body>
+<div class="navbar">&nbsp;<a class="up" href="Bits.html" title="Bits">Up</a>
+&nbsp;</div>
+<h1>Module type <a href="type_Bits.ArraybitsBase.html">Bits.ArraybitsBase</a></h1>
+
+<pre><span class="keyword">module type</span> ArraybitsBase = <code class="code">sig</code> <a href="Bits.ArraybitsBase.html">..</a> <code class="code">end</code></pre><hr width="100%">
+
+<pre><span id="TYPEelt"><span class="keyword">type</span> <code class="type"></code>elt</span> </pre>
+
+
+<pre><span id="TYPEbarray"><span class="keyword">type</span> <code class="type"></code>barray</span> </pre>
+
+
+<pre><span id="VALnbits"><span class="keyword">val</span> nbits</span> : <code class="type">int</code></pre>
+<pre><span id="VALwords"><span class="keyword">val</span> words</span> : <code class="type">int -> int</code></pre>
+<pre><span id="VALword"><span class="keyword">val</span> word</span> : <code class="type">int -> int</code></pre>
+<pre><span id="VALcreate"><span class="keyword">val</span> create</span> : <code class="type">int -> <a href="Bits.ArraybitsBase.html#TYPEbarray">barray</a></code></pre>
+<pre><span id="VALmask"><span class="keyword">val</span> mask</span> : <code class="type">int -> <a href="Bits.ArraybitsBase.html#TYPEelt">elt</a></code></pre>
+<pre><span id="VALmask_bit"><span class="keyword">val</span> mask_bit</span> : <code class="type">int -> <a href="Bits.ArraybitsBase.html#TYPEelt">elt</a></code></pre>
+<pre><span id="VALto_bits"><span class="keyword">val</span> to_bits</span> : <code class="type">string -> <a href="Bits.ArraybitsBase.html#TYPEbarray">barray</a></code></pre>
+<pre><span id="VALto_bstr"><span class="keyword">val</span> to_bstr</span> : <code class="type">int -> <a href="Bits.ArraybitsBase.html#TYPEbarray">barray</a> -> string</code></pre>
+<pre><span id="VALto_int"><span class="keyword">val</span> to_int</span> : <code class="type"><a href="Bits.ArraybitsBase.html#TYPEbarray">barray</a> -> int</code></pre>
+<pre><span id="VALof_int"><span class="keyword">val</span> of_int</span> : <code class="type">int -> int -> <a href="Bits.ArraybitsBase.html#TYPEbarray">barray</a></code></pre>
+<pre><span id="VALzero"><span class="keyword">val</span> zero</span> : <code class="type"><a href="Bits.ArraybitsBase.html#TYPEelt">elt</a></code></pre>
+<pre><span id="VALone"><span class="keyword">val</span> one</span> : <code class="type"><a href="Bits.ArraybitsBase.html#TYPEelt">elt</a></code></pre>
+<pre><span id="VALget"><span class="keyword">val</span> get</span> : <code class="type"><a href="Bits.ArraybitsBase.html#TYPEbarray">barray</a> -> int -> <a href="Bits.ArraybitsBase.html#TYPEelt">elt</a></code></pre>
+<pre><span id="VALset"><span class="keyword">val</span> set</span> : <code class="type"><a href="Bits.ArraybitsBase.html#TYPEbarray">barray</a> -> int -> <a href="Bits.ArraybitsBase.html#TYPEelt">elt</a> -> unit</code></pre>
+<pre><span id="VAL(+.)"><span class="keyword">val</span> (+.)</span> : <code class="type"><a href="Bits.ArraybitsBase.html#TYPEelt">elt</a> -> <a href="Bits.ArraybitsBase.html#TYPEelt">elt</a> -> <a href="Bits.ArraybitsBase.html#TYPEelt">elt</a></code></pre>
+<pre><span id="VAL(-.)"><span class="keyword">val</span> (-.)</span> : <code class="type"><a href="Bits.ArraybitsBase.html#TYPEelt">elt</a> -> <a href="Bits.ArraybitsBase.html#TYPEelt">elt</a> -> <a href="Bits.ArraybitsBase.html#TYPEelt">elt</a></code></pre>
+<pre><span id="VAL(&.)"><span class="keyword">val</span> (&amp;.)</span> : <code class="type"><a href="Bits.ArraybitsBase.html#TYPEelt">elt</a> -> <a href="Bits.ArraybitsBase.html#TYPEelt">elt</a> -> <a href="Bits.ArraybitsBase.html#TYPEelt">elt</a></code></pre>
+<pre><span id="VAL(|.)"><span class="keyword">val</span> (|.)</span> : <code class="type"><a href="Bits.ArraybitsBase.html#TYPEelt">elt</a> -> <a href="Bits.ArraybitsBase.html#TYPEelt">elt</a> -> <a href="Bits.ArraybitsBase.html#TYPEelt">elt</a></code></pre>
+<pre><span id="VAL(^.)"><span class="keyword">val</span> (^.)</span> : <code class="type"><a href="Bits.ArraybitsBase.html#TYPEelt">elt</a> -> <a href="Bits.ArraybitsBase.html#TYPEelt">elt</a> -> <a href="Bits.ArraybitsBase.html#TYPEelt">elt</a></code></pre>
+<pre><span id="VAL(~.)"><span class="keyword">val</span> (~.)</span> : <code class="type"><a href="Bits.ArraybitsBase.html#TYPEelt">elt</a> -> <a href="Bits.ArraybitsBase.html#TYPEelt">elt</a></code></pre>
+<pre><span id="VAL(>>.)"><span class="keyword">val</span> (&gt;&gt;.)</span> : <code class="type"><a href="Bits.ArraybitsBase.html#TYPEelt">elt</a> -> int -> <a href="Bits.ArraybitsBase.html#TYPEelt">elt</a></code></pre>
+<pre><span id="VAL(<<.)"><span class="keyword">val</span> (&lt;&lt;.)</span> : <code class="type"><a href="Bits.ArraybitsBase.html#TYPEelt">elt</a> -> int -> <a href="Bits.ArraybitsBase.html#TYPEelt">elt</a></code></pre></body></html>

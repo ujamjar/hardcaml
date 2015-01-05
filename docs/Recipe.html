@@ -1,0 +1,137 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<link rel="stylesheet" href="style.css" type="text/css">
+<meta content="text/html; charset=iso-8859-1" http-equiv="Content-Type">
+<link rel="Start" href="index.html">
+<link rel="previous" href="Interface.html">
+<link rel="next" href="Xilinx.html">
+<link rel="Up" href="index.html">
+<link title="Index of types" rel=Appendix href="index_types.html">
+<link title="Index of exceptions" rel=Appendix href="index_exceptions.html">
+<link title="Index of values" rel=Appendix href="index_values.html">
+<link title="Index of class methods" rel=Appendix href="index_methods.html">
+<link title="Index of classes" rel=Appendix href="index_classes.html">
+<link title="Index of modules" rel=Appendix href="index_modules.html">
+<link title="Index of module types" rel=Appendix href="index_module_types.html">
+<link title="Utils" rel="Chapter" href="Utils.html">
+<link title="Comb" rel="Chapter" href="Comb.html">
+<link title="Bits" rel="Chapter" href="Bits.html">
+<link title="Signal" rel="Chapter" href="Signal.html">
+<link title="Syntax" rel="Chapter" href="Syntax.html">
+<link title="Circuit" rel="Chapter" href="Circuit.html">
+<link title="Rtl" rel="Chapter" href="Rtl.html">
+<link title="Fixed" rel="Chapter" href="Fixed.html">
+<link title="Const_prop" rel="Chapter" href="Const_prop.html">
+<link title="Transform" rel="Chapter" href="Transform.html">
+<link title="Cyclesim" rel="Chapter" href="Cyclesim.html">
+<link title="Vcd" rel="Chapter" href="Vcd.html">
+<link title="Vcd_ext" rel="Chapter" href="Vcd_ext.html">
+<link title="Interface" rel="Chapter" href="Interface.html">
+<link title="Recipe" rel="Chapter" href="Recipe.html">
+<link title="Xilinx" rel="Chapter" href="Xilinx.html">
+<link title="C" rel="Chapter" href="C.html">
+<link title="Structural" rel="Chapter" href="Structural.html">
+<link title="Structural_lib" rel="Chapter" href="Structural_lib.html">
+<link title="Cosim" rel="Chapter" href="Cosim.html"><title>Recipe</title>
+</head>
+<body>
+<div class="navbar"><a class="pre" href="Interface.html" title="Interface">Previous</a>
+&nbsp;<a class="up" href="index.html" title="Index">Up</a>
+&nbsp;<a class="post" href="Xilinx.html" title="Xilinx">Next</a>
+</div>
+<h1>Module <a href="type_Recipe.html">Recipe</a></h1>
+
+<pre><span class="keyword">module</span> Recipe: <code class="code">sig</code> <a href="Recipe.html">..</a> <code class="code">end</code></pre><div class="info module top">
+Hardware generation in an imperative style<br>
+</div>
+<hr width="100%">
+<br>
+create sequential hardware designs using <code class="code">if</code>, <code class="code">while</code> and <code class="code">assignment</code><br>
+
+<pre><span id="TYPEvar"><span class="keyword">type</span> <code class="type"></code>var</span> </pre>
+
+
+<pre><span id="TYPEinp"><span class="keyword">type</span> <code class="type"></code>inp</span> </pre>
+
+
+<pre><span id="TYPEenv"><span class="keyword">type</span> <code class="type"></code>env</span> </pre>
+
+
+<pre><span id="TYPErecipe"><span class="keyword">type</span> <code class="type">'a</code> recipe</span> </pre>
+
+
+<pre><span class="keyword">module</span> <a href="Recipe.Monad.html">Monad</a>: <code class="code">sig</code> <a href="Recipe.Monad.html">..</a> <code class="code">end</code></pre>
+<pre><span id="VALskip"><span class="keyword">val</span> skip</span> : <code class="type">unit <a href="Recipe.html#TYPErecipe">recipe</a></code></pre><div class="info ">
+skip 1 cycle<br>
+</div>
+
+<pre><span id="VALwait"><span class="keyword">val</span> wait</span> : <code class="type">int -> unit <a href="Recipe.html#TYPErecipe">recipe</a></code></pre><div class="info ">
+skip n cycles<br>
+</div>
+
+<pre><span id="VALpar"><span class="keyword">val</span> par</span> : <code class="type">?comb_fin:bool -> 'a <a href="Recipe.html#TYPErecipe">recipe</a> list -> 'a list <a href="Recipe.html#TYPErecipe">recipe</a></code></pre><div class="info ">
+perform recipes in parallel.  <code class="code">comb_fin</code> controls the finish signal
+    generation.  When false and extra cycle is taken after the recipes
+    complete to generate the <code class="code">fin</code> signal.  Otherwise extra combinatorial
+    logic is generated to ensure the <code class="code">fin</code> signal toggles on the same
+    cycle as the last recipe to complete.<br>
+</div>
+
+<pre><span id="VALpar2"><span class="keyword">val</span> par2</span> : <code class="type">?comb_fin:bool -><br>       'a <a href="Recipe.html#TYPErecipe">recipe</a> -> 'b <a href="Recipe.html#TYPErecipe">recipe</a> -> ('a * 'b) <a href="Recipe.html#TYPErecipe">recipe</a></code></pre>
+<pre><span id="VAL(|||)"><span class="keyword">val</span> (|||)</span> : <code class="type">'a <a href="Recipe.html#TYPErecipe">recipe</a> -> 'b <a href="Recipe.html#TYPErecipe">recipe</a> -> ('a * 'b) <a href="Recipe.html#TYPErecipe">recipe</a></code></pre>
+<pre><span id="VALcond"><span class="keyword">val</span> cond</span> : <code class="type">Signal.Comb.t -> 'a <a href="Recipe.html#TYPErecipe">recipe</a> -> 'b <a href="Recipe.html#TYPErecipe">recipe</a> -> unit <a href="Recipe.html#TYPErecipe">recipe</a></code></pre><div class="info ">
+<code class="code">cond c t f</code>  performs <code class="code">t</code> if <code class="code">c</code> is high, otherwise performs <code class="code">f</code><br>
+</div>
+
+<pre><span id="VALiter"><span class="keyword">val</span> iter</span> : <code class="type">Signal.Comb.t -> 'a <a href="Recipe.html#TYPErecipe">recipe</a> -> 'a <a href="Recipe.html#TYPErecipe">recipe</a></code></pre><div class="info ">
+<code class="code">iter c t</code> perform <code class="code">t</code> while <code class="code">c</code> is high<br>
+</div>
+
+<pre><span id="VALforever"><span class="keyword">val</span> forever</span> : <code class="type">'a <a href="Recipe.html#TYPErecipe">recipe</a> -> 'a <a href="Recipe.html#TYPErecipe">recipe</a></code></pre><div class="info ">
+perform recipe forever<br>
+</div>
+
+<pre><span id="VALwaitWhile"><span class="keyword">val</span> waitWhile</span> : <code class="type">Signal.Comb.t -> unit <a href="Recipe.html#TYPErecipe">recipe</a></code></pre><div class="info ">
+wait until <code class="code">t</code> is low<br>
+</div>
+
+<pre><span id="VALwaitUntil"><span class="keyword">val</span> waitUntil</span> : <code class="type">Signal.Comb.t -> unit <a href="Recipe.html#TYPErecipe">recipe</a></code></pre><div class="info ">
+wait until <code class="code">t</code> is high<br>
+</div>
+
+<pre><span id="VALfollow"><span class="keyword">val</span> follow</span> : <code class="type">Signal.Comb.t -> 'a <a href="Recipe.html#TYPErecipe">recipe</a> -> Signal.Comb.t * 'a</code></pre><div class="info ">
+follow recipe and get result<br>
+</div>
+
+<pre><span id="VALnewVar"><span class="keyword">val</span> newVar</span> : <code class="type">?name:string -> int -> <a href="Recipe.html#TYPEvar">var</a> <a href="Recipe.html#TYPErecipe">recipe</a></code></pre><div class="info ">
+create an new <code class="code">n</code> bit register<br>
+</div>
+
+<pre><span id="VALreadVar"><span class="keyword">val</span> readVar</span> : <code class="type"><a href="Recipe.html#TYPEvar">var</a> -> Signal.Comb.t <a href="Recipe.html#TYPErecipe">recipe</a></code></pre><div class="info ">
+read value of register<br>
+</div>
+
+<pre><span id="VALassign"><span class="keyword">val</span> assign</span> : <code class="type">(<a href="Recipe.html#TYPEvar">var</a> * Signal.Comb.t) list -> unit <a href="Recipe.html#TYPErecipe">recipe</a></code></pre><div class="info ">
+assign list of registers - takes 1 cycle<br>
+</div>
+
+<pre><span id="VALwriteVar"><span class="keyword">val</span> writeVar</span> : <code class="type"><a href="Recipe.html#TYPEvar">var</a> -> Signal.Comb.t -> unit <a href="Recipe.html#TYPErecipe">recipe</a></code></pre><div class="info ">
+write register with value<br>
+</div>
+
+<pre><span id="VALmodifyVar"><span class="keyword">val</span> modifyVar</span> : <code class="type">(Signal.Comb.t -> Signal.Comb.t) -> <a href="Recipe.html#TYPEvar">var</a> -> unit <a href="Recipe.html#TYPErecipe">recipe</a></code></pre><div class="info ">
+modify current value of resgiter<br>
+</div>
+
+<pre><span id="VALrewriteVar"><span class="keyword">val</span> rewriteVar</span> : <code class="type">(Signal.Comb.t -> Signal.Comb.t) -><br>       <a href="Recipe.html#TYPEvar">var</a> -> <a href="Recipe.html#TYPEvar">var</a> -> unit <a href="Recipe.html#TYPErecipe">recipe</a></code></pre><div class="info ">
+read a register, modify value, write a second register<br>
+</div>
+
+<pre><span class="keyword">module type</span> <a href="Recipe.Same.html">Same</a> = <code class="code">sig</code> <a href="Recipe.Same.html">..</a> <code class="code">end</code></pre>
+<pre><span class="keyword">module</span> <a href="Recipe.Same.html">Same</a>: <div class="sig_block"><code class="code">functor (</code><code class="code">X</code><code class="code"> : </code><code class="type"><a href="Interface.S.html">Interface.S</a></code><code class="code">) -&gt; </code><code class="type"><a href="Recipe.Same.html">Same</a></code><code class="type">  with type 'a same = 'a X.t</code></div></pre>
+<pre><span class="keyword">module</span> <a href="Recipe.SVar.html">SVar</a>: <code class="type"><a href="Recipe.Same.html">Same</a></code><code class="type">  with type 'a same = 'a</code></pre>
+<pre><span class="keyword">module</span> <a href="Recipe.SList.html">SList</a>: <code class="type"><a href="Recipe.Same.html">Same</a></code><code class="type">  with type 'a same = 'a list</code></pre>
+<pre><span class="keyword">module</span> <a href="Recipe.SArray.html">SArray</a>: <code class="type"><a href="Recipe.Same.html">Same</a></code><code class="type">  with type 'a same = 'a array</code></pre>
+<pre><span class="keyword">module</span> <a href="Recipe.STuple2.html">STuple2</a>: <code class="type"><a href="Recipe.Same.html">Same</a></code><code class="type">  with type 'a same = 'a * 'a</code></pre>
+<pre><span class="keyword">module</span> <a href="Recipe.STuple3.html">STuple3</a>: <code class="type"><a href="Recipe.Same.html">Same</a></code><code class="type">  with type 'a same = 'a * 'a * 'a</code></pre></body></html>

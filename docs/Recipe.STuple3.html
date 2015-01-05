@@ -1,0 +1,56 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<link rel="stylesheet" href="style.css" type="text/css">
+<meta content="text/html; charset=iso-8859-1" http-equiv="Content-Type">
+<link rel="Start" href="index.html">
+<link rel="previous" href="Recipe.STuple2.html">
+<link rel="Up" href="Recipe.html">
+<link title="Index of types" rel=Appendix href="index_types.html">
+<link title="Index of exceptions" rel=Appendix href="index_exceptions.html">
+<link title="Index of values" rel=Appendix href="index_values.html">
+<link title="Index of class methods" rel=Appendix href="index_methods.html">
+<link title="Index of classes" rel=Appendix href="index_classes.html">
+<link title="Index of modules" rel=Appendix href="index_modules.html">
+<link title="Index of module types" rel=Appendix href="index_module_types.html">
+<link title="Utils" rel="Chapter" href="Utils.html">
+<link title="Comb" rel="Chapter" href="Comb.html">
+<link title="Bits" rel="Chapter" href="Bits.html">
+<link title="Signal" rel="Chapter" href="Signal.html">
+<link title="Syntax" rel="Chapter" href="Syntax.html">
+<link title="Circuit" rel="Chapter" href="Circuit.html">
+<link title="Rtl" rel="Chapter" href="Rtl.html">
+<link title="Fixed" rel="Chapter" href="Fixed.html">
+<link title="Const_prop" rel="Chapter" href="Const_prop.html">
+<link title="Transform" rel="Chapter" href="Transform.html">
+<link title="Cyclesim" rel="Chapter" href="Cyclesim.html">
+<link title="Vcd" rel="Chapter" href="Vcd.html">
+<link title="Vcd_ext" rel="Chapter" href="Vcd_ext.html">
+<link title="Interface" rel="Chapter" href="Interface.html">
+<link title="Recipe" rel="Chapter" href="Recipe.html">
+<link title="Xilinx" rel="Chapter" href="Xilinx.html">
+<link title="C" rel="Chapter" href="C.html">
+<link title="Structural" rel="Chapter" href="Structural.html">
+<link title="Structural_lib" rel="Chapter" href="Structural_lib.html">
+<link title="Cosim" rel="Chapter" href="Cosim.html"><title>Recipe.STuple3</title>
+</head>
+<body>
+<div class="navbar"><a class="pre" href="Recipe.STuple2.html" title="Recipe.STuple2">Previous</a>
+&nbsp;<a class="up" href="Recipe.html" title="Recipe">Up</a>
+&nbsp;</div>
+<h1>Module <a href="type_Recipe.STuple3.html">Recipe.STuple3</a></h1>
+
+<pre><span class="keyword">module</span> STuple3: <code class="type"><a href="Recipe.Same.html">Same</a></code><code class="type">  with type 'a same = 'a * 'a * 'a</code></pre><hr width="100%">
+
+<pre><span id="TYPEsame"><span class="keyword">type</span> <code class="type">'a</code> same</span> </pre>
+
+
+<pre><span id="VALsmap"><span class="keyword">val</span> smap</span> : <code class="type">(<a href="Recipe.html#TYPEvar">Recipe.var</a> -> Signal.Comb.t) -><br>       <a href="Recipe.html#TYPEvar">Recipe.var</a> <a href="Recipe.Same.html#TYPEsame">same</a> -> Signal.Comb.t <a href="Recipe.Same.html#TYPEsame">same</a></code></pre>
+<pre><span id="VALszip"><span class="keyword">val</span> szip</span> : <code class="type"><a href="Recipe.html#TYPEvar">Recipe.var</a> <a href="Recipe.Same.html#TYPEsame">same</a> -><br>       Signal.Comb.t <a href="Recipe.Same.html#TYPEsame">same</a> -> (<a href="Recipe.html#TYPEvar">Recipe.var</a> * Signal.Comb.t) list</code></pre>
+<pre><span id="VALnewVar"><span class="keyword">val</span> newVar</span> : <code class="type">unit -> <a href="Recipe.html#TYPEvar">Recipe.var</a> <a href="Recipe.Same.html#TYPEsame">same</a> <a href="Recipe.html#TYPErecipe">Recipe.recipe</a></code></pre>
+<pre><span id="VALread"><span class="keyword">val</span> read</span> : <code class="type"><a href="Recipe.html#TYPEvar">Recipe.var</a> <a href="Recipe.Same.html#TYPEsame">same</a> -> Signal.Comb.t <a href="Recipe.Same.html#TYPEsame">same</a> <a href="Recipe.html#TYPErecipe">Recipe.recipe</a></code></pre>
+<pre><span id="VALrewrite"><span class="keyword">val</span> rewrite</span> : <code class="type">(Signal.Comb.t <a href="Recipe.Same.html#TYPEsame">same</a> -> Signal.Comb.t <a href="Recipe.Same.html#TYPEsame">same</a>) -><br>       <a href="Recipe.html#TYPEvar">Recipe.var</a> <a href="Recipe.Same.html#TYPEsame">same</a> -><br>       <a href="Recipe.html#TYPEvar">Recipe.var</a> <a href="Recipe.Same.html#TYPEsame">same</a> -> unit <a href="Recipe.html#TYPErecipe">Recipe.recipe</a></code></pre>
+<pre><span id="VALapply"><span class="keyword">val</span> apply</span> : <code class="type">(Signal.Comb.t <a href="Recipe.Same.html#TYPEsame">same</a> -> Signal.Comb.t <a href="Recipe.Same.html#TYPEsame">same</a>) -><br>       <a href="Recipe.html#TYPEvar">Recipe.var</a> <a href="Recipe.Same.html#TYPEsame">same</a> -> unit <a href="Recipe.html#TYPErecipe">Recipe.recipe</a></code></pre>
+<pre><span id="VALset"><span class="keyword">val</span> set</span> : <code class="type"><a href="Recipe.html#TYPEvar">Recipe.var</a> <a href="Recipe.Same.html#TYPEsame">same</a> -><br>       Signal.Comb.t <a href="Recipe.Same.html#TYPEsame">same</a> -> unit <a href="Recipe.html#TYPErecipe">Recipe.recipe</a></code></pre>
+<pre><span id="VALifte"><span class="keyword">val</span> ifte</span> : <code class="type">(Signal.Comb.t <a href="Recipe.Same.html#TYPEsame">same</a> -> Signal.Comb.t) -><br>       <a href="Recipe.html#TYPEvar">Recipe.var</a> <a href="Recipe.Same.html#TYPEsame">same</a> -><br>       'a <a href="Recipe.html#TYPErecipe">Recipe.recipe</a> -> 'b <a href="Recipe.html#TYPErecipe">Recipe.recipe</a> -> unit <a href="Recipe.html#TYPErecipe">Recipe.recipe</a></code></pre>
+<pre><span id="VALwhile_"><span class="keyword">val</span> while_</span> : <code class="type">(Signal.Comb.t <a href="Recipe.Same.html#TYPEsame">same</a> -> Signal.Comb.t) -><br>       <a href="Recipe.html#TYPEvar">Recipe.var</a> <a href="Recipe.Same.html#TYPEsame">same</a> -> 'a <a href="Recipe.html#TYPErecipe">Recipe.recipe</a> -> 'a <a href="Recipe.html#TYPErecipe">Recipe.recipe</a></code></pre></body></html>

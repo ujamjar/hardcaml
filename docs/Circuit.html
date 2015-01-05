@@ -1,0 +1,187 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<link rel="stylesheet" href="style.css" type="text/css">
+<meta content="text/html; charset=iso-8859-1" http-equiv="Content-Type">
+<link rel="Start" href="index.html">
+<link rel="previous" href="Syntax.html">
+<link rel="next" href="Rtl.html">
+<link rel="Up" href="index.html">
+<link title="Index of types" rel=Appendix href="index_types.html">
+<link title="Index of exceptions" rel=Appendix href="index_exceptions.html">
+<link title="Index of values" rel=Appendix href="index_values.html">
+<link title="Index of class methods" rel=Appendix href="index_methods.html">
+<link title="Index of classes" rel=Appendix href="index_classes.html">
+<link title="Index of modules" rel=Appendix href="index_modules.html">
+<link title="Index of module types" rel=Appendix href="index_module_types.html">
+<link title="Utils" rel="Chapter" href="Utils.html">
+<link title="Comb" rel="Chapter" href="Comb.html">
+<link title="Bits" rel="Chapter" href="Bits.html">
+<link title="Signal" rel="Chapter" href="Signal.html">
+<link title="Syntax" rel="Chapter" href="Syntax.html">
+<link title="Circuit" rel="Chapter" href="Circuit.html">
+<link title="Rtl" rel="Chapter" href="Rtl.html">
+<link title="Fixed" rel="Chapter" href="Fixed.html">
+<link title="Const_prop" rel="Chapter" href="Const_prop.html">
+<link title="Transform" rel="Chapter" href="Transform.html">
+<link title="Cyclesim" rel="Chapter" href="Cyclesim.html">
+<link title="Vcd" rel="Chapter" href="Vcd.html">
+<link title="Vcd_ext" rel="Chapter" href="Vcd_ext.html">
+<link title="Interface" rel="Chapter" href="Interface.html">
+<link title="Recipe" rel="Chapter" href="Recipe.html">
+<link title="Xilinx" rel="Chapter" href="Xilinx.html">
+<link title="C" rel="Chapter" href="C.html">
+<link title="Structural" rel="Chapter" href="Structural.html">
+<link title="Structural_lib" rel="Chapter" href="Structural_lib.html">
+<link title="Cosim" rel="Chapter" href="Cosim.html"><title>Circuit</title>
+</head>
+<body>
+<div class="navbar"><a class="pre" href="Syntax.html" title="Syntax">Previous</a>
+&nbsp;<a class="up" href="index.html" title="Index">Up</a>
+&nbsp;<a class="post" href="Rtl.html" title="Rtl">Next</a>
+</div>
+<h1>Module <a href="type_Circuit.html">Circuit</a></h1>
+
+<pre><span class="keyword">module</span> Circuit: <code class="code">sig</code> <a href="Circuit.html">..</a> <code class="code">end</code></pre><div class="info module top">
+Creation and manipulation of hardware circuits<br>
+</div>
+<hr width="100%">
+
+<pre><span id="EXCEPTIONFailure"><span class="keyword">exception</span> Failure</span> <span class="keyword">of</span> <code class="type">string</code></pre>
+
+<pre><span class="keyword">module</span> <a href="Circuit.Mangler.html">Mangler</a>: <code class="code">sig</code> <a href="Circuit.Mangler.html">..</a> <code class="code">end</code></pre><div class="info">
+Generation of valid netlist names from signal names
+</div>
+
+<pre><code><span id="TYPEt"><span class="keyword">type</span> <code class="type"></code>t</span> = {</code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTt.circ_name">circ_name</span>&nbsp;: <code class="type">string</code>;</code></td>
+<td class="typefieldcomment" align="left" valign="top" ><code>(*</code></td><td class="typefieldcomment" align="left" valign="top" ><div class="info ">
+circuit name<br>
+</div>
+</td><td class="typefieldcomment" align="left" valign="bottom" ><code>*)</code></td>
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTt.circ_id_to_sig">circ_id_to_sig</span>&nbsp;: <code class="type"><a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a> Signal.Types.UidMap.t</code>;</code></td>
+<td class="typefieldcomment" align="left" valign="top" ><code>(*</code></td><td class="typefieldcomment" align="left" valign="top" ><div class="info ">
+map id's to signals<br>
+</div>
+</td><td class="typefieldcomment" align="left" valign="bottom" ><code>*)</code></td>
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTt.circ_inputs">circ_inputs</span>&nbsp;: <code class="type"><a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a> list</code>;</code></td>
+<td class="typefieldcomment" align="left" valign="top" ><code>(*</code></td><td class="typefieldcomment" align="left" valign="top" ><div class="info ">
+circuit inputs<br>
+</div>
+</td><td class="typefieldcomment" align="left" valign="bottom" ><code>*)</code></td>
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTt.circ_outputs">circ_outputs</span>&nbsp;: <code class="type"><a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a> list</code>;</code></td>
+<td class="typefieldcomment" align="left" valign="top" ><code>(*</code></td><td class="typefieldcomment" align="left" valign="top" ><div class="info ">
+circuit outputs<br>
+</div>
+</td><td class="typefieldcomment" align="left" valign="bottom" ><code>*)</code></td>
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTt.circ_fanout">circ_fanout</span>&nbsp;: <code class="type">Signal.Types.UidSet.t Signal.Types.UidMap.t</code>;</code></td>
+<td class="typefieldcomment" align="left" valign="top" ><code>(*</code></td><td class="typefieldcomment" align="left" valign="top" ><div class="info ">
+fanout's of each signal<br>
+</div>
+</td><td class="typefieldcomment" align="left" valign="bottom" ><code>*)</code></td>
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTt.circ_fanin">circ_fanin</span>&nbsp;: <code class="type">Signal.Types.UidSet.t Signal.Types.UidMap.t</code>;</code></td>
+<td class="typefieldcomment" align="left" valign="top" ><code>(*</code></td><td class="typefieldcomment" align="left" valign="top" ><div class="info ">
+fanin's of each signal<br>
+</div>
+</td><td class="typefieldcomment" align="left" valign="bottom" ><code>*)</code></td>
+</tr></table>
+}
+
+<div class="info ">
+circuit data structure<br>
+</div>
+
+
+<pre><span id="VALmake"><span class="keyword">val</span> make</span> : <code class="type">string -> <a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a> list -> <a href="Circuit.html#TYPEt">t</a></code></pre><div class="info ">
+create circuit data structure<br>
+</div>
+
+<pre><span id="VALid"><span class="keyword">val</span> id</span> : <code class="type">'a -> <a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a> -> 'a</code></pre><div class="info ">
+null search function<br>
+</div>
+
+<pre><span id="VALsearch1"><span class="keyword">val</span> search1</span> : <code class="type">('a -> <a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a> -> 'a) -><br>       ('a -> <a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a> -> 'a) -> 'a -> <a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a> -> 'a</code></pre><div class="info ">
+search circuit starting at given signal<br>
+</div>
+
+<pre><span id="VALsearch"><span class="keyword">val</span> search</span> : <code class="type">('a -> <a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a> -> 'a) -><br>       ('a -> <a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a> -> 'a) -> 'a -> <a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a> list -> 'a</code></pre><div class="info ">
+search circuit from each given signal<br>
+</div>
+
+<pre><span id="VALset_of_signals"><span class="keyword">val</span> set_of_signals</span> : <code class="type"><a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a> list -> Signal.Types.UidSet.t</code></pre><div class="info ">
+create a set of UID's from each given signal<br>
+</div>
+
+<pre><span id="VALfilter"><span class="keyword">val</span> filter</span> : <code class="type">(<a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a> -> bool) -><br>       <a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a> list -> <a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a> list</code></pre><div class="info ">
+filter on signals<br>
+</div>
+
+<pre><span id="VALinputs"><span class="keyword">val</span> inputs</span> : <code class="type"><a href="Circuit.html#TYPEt">t</a> -> <a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a> list</code></pre><div class="info ">
+return circuit inputs<br>
+</div>
+
+<pre><span id="VALoutputs"><span class="keyword">val</span> outputs</span> : <code class="type"><a href="Circuit.html#TYPEt">t</a> -> <a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a> list</code></pre><div class="info ">
+return circuit outputs<br>
+</div>
+
+<pre><span id="VALname"><span class="keyword">val</span> name</span> : <code class="type"><a href="Circuit.html#TYPEt">t</a> -> string</code></pre><div class="info ">
+return circuit name<br>
+</div>
+
+<pre><span id="VALmangle_names"><span class="keyword">val</span> mangle_names</span> : <code class="type">string list -> string -> <a href="Circuit.html#TYPEt">t</a> -> <a href="Signal.Types.html#TYPEuid">Signal.Types.uid</a> -> int -> string</code></pre><div class="info ">
+create a map of signal uids to mangled names<br>
+</div>
+
+<pre><span id="VALis_input"><span class="keyword">val</span> is_input</span> : <code class="type"><a href="Circuit.html#TYPEt">t</a> -> <a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a> -> bool</code></pre><div class="info ">
+is the signal an input to the circuit<br>
+</div>
+
+<pre><span id="VALis_output"><span class="keyword">val</span> is_output</span> : <code class="type"><a href="Circuit.html#TYPEt">t</a> -> <a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a> -> bool</code></pre><div class="info ">
+is the signal an output of the circuit<br>
+</div>
+
+<pre><span id="VALsignal_of_uid"><span class="keyword">val</span> signal_of_uid</span> : <code class="type"><a href="Circuit.html#TYPEt">t</a> -> <a href="Signal.Types.html#TYPEuid">Signal.Types.uid</a> -> <a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a></code></pre>
+<pre><span id="VALsignal_map"><span class="keyword">val</span> signal_map</span> : <code class="type"><a href="Circuit.html#TYPEt">t</a> -> <a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a> Signal.Types.UidMap.t</code></pre>
+<pre><span id="VALfind_fanout"><span class="keyword">val</span> find_fanout</span> : <code class="type">(<a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a> -> <a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a> list) -><br>       <a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a> list -> Signal.Types.UidSet.t Signal.Types.UidMap.t</code></pre><div class="info ">
+construct a set of fanouts from nodes<br>
+</div>
+
+<pre><span id="VALfind_signals"><span class="keyword">val</span> find_signals</span> : <code class="type">(<a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a> -> bool) -><br>       <a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a> list -> <a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a> list</code></pre>
+<pre><span id="VALfind_signals_by_name"><span class="keyword">val</span> find_signals_by_name</span> : <code class="type">string -> <a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a> list -> <a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a> list</code></pre><div class="info ">
+find all signals which match the given name<br>
+</div>
+
+<pre><span id="VALstructural_compare"><span class="keyword">val</span> structural_compare</span> : <code class="type"><a href="Circuit.html#TYPEt">t</a> -> <a href="Circuit.html#TYPEt">t</a> -> bool</code></pre><div class="info ">
+compare 2 circuits to see if they are the same<br>
+</div>
+
+<pre><span class="keyword">module</span> <a href="Circuit.Hierarchy.html">Hierarchy</a>: <code class="code">sig</code> <a href="Circuit.Hierarchy.html">..</a> <code class="code">end</code></pre></body></html>

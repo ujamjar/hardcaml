@@ -1,0 +1,491 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<link rel="stylesheet" href="style.css" type="text/css">
+<meta content="text/html; charset=iso-8859-1" http-equiv="Content-Type">
+<link rel="Start" href="index.html">
+<link rel="next" href="Signal.Base.html">
+<link rel="Up" href="Signal.html">
+<link title="Index of types" rel=Appendix href="index_types.html">
+<link title="Index of exceptions" rel=Appendix href="index_exceptions.html">
+<link title="Index of values" rel=Appendix href="index_values.html">
+<link title="Index of class methods" rel=Appendix href="index_methods.html">
+<link title="Index of classes" rel=Appendix href="index_classes.html">
+<link title="Index of modules" rel=Appendix href="index_modules.html">
+<link title="Index of module types" rel=Appendix href="index_module_types.html">
+<link title="Utils" rel="Chapter" href="Utils.html">
+<link title="Comb" rel="Chapter" href="Comb.html">
+<link title="Bits" rel="Chapter" href="Bits.html">
+<link title="Signal" rel="Chapter" href="Signal.html">
+<link title="Syntax" rel="Chapter" href="Syntax.html">
+<link title="Circuit" rel="Chapter" href="Circuit.html">
+<link title="Rtl" rel="Chapter" href="Rtl.html">
+<link title="Fixed" rel="Chapter" href="Fixed.html">
+<link title="Const_prop" rel="Chapter" href="Const_prop.html">
+<link title="Transform" rel="Chapter" href="Transform.html">
+<link title="Cyclesim" rel="Chapter" href="Cyclesim.html">
+<link title="Vcd" rel="Chapter" href="Vcd.html">
+<link title="Vcd_ext" rel="Chapter" href="Vcd_ext.html">
+<link title="Interface" rel="Chapter" href="Interface.html">
+<link title="Recipe" rel="Chapter" href="Recipe.html">
+<link title="Xilinx" rel="Chapter" href="Xilinx.html">
+<link title="C" rel="Chapter" href="C.html">
+<link title="Structural" rel="Chapter" href="Structural.html">
+<link title="Structural_lib" rel="Chapter" href="Structural_lib.html">
+<link title="Cosim" rel="Chapter" href="Cosim.html"><title>Signal.Types</title>
+</head>
+<body>
+<div class="navbar">&nbsp;<a class="up" href="Signal.html" title="Signal">Up</a>
+&nbsp;<a class="post" href="Signal.Base.html" title="Signal.Base">Next</a>
+</div>
+<h1>Module <a href="type_Signal.Types.html">Signal.Types</a></h1>
+
+<pre><span class="keyword">module</span> Types: <code class="code">sig</code> <a href="Signal.Types.html">..</a> <code class="code">end</code></pre><div class="info module top">
+Signal data type and low-level functions<br>
+</div>
+<hr width="100%">
+
+<pre><code><span id="TYPEsignal_op"><span class="keyword">type</span> <code class="type"></code>signal_op</span> = </code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTsignal_op.Signal_add"><span class="constructor">Signal_add</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTsignal_op.Signal_sub"><span class="constructor">Signal_sub</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTsignal_op.Signal_mulu"><span class="constructor">Signal_mulu</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTsignal_op.Signal_muls"><span class="constructor">Signal_muls</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTsignal_op.Signal_and"><span class="constructor">Signal_and</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTsignal_op.Signal_or"><span class="constructor">Signal_or</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTsignal_op.Signal_xor"><span class="constructor">Signal_xor</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTsignal_op.Signal_eq"><span class="constructor">Signal_eq</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTsignal_op.Signal_not"><span class="constructor">Signal_not</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTsignal_op.Signal_lt"><span class="constructor">Signal_lt</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTsignal_op.Signal_cat"><span class="constructor">Signal_cat</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTsignal_op.Signal_mux"><span class="constructor">Signal_mux</span></span></code></td>
+
+</tr></table>
+
+<div class="info ">
+simple operators<br>
+</div>
+
+
+<pre><span id="TYPEuid"><span class="keyword">type</span> <code class="type"></code>uid</span> = <code class="type">int64</code> </pre>
+
+
+<pre><span class="keyword">module</span> <a href="Signal.Types.UidMap.html">UidMap</a>: <code class="type">Map.S</code><code class="type">  with type key = uid</code></pre>
+<pre><span class="keyword">module</span> <a href="Signal.Types.UidSet.html">UidSet</a>: <code class="type">Set.S</code><code class="type">  with type elt = uid</code></pre>
+<pre><code><span id="TYPEsignal_id"><span class="keyword">type</span> <code class="type"></code>signal_id</span> = {</code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTsignal_id.s_id">s_id</span>&nbsp;: <code class="type"><a href="Signal.Types.html#TYPEuid">uid</a></code>;</code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span class="keyword">mutable&nbsp;</span><span id="TYPEELTsignal_id.s_names">s_names</span>&nbsp;: <code class="type">string list</code>;</code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTsignal_id.s_width">s_width</span>&nbsp;: <code class="type">int</code>;</code></td>
+<td class="typefieldcomment" align="left" valign="top" ><code>(*</code></td><td class="typefieldcomment" align="left" valign="top" ><div class="info ">
+making this mutable turns hardcaml from pretty functional
+              * to pretty imperative.  however, if used carefully and only
+              * with the library, we can provide a potentially easier way
+              * of changing the graph structure in some cases<br>
+</div>
+</td><td class="typefieldcomment" align="left" valign="bottom" ><code>*)</code></td>
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span class="keyword">mutable&nbsp;</span><span id="TYPEELTsignal_id.s_deps">s_deps</span>&nbsp;: <code class="type"><a href="Signal.Types.html#TYPEsignal">signal</a> list</code>;</code></td>
+
+</tr></table>
+}
+
+<div class="info ">
+internal structure for tracking signals<br>
+</div>
+
+
+<pre><code><span id="TYPEsignal"><span class="keyword">type</span> <code class="type"></code>signal</span> = </code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTsignal.Signal_empty"><span class="constructor">Signal_empty</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTsignal.Signal_const"><span class="constructor">Signal_const</span></span> <span class="keyword">of</span> <code class="type"><a href="Signal.Types.html#TYPEsignal_id">signal_id</a> * string</code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTsignal.Signal_op"><span class="constructor">Signal_op</span></span> <span class="keyword">of</span> <code class="type"><a href="Signal.Types.html#TYPEsignal_id">signal_id</a> * <a href="Signal.Types.html#TYPEsignal_op">signal_op</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTsignal.Signal_wire"><span class="constructor">Signal_wire</span></span> <span class="keyword">of</span> <code class="type"><a href="Signal.Types.html#TYPEsignal_id">signal_id</a> * <a href="Signal.Types.html#TYPEsignal">signal</a> Pervasives.ref</code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTsignal.Signal_select"><span class="constructor">Signal_select</span></span> <span class="keyword">of</span> <code class="type"><a href="Signal.Types.html#TYPEsignal_id">signal_id</a> * int * int</code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTsignal.Signal_reg"><span class="constructor">Signal_reg</span></span> <span class="keyword">of</span> <code class="type"><a href="Signal.Types.html#TYPEsignal_id">signal_id</a> * <a href="Signal.Types.html#TYPEregister">register</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTsignal.Signal_mem"><span class="constructor">Signal_mem</span></span> <span class="keyword">of</span> <code class="type"><a href="Signal.Types.html#TYPEsignal_id">signal_id</a> * <a href="Signal.Types.html#TYPEuid">uid</a> * <a href="Signal.Types.html#TYPEregister">register</a><br>        * <a href="Signal.Types.html#TYPEmemory">memory</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTsignal.Signal_inst"><span class="constructor">Signal_inst</span></span> <span class="keyword">of</span> <code class="type"><a href="Signal.Types.html#TYPEsignal_id">signal_id</a> * <a href="Signal.Types.html#TYPEuid">uid</a> * <a href="Signal.Types.html#TYPEinstantiation">instantiation</a></code></code></td>
+
+</tr></table>
+
+<div class="info ">
+main signal data type<br>
+</div>
+
+
+<pre><code><span id="TYPEregister"><span class="keyword">type</span> <code class="type"></code>register</span> = {</code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTregister.reg_clock">reg_clock</span>&nbsp;: <code class="type"><a href="Signal.Types.html#TYPEsignal">signal</a></code>;</code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTregister.reg_clock_level">reg_clock_level</span>&nbsp;: <code class="type"><a href="Signal.Types.html#TYPEsignal">signal</a></code>;</code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTregister.reg_reset">reg_reset</span>&nbsp;: <code class="type"><a href="Signal.Types.html#TYPEsignal">signal</a></code>;</code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTregister.reg_reset_level">reg_reset_level</span>&nbsp;: <code class="type"><a href="Signal.Types.html#TYPEsignal">signal</a></code>;</code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTregister.reg_reset_value">reg_reset_value</span>&nbsp;: <code class="type"><a href="Signal.Types.html#TYPEsignal">signal</a></code>;</code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTregister.reg_clear">reg_clear</span>&nbsp;: <code class="type"><a href="Signal.Types.html#TYPEsignal">signal</a></code>;</code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTregister.reg_clear_level">reg_clear_level</span>&nbsp;: <code class="type"><a href="Signal.Types.html#TYPEsignal">signal</a></code>;</code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTregister.reg_clear_value">reg_clear_value</span>&nbsp;: <code class="type"><a href="Signal.Types.html#TYPEsignal">signal</a></code>;</code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTregister.reg_enable">reg_enable</span>&nbsp;: <code class="type"><a href="Signal.Types.html#TYPEsignal">signal</a></code>;</code></td>
+
+</tr></table>
+}
+
+
+
+<pre><code><span id="TYPEmemory"><span class="keyword">type</span> <code class="type"></code>memory</span> = {</code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTmemory.mem_size">mem_size</span>&nbsp;: <code class="type">int</code>;</code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTmemory.mem_read_address">mem_read_address</span>&nbsp;: <code class="type"><a href="Signal.Types.html#TYPEsignal">signal</a></code>;</code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTmemory.mem_write_address">mem_write_address</span>&nbsp;: <code class="type"><a href="Signal.Types.html#TYPEsignal">signal</a></code>;</code></td>
+
+</tr></table>
+}
+
+
+
+<pre><code><span id="TYPEinstantiation"><span class="keyword">type</span> <code class="type"></code>instantiation</span> = {</code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTinstantiation.inst_name">inst_name</span>&nbsp;: <code class="type">string</code>;</code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTinstantiation.inst_generics">inst_generics</span>&nbsp;: <code class="type">(string * <a href="Signal.Types.html#TYPEparameter">parameter</a>) list</code>;</code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTinstantiation.inst_inputs">inst_inputs</span>&nbsp;: <code class="type">(string * <a href="Signal.Types.html#TYPEsignal">signal</a>) list</code>;</code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTinstantiation.inst_outputs">inst_outputs</span>&nbsp;: <code class="type">(string * (int * int)) list</code>;</code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTinstantiation.inst_lib">inst_lib</span>&nbsp;: <code class="type">string</code>;</code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTinstantiation.inst_arch">inst_arch</span>&nbsp;: <code class="type">string</code>;</code></td>
+
+</tr></table>
+}
+
+
+
+<pre><code><span id="TYPEparameter"><span class="keyword">type</span> <code class="type"></code>parameter</span> = </code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTparameter.ParamString"><span class="constructor">ParamString</span></span> <span class="keyword">of</span> <code class="type">string</code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTparameter.ParamInt"><span class="constructor">ParamInt</span></span> <span class="keyword">of</span> <code class="type">int</code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTparameter.ParamFloat"><span class="constructor">ParamFloat</span></span> <span class="keyword">of</span> <code class="type">float</code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTparameter.ParamBool"><span class="constructor">ParamBool</span></span> <span class="keyword">of</span> <code class="type">bool</code></code></td>
+
+</tr></table>
+
+
+
+<pre><span id="VALuid"><span class="keyword">val</span> uid</span> : <code class="type"><a href="Signal.Types.html#TYPEsignal">signal</a> -> <a href="Signal.Types.html#TYPEuid">uid</a></code></pre><div class="info ">
+returns the unique id of the signal<br>
+</div>
+
+<pre><span id="VALdepo"><span class="keyword">val</span> depo</span> : <code class="type"><a href="Signal.Types.html#TYPEsignal">signal</a> -><br>       < data : <a href="Signal.Types.html#TYPEsignal">signal</a> list; op1 : <a href="Signal.Types.html#TYPEsignal">signal</a>;<br>         op2 : <a href="Signal.Types.html#TYPEsignal">signal</a> * <a href="Signal.Types.html#TYPEsignal">signal</a>;<br>         sel : <a href="Signal.Types.html#TYPEsignal">signal</a> ></code></pre>
+<pre><span id="VALdeps"><span class="keyword">val</span> deps</span> : <code class="type"><a href="Signal.Types.html#TYPEsignal">signal</a> -> <a href="Signal.Types.html#TYPEsignal">signal</a> list</code></pre><div class="info ">
+returns the signals dependancies<br>
+</div>
+
+<pre><span id="VALnames"><span class="keyword">val</span> names</span> : <code class="type"><a href="Signal.Types.html#TYPEsignal">signal</a> -> string list</code></pre><div class="info ">
+returns the list of names assigned to the signal<br>
+</div>
+
+<pre><span id="VALwidth"><span class="keyword">val</span> width</span> : <code class="type"><a href="Signal.Types.html#TYPEsignal">signal</a> -> int</code></pre><div class="info ">
+width of the signal<br>
+</div>
+
+<pre><span id="VALis_reg"><span class="keyword">val</span> is_reg</span> : <code class="type"><a href="Signal.Types.html#TYPEsignal">signal</a> -> bool</code></pre><div class="info ">
+is the signal a register?<br>
+</div>
+
+<pre><span id="VALis_mem"><span class="keyword">val</span> is_mem</span> : <code class="type"><a href="Signal.Types.html#TYPEsignal">signal</a> -> bool</code></pre><div class="info ">
+is the signal a memory?<br>
+</div>
+
+<pre><span id="VALis_inst"><span class="keyword">val</span> is_inst</span> : <code class="type"><a href="Signal.Types.html#TYPEsignal">signal</a> -> bool</code></pre><div class="info ">
+is the signal an instantiation?<br>
+</div>
+
+<pre><span id="VALis_const"><span class="keyword">val</span> is_const</span> : <code class="type"><a href="Signal.Types.html#TYPEsignal">signal</a> -> bool</code></pre><div class="info ">
+is the signal a constant?<br>
+</div>
+
+<pre><span id="VALis_select"><span class="keyword">val</span> is_select</span> : <code class="type"><a href="Signal.Types.html#TYPEsignal">signal</a> -> bool</code></pre><div class="info ">
+is the signal a part selection?<br>
+</div>
+
+<pre><span id="VALis_wire"><span class="keyword">val</span> is_wire</span> : <code class="type"><a href="Signal.Types.html#TYPEsignal">signal</a> -> bool</code></pre><div class="info ">
+is the signal a wire?<br>
+</div>
+
+<pre><span id="VALis_op"><span class="keyword">val</span> is_op</span> : <code class="type"><a href="Signal.Types.html#TYPEsignal_op">signal_op</a> -> <a href="Signal.Types.html#TYPEsignal">signal</a> -> bool</code></pre><div class="info ">
+is the signal the given operator?<br>
+</div>
+
+<pre><span id="VALconst_value"><span class="keyword">val</span> const_value</span> : <code class="type"><a href="Signal.Types.html#TYPEsignal">signal</a> -> string</code></pre><div class="info ">
+return the (binary) string representing a constants value<br>
+</div>
+
+<pre><span id="VALnew_id"><span class="keyword">val</span> new_id</span> : <code class="type">unit -> <a href="Signal.Types.html#TYPEuid">uid</a></code></pre><div class="info ">
+creates a new signal uid<br>
+</div>
+
+<pre><span id="VALreset_id"><span class="keyword">val</span> reset_id</span> : <code class="type">unit -> unit</code></pre><div class="info ">
+resets the signal identifiers<br>
+</div>
+
+<pre><span id="VALmake_id"><span class="keyword">val</span> make_id</span> : <code class="type">int -> <a href="Signal.Types.html#TYPEsignal">signal</a> list -> <a href="Signal.Types.html#TYPEsignal_id">signal_id</a></code></pre><div class="info ">
+constructs a signal_id type<br>
+</div>
+
+<pre><span id="VALstring_of_op"><span class="keyword">val</span> string_of_op</span> : <code class="type"><a href="Signal.Types.html#TYPEsignal_op">signal_op</a> -> string</code></pre><div class="info ">
+return string representation of operator<br>
+</div>
+
+<pre><span id="VALto_string"><span class="keyword">val</span> to_string</span> : <code class="type"><a href="Signal.Types.html#TYPEsignal">signal</a> -> string</code></pre>
+<pre><span id="VALstructural_compare"><span class="keyword">val</span> structural_compare</span> : <code class="type">?check_names:bool -><br>       ?check_deps:bool -> <a href="Signal.Types.html#TYPEsignal">signal</a> -> <a href="Signal.Types.html#TYPEsignal">signal</a> -> bool</code></pre><div class="info ">
+perform a recursive structural comparison of two signals<br>
+</div>
+</body></html>

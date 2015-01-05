@@ -1,0 +1,218 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<link rel="stylesheet" href="style.css" type="text/css">
+<meta content="text/html; charset=iso-8859-1" http-equiv="Content-Type">
+<link rel="Start" href="index.html">
+<link rel="previous" href="Signal.Instantiation.html">
+<link rel="next" href="Signal.Multiram.html">
+<link rel="Up" href="Signal.html">
+<link title="Index of types" rel=Appendix href="index_types.html">
+<link title="Index of exceptions" rel=Appendix href="index_exceptions.html">
+<link title="Index of values" rel=Appendix href="index_values.html">
+<link title="Index of class methods" rel=Appendix href="index_methods.html">
+<link title="Index of classes" rel=Appendix href="index_classes.html">
+<link title="Index of modules" rel=Appendix href="index_modules.html">
+<link title="Index of module types" rel=Appendix href="index_module_types.html">
+<link title="Utils" rel="Chapter" href="Utils.html">
+<link title="Comb" rel="Chapter" href="Comb.html">
+<link title="Bits" rel="Chapter" href="Bits.html">
+<link title="Signal" rel="Chapter" href="Signal.html">
+<link title="Syntax" rel="Chapter" href="Syntax.html">
+<link title="Circuit" rel="Chapter" href="Circuit.html">
+<link title="Rtl" rel="Chapter" href="Rtl.html">
+<link title="Fixed" rel="Chapter" href="Fixed.html">
+<link title="Const_prop" rel="Chapter" href="Const_prop.html">
+<link title="Transform" rel="Chapter" href="Transform.html">
+<link title="Cyclesim" rel="Chapter" href="Cyclesim.html">
+<link title="Vcd" rel="Chapter" href="Vcd.html">
+<link title="Vcd_ext" rel="Chapter" href="Vcd_ext.html">
+<link title="Interface" rel="Chapter" href="Interface.html">
+<link title="Recipe" rel="Chapter" href="Recipe.html">
+<link title="Xilinx" rel="Chapter" href="Xilinx.html">
+<link title="C" rel="Chapter" href="C.html">
+<link title="Structural" rel="Chapter" href="Structural.html">
+<link title="Structural_lib" rel="Chapter" href="Structural_lib.html">
+<link title="Cosim" rel="Chapter" href="Cosim.html"><title>Signal.Guarded</title>
+</head>
+<body>
+<div class="navbar"><a class="pre" href="Signal.Instantiation.html" title="Signal.Instantiation">Previous</a>
+&nbsp;<a class="up" href="Signal.html" title="Signal">Up</a>
+&nbsp;<a class="post" href="Signal.Multiram.html" title="Signal.Multiram">Next</a>
+</div>
+<h1>Module <a href="type_Signal.Guarded.html">Signal.Guarded</a></h1>
+
+<pre><span class="keyword">module</span> Guarded: <code class="code">sig</code> <a href="Signal.Guarded.html">..</a> <code class="code">end</code></pre><div class="info module top">
+Guarded assignments.
+<p>
+
+    Allows code to be written in a similar manner to verilog always or vhdl
+    process blocks.  'if' and 'switch' control constructs are provided. ($==)
+    is used for assignment.
+<p>
+
+    Code is written as lists of assignments, if and control statements.
+<p>
+
+    variables;
+<p>
+
+<pre class="codepre"><code class="code">    let var = g_wire (zero 8) in
+    let var = g_reg r_sync enable 8 in
+</code></pre>
+<p>
+
+    assignment;
+<p>
+
+<pre class="codepre"><code class="code">    var $== exp;
+</code></pre>
+<p>
+
+    if statements;
+<p>
+
+<pre class="codepre"><code class="code">    g_if condition [ ... ] [ ... ]
+</code></pre>
+<p>
+
+    switch statements;
+<p>
+
+<pre class="codepre"><code class="code">    g_switch condition [
+    consti 3 0 [ ... ]
+    consti 3 1 [ ... ]
+    consti 3 2 [ ... ]
+    consti 3 3 [ ... ]
+    ]
+</code></pre>
+<p>
+
+    signals;
+<p>
+
+<pre class="codepre"><code class="code">    let (s:signal) = q (v:guarded) in
+</code></pre>
+<p>
+
+    compilation;
+<p>
+
+<pre class="codepre"><code class="code">    compile [ ... ]
+</code></pre>
+<p>
+
+    example;
+<p>
+
+<pre class="codepre"><code class="code">    let state = g_reg r_sync enable 2 in
+    let a = g_wire 8 in
+    compile [
+        g_if (q a) ==: consti 8 4 [
+            a $== consti 8 2
+        ]
+        g_switch (q state) [
+            (consti 2 0) [
+                a $== 3;
+                state $== const 2 1;
+            ]
+            (consti 2 1) [
+                a $== 2;
+                state $== const 2 2;
+            ]
+            (consti 2 2) [
+                a $== 1;
+                state $== const 2 3;
+            ]
+            (consti 2 3) [
+                a $== 0;
+                state $== const 2 4;
+            ]
+        ]
+    ]
+    let state = q state in
+    let a = q a in
+    ....
+</code></pre><br>
+</div>
+<hr width="100%">
+
+<pre><span id="TYPEstatement"><span class="keyword">type</span> <code class="type"></code>statement</span> </pre>
+<div class="info ">
+the type of statements in guarded assigments<br>
+</div>
+
+
+<pre><span id="TYPEstatements"><span class="keyword">type</span> <code class="type"></code>statements</span> = <code class="type"><a href="Signal.Guarded.html#TYPEstatement">statement</a> list</code> </pre>
+
+
+<pre><span id="TYPEguarded_var_i"><span class="keyword">type</span> <code class="type"></code>guarded_var_i</span> </pre>
+<div class="info ">
+the type of variables in guarded assignments<br>
+</div>
+
+
+<pre><span name="TYPEvariable"><span class="keyword">class</span> <a href="Signal.Guarded.variable-c.html">variable</a></span> : <code class="type"><a href="Signal.Guarded.html#TYPEguarded_var_i">guarded_var_i</a> -> </code><code class="code">object</code> <a href="Signal.Guarded.variable-c.html">..</a> <code class="code">end</code></pre>
+<pre><span id="TYPEcase"><span class="keyword">type</span> <code class="type">'a</code> case</span> = <code class="type">'a * <a href="Signal.Guarded.html#TYPEstatements">statements</a></code> </pre>
+
+
+<pre><span id="TYPEcases"><span class="keyword">type</span> <code class="type">'a</code> cases</span> = <code class="type">'a <a href="Signal.Guarded.html#TYPEcase">case</a> list</code> </pre>
+
+
+<pre><span id="VALg_wire"><span class="keyword">val</span> g_wire</span> : <code class="type"><a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a> -> <a href="Signal.Guarded.variable-c.html">variable</a></code></pre><div class="info ">
+create a wire<br>
+</div>
+
+<pre><span id="VALg_reg"><span class="keyword">val</span> g_reg</span> : <code class="type"><a href="Signal.Types.html#TYPEregister">Signal.Types.register</a> -><br>       <a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a> -> int -> <a href="Signal.Guarded.variable-c.html">variable</a></code></pre><div class="info ">
+create a register<br>
+</div>
+
+<pre><span id="VALg_var"><span class="keyword">val</span> g_var</span> : <code class="type"><a href="Signal.Types.html#TYPEregister">Signal.Types.register</a> -><br>       <a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a> -> int -> <a href="Signal.Guarded.variable-c.html">variable</a></code></pre><div class="info ">
+create a register with variable semantics<br>
+</div>
+
+<pre><span id="VALg_pipeline"><span class="keyword">val</span> g_pipeline</span> : <code class="type">int -><br>       <a href="Signal.Types.html#TYPEregister">Signal.Types.register</a> -><br>       <a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a> -> int -> <a href="Signal.Guarded.variable-c.html">variable</a></code></pre><div class="info ">
+create a pipeline of registers<br>
+</div>
+
+<pre><span id="VALg_if"><span class="keyword">val</span> g_if</span> : <code class="type"><a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a> -><br>       <a href="Signal.Guarded.html#TYPEstatements">statements</a> -><br>       <a href="Signal.Guarded.html#TYPEstatements">statements</a> -> <a href="Signal.Guarded.html#TYPEstatement">statement</a></code></pre><div class="info ">
+if statement<br>
+</div>
+
+<pre><span id="VALg_elif"><span class="keyword">val</span> g_elif</span> : <code class="type"><a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a> -><br>       <a href="Signal.Guarded.html#TYPEstatements">statements</a> -><br>       <a href="Signal.Guarded.html#TYPEstatements">statements</a> -> <a href="Signal.Guarded.html#TYPEstatements">statements</a></code></pre><div class="info ">
+else if branch<br>
+</div>
+
+<pre><span id="VALg_when"><span class="keyword">val</span> g_when</span> : <code class="type"><a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a> -> <a href="Signal.Guarded.html#TYPEstatements">statements</a> -> <a href="Signal.Guarded.html#TYPEstatement">statement</a></code></pre><div class="info ">
+if sel then <code class="code">...</code> else []<br>
+</div>
+
+<pre><span id="VALg_unless"><span class="keyword">val</span> g_unless</span> : <code class="type"><a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a> -> <a href="Signal.Guarded.html#TYPEstatements">statements</a> -> <a href="Signal.Guarded.html#TYPEstatement">statement</a></code></pre><div class="info ">
+if sel then [] else <code class="code">...</code><br>
+</div>
+
+<pre><span id="VALg_switch"><span class="keyword">val</span> g_switch</span> : <code class="type"><a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a> -><br>       <a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a> <a href="Signal.Guarded.html#TYPEcases">cases</a> -> <a href="Signal.Guarded.html#TYPEstatement">statement</a></code></pre><div class="info ">
+switch statement<br>
+</div>
+
+<pre><span id="VALg_proc"><span class="keyword">val</span> g_proc</span> : <code class="type"><a href="Signal.Guarded.html#TYPEstatements">statements</a> -> <a href="Signal.Guarded.html#TYPEstatement">statement</a></code></pre><div class="info ">
+allows sequences of expressions to be inserted into the code.  a
+        syntactic nicety.<br>
+</div>
+
+<pre><span id="VAL($==)"><span class="keyword">val</span> ($==)</span> : <code class="type"><a href="Signal.Guarded.variable-c.html">variable</a> -> <a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a> -> <a href="Signal.Guarded.html#TYPEstatement">statement</a></code></pre><div class="info ">
+assignment<br>
+</div>
+
+<pre><span id="VAL($==.)"><span class="keyword">val</span> ($==.)</span> : <code class="type"><a href="Signal.Guarded.variable-c.html">variable</a> -> int -> <a href="Signal.Guarded.html#TYPEstatement">statement</a></code></pre><div class="info ">
+assignment with an integer constant - width is inferred<br>
+</div>
+
+<pre><span id="VALcompile"><span class="keyword">val</span> compile</span> : <code class="type"><a href="Signal.Guarded.html#TYPEstatements">statements</a> -> unit</code></pre><div class="info ">
+compile statements to structural code<br>
+</div>
+
+<pre><span id="VALstatemachine"><span class="keyword">val</span> statemachine</span> : <code class="type"><a href="Signal.Types.html#TYPEregister">Signal.Types.register</a> -><br>       <a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a> -><br>       'a list -><br>       <a href="Signal.Guarded.variable-c.html">variable</a> *<br>       ('a <a href="Signal.Guarded.html#TYPEcases">cases</a> -> <a href="Signal.Guarded.html#TYPEstatement">statement</a>) *<br>       ('a -> <a href="Signal.Guarded.html#TYPEstatement">statement</a>)</code></pre><div class="info ">
+statemachine abstraction<br>
+</div>
+</body></html>

@@ -1,0 +1,86 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<link rel="stylesheet" href="style.css" type="text/css">
+<meta content="text/html; charset=iso-8859-1" http-equiv="Content-Type">
+<link rel="Start" href="index.html">
+<link rel="previous" href="Bits.html">
+<link rel="next" href="Syntax.html">
+<link rel="Up" href="index.html">
+<link title="Index of types" rel=Appendix href="index_types.html">
+<link title="Index of exceptions" rel=Appendix href="index_exceptions.html">
+<link title="Index of values" rel=Appendix href="index_values.html">
+<link title="Index of class methods" rel=Appendix href="index_methods.html">
+<link title="Index of classes" rel=Appendix href="index_classes.html">
+<link title="Index of modules" rel=Appendix href="index_modules.html">
+<link title="Index of module types" rel=Appendix href="index_module_types.html">
+<link title="Utils" rel="Chapter" href="Utils.html">
+<link title="Comb" rel="Chapter" href="Comb.html">
+<link title="Bits" rel="Chapter" href="Bits.html">
+<link title="Signal" rel="Chapter" href="Signal.html">
+<link title="Syntax" rel="Chapter" href="Syntax.html">
+<link title="Circuit" rel="Chapter" href="Circuit.html">
+<link title="Rtl" rel="Chapter" href="Rtl.html">
+<link title="Fixed" rel="Chapter" href="Fixed.html">
+<link title="Const_prop" rel="Chapter" href="Const_prop.html">
+<link title="Transform" rel="Chapter" href="Transform.html">
+<link title="Cyclesim" rel="Chapter" href="Cyclesim.html">
+<link title="Vcd" rel="Chapter" href="Vcd.html">
+<link title="Vcd_ext" rel="Chapter" href="Vcd_ext.html">
+<link title="Interface" rel="Chapter" href="Interface.html">
+<link title="Recipe" rel="Chapter" href="Recipe.html">
+<link title="Xilinx" rel="Chapter" href="Xilinx.html">
+<link title="C" rel="Chapter" href="C.html">
+<link title="Structural" rel="Chapter" href="Structural.html">
+<link title="Structural_lib" rel="Chapter" href="Structural_lib.html">
+<link title="Cosim" rel="Chapter" href="Cosim.html"><title>Signal</title>
+</head>
+<body>
+<div class="navbar"><a class="pre" href="Bits.html" title="Bits">Previous</a>
+&nbsp;<a class="up" href="index.html" title="Index">Up</a>
+&nbsp;<a class="post" href="Syntax.html" title="Syntax">Next</a>
+</div>
+<h1>Module <a href="type_Signal.html">Signal</a></h1>
+
+<pre><span class="keyword">module</span> Signal: <code class="code">sig</code> <a href="Signal.html">..</a> <code class="code">end</code></pre><div class="info module top">
+Hardware design datatype suitable for simulation and netlist generation<br>
+</div>
+<hr width="100%">
+
+<pre><span id="EXCEPTIONFailure"><span class="keyword">exception</span> Failure</span> <span class="keyword">of</span> <code class="type">string</code></pre>
+
+<pre><span class="keyword">module</span> <a href="Signal.Types.html">Types</a>: <code class="code">sig</code> <a href="Signal.Types.html">..</a> <code class="code">end</code></pre><div class="info">
+Signal data type and low-level functions
+</div>
+
+<pre><span class="keyword">module</span> <a href="Signal.Base.html">Base</a>: <code class="type"><a href="Comb.T.html">Comb.T</a></code><code class="type">  with type t = Types.signal</code></pre><div class="info">
+internal signal implementation
+</div>
+
+<pre><span class="keyword">module</span> <a href="Signal.Comb.html">Comb</a>: <code class="type"><a href="Comb.S.html">Comb.S</a></code><code class="type">  with type t = Types.signal</code></pre><div class="info">
+Combinatorial signal API
+</div>
+
+<pre><span class="keyword">module</span> <a href="Signal.Seq.html">Seq</a>: <code class="code">sig</code> <a href="Signal.Seq.html">..</a> <code class="code">end</code></pre><div class="info">
+Sequential logic (register + memories)
+</div>
+
+<pre><span class="keyword">module</span> <a href="Signal.Instantiation.html">Instantiation</a>: <code class="code">sig</code> <a href="Signal.Instantiation.html">..</a> <code class="code">end</code></pre>
+<pre><span class="keyword">module</span> <a href="Signal.Guarded.html">Guarded</a>: <code class="code">sig</code> <a href="Signal.Guarded.html">..</a> <code class="code">end</code></pre><div class="info">
+Guarded assignments.
+</div>
+
+<pre><span class="keyword">module</span> <a href="Signal.Multiram.html">Multiram</a>: <code class="code">sig</code> <a href="Signal.Multiram.html">..</a> <code class="code">end</code></pre><div class="info">
+N read port by M write port memories
+</div>
+
+<pre><span class="keyword">module</span> <a href="Signal.Statemachine.html">Statemachine</a>: <code class="code">sig</code> <a href="Signal.Statemachine.html">..</a> <code class="code">end</code></pre><div class="info">
+(revised) statemachine generator
+</div>
+
+<pre><span class="keyword">module type</span> <a href="Signal.Seq_spec.html">Seq_spec</a> = <code class="code">sig</code> <a href="Signal.Seq_spec.html">..</a> <code class="code">end</code></pre>
+<pre><span class="keyword">module type</span> <a href="Signal.Seq.html">Seq</a> = <code class="code">sig</code> <a href="Signal.Seq.html">..</a> <code class="code">end</code></pre>
+<pre><span class="keyword">module</span> <a href="Signal.Make_seq.html">Make_seq</a>: <div class="sig_block"><code class="code">functor (</code><code class="code">S</code><code class="code"> : </code><code class="type"><a href="Signal.Seq_spec.html">Seq_spec</a></code><code class="code">) -&gt; </code><code class="type"><a href="Signal.Seq.html">Seq</a></code><code class="type"> </code></div></pre><div class="info">
+Generate register logic parameterised over reset/clear/enable types and defaults
+</div>
+</body></html>

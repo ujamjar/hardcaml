@@ -1,0 +1,57 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<link rel="stylesheet" href="style.css" type="text/css">
+<meta content="text/html; charset=iso-8859-1" http-equiv="Content-Type">
+<link rel="Start" href="index.html">
+<link rel="previous" href="Rtl.Verilog.html">
+<link rel="Up" href="Rtl.html">
+<link title="Index of types" rel=Appendix href="index_types.html">
+<link title="Index of exceptions" rel=Appendix href="index_exceptions.html">
+<link title="Index of values" rel=Appendix href="index_values.html">
+<link title="Index of class methods" rel=Appendix href="index_methods.html">
+<link title="Index of classes" rel=Appendix href="index_classes.html">
+<link title="Index of modules" rel=Appendix href="index_modules.html">
+<link title="Index of module types" rel=Appendix href="index_module_types.html">
+<link title="Utils" rel="Chapter" href="Utils.html">
+<link title="Comb" rel="Chapter" href="Comb.html">
+<link title="Bits" rel="Chapter" href="Bits.html">
+<link title="Signal" rel="Chapter" href="Signal.html">
+<link title="Syntax" rel="Chapter" href="Syntax.html">
+<link title="Circuit" rel="Chapter" href="Circuit.html">
+<link title="Rtl" rel="Chapter" href="Rtl.html">
+<link title="Fixed" rel="Chapter" href="Fixed.html">
+<link title="Const_prop" rel="Chapter" href="Const_prop.html">
+<link title="Transform" rel="Chapter" href="Transform.html">
+<link title="Cyclesim" rel="Chapter" href="Cyclesim.html">
+<link title="Vcd" rel="Chapter" href="Vcd.html">
+<link title="Vcd_ext" rel="Chapter" href="Vcd_ext.html">
+<link title="Interface" rel="Chapter" href="Interface.html">
+<link title="Recipe" rel="Chapter" href="Recipe.html">
+<link title="Xilinx" rel="Chapter" href="Xilinx.html">
+<link title="C" rel="Chapter" href="C.html">
+<link title="Structural" rel="Chapter" href="Structural.html">
+<link title="Structural_lib" rel="Chapter" href="Structural_lib.html">
+<link title="Cosim" rel="Chapter" href="Cosim.html"><title>Rtl.Hierarchy</title>
+</head>
+<body>
+<div class="navbar"><a class="pre" href="Rtl.Verilog.html" title="Rtl.Verilog">Previous</a>
+&nbsp;<a class="up" href="Rtl.html" title="Rtl">Up</a>
+&nbsp;</div>
+<h1>Module <a href="type_Rtl.Hierarchy.html">Rtl.Hierarchy</a></h1>
+
+<pre><span class="keyword">module</span> Hierarchy: <code class="code">sig</code> <a href="Rtl.Hierarchy.html">..</a> <code class="code">end</code></pre><div class="info module top">
+Generate circuit with hierarchy<br>
+</div>
+<hr width="100%">
+
+<pre><span id="VALwrite"><span class="keyword">val</span> write</span> : <code class="type">?transforms:<a href="Transform.html#TYPEtransform_fn">Transform.transform_fn</a> list -><br>       <a href="Circuit.Hierarchy.html#TYPEdatabase">Circuit.Hierarchy.database</a> -><br>       string -> (string -> <a href="Circuit.html#TYPEt">Circuit.t</a> -> unit) -> <a href="Circuit.html#TYPEt">Circuit.t</a> -> unit</code></pre><div class="info ">
+<code class="code">write ~transforms ~database circuit_name write_module circuit</code> recursively scans 
+      <code class="code">circuit</code> and finds all sub-circuits (ie instantiations).  These are looked up <code class="code">database</code>
+      and <code class="code">write_module</code> is called for each sub-circuit.
+<p>
+
+      Appropriately designed circuits can thus be split over multiple layers of hierarchy
+      and files.<br>
+</div>
+</body></html>

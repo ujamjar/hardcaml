@@ -1,0 +1,98 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<link rel="stylesheet" href="style.css" type="text/css">
+<meta content="text/html; charset=iso-8859-1" http-equiv="Content-Type">
+<link rel="Start" href="index.html">
+<link rel="previous" href="Signal.Guarded.html">
+<link rel="next" href="Signal.Statemachine.html">
+<link rel="Up" href="Signal.html">
+<link title="Index of types" rel=Appendix href="index_types.html">
+<link title="Index of exceptions" rel=Appendix href="index_exceptions.html">
+<link title="Index of values" rel=Appendix href="index_values.html">
+<link title="Index of class methods" rel=Appendix href="index_methods.html">
+<link title="Index of classes" rel=Appendix href="index_classes.html">
+<link title="Index of modules" rel=Appendix href="index_modules.html">
+<link title="Index of module types" rel=Appendix href="index_module_types.html">
+<link title="Utils" rel="Chapter" href="Utils.html">
+<link title="Comb" rel="Chapter" href="Comb.html">
+<link title="Bits" rel="Chapter" href="Bits.html">
+<link title="Signal" rel="Chapter" href="Signal.html">
+<link title="Syntax" rel="Chapter" href="Syntax.html">
+<link title="Circuit" rel="Chapter" href="Circuit.html">
+<link title="Rtl" rel="Chapter" href="Rtl.html">
+<link title="Fixed" rel="Chapter" href="Fixed.html">
+<link title="Const_prop" rel="Chapter" href="Const_prop.html">
+<link title="Transform" rel="Chapter" href="Transform.html">
+<link title="Cyclesim" rel="Chapter" href="Cyclesim.html">
+<link title="Vcd" rel="Chapter" href="Vcd.html">
+<link title="Vcd_ext" rel="Chapter" href="Vcd_ext.html">
+<link title="Interface" rel="Chapter" href="Interface.html">
+<link title="Recipe" rel="Chapter" href="Recipe.html">
+<link title="Xilinx" rel="Chapter" href="Xilinx.html">
+<link title="C" rel="Chapter" href="C.html">
+<link title="Structural" rel="Chapter" href="Structural.html">
+<link title="Structural_lib" rel="Chapter" href="Structural_lib.html">
+<link title="Cosim" rel="Chapter" href="Cosim.html"><title>Signal.Multiram</title>
+</head>
+<body>
+<div class="navbar"><a class="pre" href="Signal.Guarded.html" title="Signal.Guarded">Previous</a>
+&nbsp;<a class="up" href="Signal.html" title="Signal">Up</a>
+&nbsp;<a class="post" href="Signal.Statemachine.html" title="Signal.Statemachine">Next</a>
+</div>
+<h1>Module <a href="type_Signal.Multiram.html">Signal.Multiram</a></h1>
+
+<pre><span class="keyword">module</span> Multiram: <code class="code">sig</code> <a href="Signal.Multiram.html">..</a> <code class="code">end</code></pre><div class="info module top">
+N read port by M write port memories<br>
+</div>
+<hr width="100%">
+
+<pre><code><span id="TYPEwrite"><span class="keyword">type</span> <code class="type">'a</code> write</span> = {</code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTwrite.we">we</span>&nbsp;: <code class="type">'a</code>;</code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTwrite.wd">wd</span>&nbsp;: <code class="type">'a</code>;</code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTwrite.wa">wa</span>&nbsp;: <code class="type">'a</code>;</code></td>
+
+</tr></table>
+}
+
+
+
+<pre><code><span id="TYPEread"><span class="keyword">type</span> <code class="type">'a</code> read</span> = {</code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTread.re">re</span>&nbsp;: <code class="type">'a</code>;</code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTread.ra">ra</span>&nbsp;: <code class="type">'a</code>;</code></td>
+
+</tr></table>
+}
+
+
+
+<pre><span id="TYPEram"><span class="keyword">type</span> <code class="type"></code>ram</span> = <code class="type">size:int -><br>       we:<a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a> -><br>       wa:<a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a> -><br>       d:<a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a> -><br>       re:<a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a> -> ra:<a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a> -> <a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a></code> </pre>
+
+
+<pre><span id="VALram"><span class="keyword">val</span> ram</span> : <code class="type">?priority_write:bool -><br>       ram:<a href="Signal.Multiram.html#TYPEram">ram</a> -><br>       size:int -><br>       spec:<a href="Signal.Types.html#TYPEregister">Signal.Types.register</a> -><br>       wr:<a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a> <a href="Signal.Multiram.html#TYPEwrite">write</a> array -><br>       rd:<a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a> <a href="Signal.Multiram.html#TYPEread">read</a> array -><br>       <a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a> array</code></pre></body></html>

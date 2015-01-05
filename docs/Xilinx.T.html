@@ -1,0 +1,73 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<link rel="stylesheet" href="style.css" type="text/css">
+<meta content="text/html; charset=iso-8859-1" http-equiv="Content-Type">
+<link rel="Start" href="index.html">
+<link rel="previous" href="Xilinx.S.html">
+<link rel="next" href="Xilinx.LutSize.html">
+<link rel="Up" href="Xilinx.html">
+<link title="Index of types" rel=Appendix href="index_types.html">
+<link title="Index of exceptions" rel=Appendix href="index_exceptions.html">
+<link title="Index of values" rel=Appendix href="index_values.html">
+<link title="Index of class methods" rel=Appendix href="index_methods.html">
+<link title="Index of classes" rel=Appendix href="index_classes.html">
+<link title="Index of modules" rel=Appendix href="index_modules.html">
+<link title="Index of module types" rel=Appendix href="index_module_types.html">
+<link title="Utils" rel="Chapter" href="Utils.html">
+<link title="Comb" rel="Chapter" href="Comb.html">
+<link title="Bits" rel="Chapter" href="Bits.html">
+<link title="Signal" rel="Chapter" href="Signal.html">
+<link title="Syntax" rel="Chapter" href="Syntax.html">
+<link title="Circuit" rel="Chapter" href="Circuit.html">
+<link title="Rtl" rel="Chapter" href="Rtl.html">
+<link title="Fixed" rel="Chapter" href="Fixed.html">
+<link title="Const_prop" rel="Chapter" href="Const_prop.html">
+<link title="Transform" rel="Chapter" href="Transform.html">
+<link title="Cyclesim" rel="Chapter" href="Cyclesim.html">
+<link title="Vcd" rel="Chapter" href="Vcd.html">
+<link title="Vcd_ext" rel="Chapter" href="Vcd_ext.html">
+<link title="Interface" rel="Chapter" href="Interface.html">
+<link title="Recipe" rel="Chapter" href="Recipe.html">
+<link title="Xilinx" rel="Chapter" href="Xilinx.html">
+<link title="C" rel="Chapter" href="C.html">
+<link title="Structural" rel="Chapter" href="Structural.html">
+<link title="Structural_lib" rel="Chapter" href="Structural_lib.html">
+<link title="Cosim" rel="Chapter" href="Cosim.html"><title>Xilinx.T</title>
+</head>
+<body>
+<div class="navbar"><a class="pre" href="Xilinx.S.html" title="Xilinx.S">Previous</a>
+&nbsp;<a class="up" href="Xilinx.html" title="Xilinx">Up</a>
+&nbsp;<a class="post" href="Xilinx.LutSize.html" title="Xilinx.LutSize">Next</a>
+</div>
+<h1>Module type <a href="type_Xilinx.T.html">Xilinx.T</a></h1>
+
+<pre><span class="keyword">module type</span> T = <code class="code">sig</code> <a href="Xilinx.T.html">..</a> <code class="code">end</code></pre><hr width="100%">
+
+<pre><span id="VALx_lut"><span class="keyword">val</span> x_lut</span> : <code class="type"><a href="Xilinx.LutEqn.html#TYPEt">Xilinx.LutEqn.t</a> -> <a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a> -> <a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a></code></pre>
+<pre><span id="VALx_map"><span class="keyword">val</span> x_map</span> : <code class="type"><a href="Xilinx.LutEqn.html#TYPEt">Xilinx.LutEqn.t</a> -> <a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a> list -> <a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a></code></pre>
+<pre><span id="VALx_and"><span class="keyword">val</span> x_and</span> : <code class="type"><a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a> -> <a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a> -> <a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a></code></pre>
+<pre><span id="VALx_or"><span class="keyword">val</span> x_or</span> : <code class="type"><a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a> -> <a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a> -> <a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a></code></pre>
+<pre><span id="VALx_xor"><span class="keyword">val</span> x_xor</span> : <code class="type"><a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a> -> <a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a> -> <a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a></code></pre>
+<pre><span id="VALx_not"><span class="keyword">val</span> x_not</span> : <code class="type"><a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a> -> <a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a></code></pre>
+<pre><span id="VALx_reduce_carry"><span class="keyword">val</span> x_reduce_carry</span> : <code class="type">bool -><br>       (<a href="Xilinx.LutEqn.html#TYPEt">Xilinx.LutEqn.t</a> -> <a href="Xilinx.LutEqn.html#TYPEt">Xilinx.LutEqn.t</a> -> <a href="Xilinx.LutEqn.html#TYPEt">Xilinx.LutEqn.t</a>) -><br>       <a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a> -><br>       <a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a> -> <a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a> -> <a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a></code></pre>
+<pre><span id="VALx_and_reduce"><span class="keyword">val</span> x_and_reduce</span> : <code class="type"><a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a> -> <a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a></code></pre>
+<pre><span id="VALx_or_reduce"><span class="keyword">val</span> x_or_reduce</span> : <code class="type"><a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a> -> <a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a></code></pre>
+<pre><span id="VALx_reduce_tree"><span class="keyword">val</span> x_reduce_tree</span> : <code class="type">(<a href="Xilinx.LutEqn.html#TYPEt">Xilinx.LutEqn.t</a> -> <a href="Xilinx.LutEqn.html#TYPEt">Xilinx.LutEqn.t</a> -> <a href="Xilinx.LutEqn.html#TYPEt">Xilinx.LutEqn.t</a>) -><br>       <a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a> -> <a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a></code></pre>
+<pre><span id="VALx_add_carry"><span class="keyword">val</span> x_add_carry</span> : <code class="type"><a href="Xilinx.LutEqn.html#TYPEt">Xilinx.LutEqn.t</a> -><br>       <a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a> -><br>       <a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a> -><br>       <a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a> -> <a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a> * <a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a></code></pre>
+<pre><span id="VALx_add"><span class="keyword">val</span> x_add</span> : <code class="type"><a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a> -> <a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a> -> <a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a></code></pre>
+<pre><span id="VALx_sub"><span class="keyword">val</span> x_sub</span> : <code class="type"><a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a> -> <a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a> -> <a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a></code></pre>
+<pre><span id="VALx_mux_add_carry"><span class="keyword">val</span> x_mux_add_carry</span> : <code class="type"><a href="Xilinx.LutEqn.html#TYPEt">Xilinx.LutEqn.t</a> -><br>       <a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a> -><br>       <a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a> -><br>       <a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a> * <a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a> -><br>       <a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a> -> <a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a> * <a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a></code></pre>
+<pre><span id="VALx_mux_add"><span class="keyword">val</span> x_mux_add</span> : <code class="type"><a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a> -><br>       <a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a> * <a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a> -><br>       <a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a> -> <a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a></code></pre><div class="info ">
+<code class="code">x_mux_add x (a,a') b</code> gives <code class="code">(x ? a : a') + b</code><br>
+</div>
+
+<pre><span id="VALx_mux_sub"><span class="keyword">val</span> x_mux_sub</span> : <code class="type"><a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a> -><br>       <a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a> -><br>       <a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a> * <a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a> -> <a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a></code></pre><div class="info ">
+<code class="code">x_mux_sub x a (b,b')</code> gives <code class="code">a - (x ? b : b')</code><br>
+</div>
+
+<pre><span id="VALx_eq"><span class="keyword">val</span> x_eq</span> : <code class="type"><a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a> -> <a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a> -> <a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a></code></pre>
+<pre><span id="VALx_lt"><span class="keyword">val</span> x_lt</span> : <code class="type"><a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a> -> <a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a> -> <a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a></code></pre>
+<pre><span id="VALx_mux"><span class="keyword">val</span> x_mux</span> : <code class="type"><a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a> -> <a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a> list -> <a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a></code></pre>
+<pre><span id="VALx_mulu"><span class="keyword">val</span> x_mulu</span> : <code class="type"><a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a> -> <a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a> -> <a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a></code></pre>
+<pre><span id="VALx_muls"><span class="keyword">val</span> x_muls</span> : <code class="type"><a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a> -> <a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a> -> <a href="Signal.Types.html#TYPEsignal">Signal.Types.signal</a></code></pre></body></html>

@@ -1,0 +1,133 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<link rel="stylesheet" href="style.css" type="text/css">
+<meta content="text/html; charset=iso-8859-1" http-equiv="Content-Type">
+<link rel="Start" href="index.html">
+<link rel="next" href="Cyclesim.Make.html">
+<link rel="Up" href="Cyclesim.html">
+<link title="Index of types" rel=Appendix href="index_types.html">
+<link title="Index of exceptions" rel=Appendix href="index_exceptions.html">
+<link title="Index of values" rel=Appendix href="index_values.html">
+<link title="Index of class methods" rel=Appendix href="index_methods.html">
+<link title="Index of classes" rel=Appendix href="index_classes.html">
+<link title="Index of modules" rel=Appendix href="index_modules.html">
+<link title="Index of module types" rel=Appendix href="index_module_types.html">
+<link title="Utils" rel="Chapter" href="Utils.html">
+<link title="Comb" rel="Chapter" href="Comb.html">
+<link title="Bits" rel="Chapter" href="Bits.html">
+<link title="Signal" rel="Chapter" href="Signal.html">
+<link title="Syntax" rel="Chapter" href="Syntax.html">
+<link title="Circuit" rel="Chapter" href="Circuit.html">
+<link title="Rtl" rel="Chapter" href="Rtl.html">
+<link title="Fixed" rel="Chapter" href="Fixed.html">
+<link title="Const_prop" rel="Chapter" href="Const_prop.html">
+<link title="Transform" rel="Chapter" href="Transform.html">
+<link title="Cyclesim" rel="Chapter" href="Cyclesim.html">
+<link title="Vcd" rel="Chapter" href="Vcd.html">
+<link title="Vcd_ext" rel="Chapter" href="Vcd_ext.html">
+<link title="Interface" rel="Chapter" href="Interface.html">
+<link title="Recipe" rel="Chapter" href="Recipe.html">
+<link title="Xilinx" rel="Chapter" href="Xilinx.html">
+<link title="C" rel="Chapter" href="C.html">
+<link title="Structural" rel="Chapter" href="Structural.html">
+<link title="Structural_lib" rel="Chapter" href="Structural_lib.html">
+<link title="Cosim" rel="Chapter" href="Cosim.html"><title>Cyclesim.Api</title>
+</head>
+<body>
+<div class="navbar">&nbsp;<a class="up" href="Cyclesim.html" title="Cyclesim">Up</a>
+&nbsp;<a class="post" href="Cyclesim.Make.html" title="Cyclesim.Make">Next</a>
+</div>
+<h1>Module <a href="type_Cyclesim.Api.html">Cyclesim.Api</a></h1>
+
+<pre><span class="keyword">module</span> Api: <code class="code">sig</code> <a href="Cyclesim.Api.html">..</a> <code class="code">end</code></pre><div class="info module top">
+Cycle based simulator type and API<br>
+</div>
+<hr width="100%">
+
+<pre><code><span id="TYPEcyclesim"><span class="keyword">type</span> <code class="type">'a</code> cyclesim</span> = {</code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTcyclesim.sim_in_ports">sim_in_ports</span>&nbsp;: <code class="type">(string * 'a Pervasives.ref) list</code>;</code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTcyclesim.sim_out_ports">sim_out_ports</span>&nbsp;: <code class="type">(string * 'a Pervasives.ref) list</code>;</code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTcyclesim.sim_internal_ports">sim_internal_ports</span>&nbsp;: <code class="type">(string * 'a Pervasives.ref) list</code>;</code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTcyclesim.sim_reset">sim_reset</span>&nbsp;: <code class="type">unit -> unit</code>;</code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTcyclesim.sim_cycle_comb">sim_cycle_comb</span>&nbsp;: <code class="type">unit -> unit</code>;</code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTcyclesim.sim_cycle">sim_cycle</span>&nbsp;: <code class="type">unit -> unit</code>;</code></td>
+
+</tr></table>
+}
+
+<div class="info ">
+base type of the cycle based simulators<br>
+</div>
+
+
+<pre><span id="VALcycle"><span class="keyword">val</span> cycle</span> : <code class="type">'a <a href="Cyclesim.Api.html#TYPEcyclesim">cyclesim</a> -> unit</code></pre><div class="info ">
+advance by 1 clock cycle<br>
+</div>
+
+<pre><span id="VALcycle_comb"><span class="keyword">val</span> cycle_comb</span> : <code class="type">'a <a href="Cyclesim.Api.html#TYPEcyclesim">cyclesim</a> -> unit</code></pre><div class="info ">
+update combinatorial logic<br>
+</div>
+
+<pre><span id="VALreset"><span class="keyword">val</span> reset</span> : <code class="type">'a <a href="Cyclesim.Api.html#TYPEcyclesim">cyclesim</a> -> unit</code></pre><div class="info ">
+reset simulator<br>
+</div>
+
+<pre><span id="VALin_port"><span class="keyword">val</span> in_port</span> : <code class="type">'a <a href="Cyclesim.Api.html#TYPEcyclesim">cyclesim</a> -> string -> 'a Pervasives.ref</code></pre><div class="info ">
+get input port given a name<br>
+</div>
+
+<pre><span id="VALout_port"><span class="keyword">val</span> out_port</span> : <code class="type">'a <a href="Cyclesim.Api.html#TYPEcyclesim">cyclesim</a> -> string -> 'a Pervasives.ref</code></pre><div class="info ">
+get output port given a name<br>
+</div>
+
+<pre><span id="VALinternal_port"><span class="keyword">val</span> internal_port</span> : <code class="type">'a <a href="Cyclesim.Api.html#TYPEcyclesim">cyclesim</a> -> string -> 'a Pervasives.ref</code></pre><div class="info ">
+get internal port given a name<br>
+</div>
+
+<pre><span id="VALin_ports"><span class="keyword">val</span> in_ports</span> : <code class="type">'a <a href="Cyclesim.Api.html#TYPEcyclesim">cyclesim</a> -> (string * 'a Pervasives.ref) list</code></pre><div class="info ">
+get list of input ports<br>
+</div>
+
+<pre><span id="VALout_ports"><span class="keyword">val</span> out_ports</span> : <code class="type">'a <a href="Cyclesim.Api.html#TYPEcyclesim">cyclesim</a> -> (string * 'a Pervasives.ref) list</code></pre><div class="info ">
+get list of output ports<br>
+</div>
+
+<pre><span id="VALinternal_ports"><span class="keyword">val</span> internal_ports</span> : <code class="type">'a <a href="Cyclesim.Api.html#TYPEcyclesim">cyclesim</a> -> (string * 'a Pervasives.ref) list</code></pre><div class="info ">
+get list of internal nodes<br>
+</div>
+</body></html>
