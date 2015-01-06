@@ -76,12 +76,16 @@ struct
             sim_out_ports : (string * 'a ref) list;
             sim_internal_ports : (string * 'a ref) list;
             sim_reset : unit->unit;
+            sim_cycle_check : unit->unit;
             sim_cycle_comb : unit->unit;
+            sim_cycle_seq : unit->unit;
             sim_cycle : unit->unit;
         }
 
     let cycle sim = sim.sim_cycle()
+    let cycle_check sim = sim.sim_cycle_check()
     let cycle_comb sim = sim.sim_cycle_comb()
+    let cycle_seq sim = sim.sim_cycle_seq()
     let reset sim = sim.sim_reset()
     
     let in_port sim name = try List.assoc name sim.sim_in_ports with _ ->
@@ -343,12 +347,10 @@ struct
             let l = List.filter ((<>) None) l in
             map (function Some(x) -> x | _ -> failwith "error") l
         in
+        let tasks_check = map check_input inputs in
         let tasks_comb = filter_none (map compile (schedule @ regs)) in
-        let tasks = (map check_input inputs) @
-                    tasks_comb @ 
-                    (map compile_mem_update mems) @
-                    (map compile_reg_update regs) in
- 
+        let tasks_seq = (map compile_mem_update mems) @ (map compile_reg_update regs) in
+
         (* reset *)
         log "compile reset";
         let resets = filter_none (List.map compile_reset regs) in
@@ -377,15 +379,21 @@ struct
         in 
 
         log "done";
-        (* get data associated with some internal node *)
+
+        let iter l = 
+          let l = List.concat l in
+          (fun () -> List.iter (fun f -> f()) l)
+        in
 
         (* simulator structure *)
         {
             sim_in_ports = in_ports;
             sim_out_ports = out_ports;
             sim_internal_ports = internal_ports;
-            sim_cycle_comb = (fun () -> List.iter (fun f -> f()) tasks_comb);
-            sim_cycle = (fun () -> List.iter (fun f -> f()) tasks);
+            sim_cycle_check = iter [ tasks_check ];
+            sim_cycle_comb = iter [ tasks_comb ];
+            sim_cycle_seq = iter [ tasks_seq ];
+            sim_cycle = iter [ tasks_check; tasks_comb; tasks_seq; tasks_comb ];
             sim_reset = (fun () -> List.iter (fun f -> f()) resets);
         }
 
@@ -412,16 +420,17 @@ struct
             ) op0 op1;
             incr cycle_no
         in
-        let cycle_comb() = 
-            s0.sim_cycle_comb();
-            s1.sim_cycle_comb()
-        in
+        let cycle_check() = s0.sim_cycle_check(); s1.sim_cycle_check() in
+        let cycle_comb() = s0.sim_cycle_comb(); s1.sim_cycle_comb() in
+        let cycle_seq() = s0.sim_cycle_seq(); s1.sim_cycle_seq() in
         let reset () = s0.sim_reset(); s1.sim_reset() in
 
         {
             sim_in_ports = ip0;
             sim_out_ports = op0;
             sim_internal_ports = [];
+            sim_cycle_check = cycle_check;
+            sim_cycle_seq = cycle_seq;
             sim_cycle_comb = cycle_comb;
             sim_cycle = cycle;
             sim_reset = reset;
@@ -479,16 +488,17 @@ struct
         List.iter (fun f -> f()) check_outputs;
         incr cycle_no
       in
-      let cycle_comb() = 
-        s0.sim_cycle_comb();
-        s1.sim_cycle_comb()
-      in
+      let cycle_check() = s0.sim_cycle_check(); s1.sim_cycle_check() in
+      let cycle_comb() = s0.sim_cycle_comb(); s1.sim_cycle_comb() in
+      let cycle_seq() = s0.sim_cycle_seq(); s1.sim_cycle_seq() in
       let reset () = s0.sim_reset(); s1.sim_reset() in
       {
         sim_in_ports = inputs;
         sim_out_ports = outputs;
         sim_internal_ports = [];
+        sim_cycle_check = cycle_check;
         sim_cycle_comb = cycle_comb;
+        sim_cycle_seq = cycle_seq;
         sim_cycle = cycle;
         sim_reset = reset;
       }

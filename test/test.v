@@ -7,7 +7,7 @@ module test (
   output reg [4:0] d
 );
 
-  always @(posedge clock) begin
+  always @(posedge clock or posedge reset) begin
     if (reset) begin
       c <= 0;
       d <= 0;

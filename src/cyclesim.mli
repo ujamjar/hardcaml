@@ -25,19 +25,28 @@ sig
     (** base type of the cycle based simulators *)
     type 'a cyclesim =
         {
+
             sim_in_ports : (string * 'a ref) list; 
             sim_out_ports : (string * 'a ref) list;
             sim_internal_ports : (string * 'a ref) list;
             sim_reset : unit->unit;
+            sim_cycle_check : unit -> unit;
             sim_cycle_comb : unit -> unit;
+            sim_cycle_seq : unit -> unit;
             sim_cycle : unit->unit;
         }
 
-    (** advance by 1 clock cycle *)
+    (** advance by 1 clock cycle (check->comb->seq->comb) *)
     val cycle : 'a cyclesim -> unit
+
+    (** check inputs are valid before a simulation cycle *)
+    val cycle_check : 'a cyclesim -> unit
 
     (** update combinatorial logic *)
     val cycle_comb : 'a cyclesim -> unit
+
+    (** update sequential logic *)
+    val cycle_seq : 'a cyclesim -> unit
 
     (** reset simulator *)
     val reset : 'a cyclesim -> unit

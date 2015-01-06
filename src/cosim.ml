@@ -242,7 +242,9 @@ module Make(B : Comb.S) = struct
       sim_internal_ports = [];
       sim_reset = freset;
       sim_cycle = fcycle;
-      sim_cycle_comb = (fun () -> ());
+      sim_cycle_check = (fun () -> failwith "sim_cycle_check");
+      sim_cycle_comb = (fun () -> failwith "sim_cycle_comb");
+      sim_cycle_seq = (fun () -> failwith "sim_cycle_seq");
     })
 
   (* create simulator from hardcaml circuit *)

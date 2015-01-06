@@ -158,7 +158,9 @@ struct
         in
         {
             sim_cycle = cycle;
-            sim_cycle_comb = (fun () -> sim.sim_cycle_comb());
+            sim_cycle_check = sim.sim_cycle_check;
+            sim_cycle_comb = sim.sim_cycle_comb;
+            sim_cycle_seq = sim.sim_cycle_seq;
             sim_reset = reset;
             sim_in_ports = sim.sim_in_ports;
             sim_out_ports = sim.sim_out_ports;

@@ -33,7 +33,7 @@ open O
 module Vcd = Vcd_ext.Make(B)
 
 let _,sim0,i,o = G.make "cosimtest" f
-let sim0 = Vcd.gtkwave ~args:"-S test/gwShowall.tcl" sim0
+let sim0 = Vcd.gtkwave ~args:"-S gwShowall.tcl" sim0
 let _,sim1,_,_ = Gc.make "cosimtest" f
 
 module Cs = Cyclesim.Make(B)
