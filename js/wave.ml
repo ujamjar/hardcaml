@@ -79,17 +79,21 @@ let wrap sim =
     let out_ports = ports sim.sim_out_ports in
     let trace i x = List.iter2 (fun a b -> set a.data i !(snd b)) x in
     let cycle = ref 0 in
-    let reset () = 
-        sim.sim_reset();
-        trace !cycle in_ports sim.sim_in_ports;
-        trace !cycle out_ports sim.sim_out_ports;
-        incr cycle
+    let reset = List.concat [
+        sim.sim_reset;
+        [ fun () -> 
+          trace !cycle in_ports sim.sim_in_ports;
+          trace !cycle out_ports sim.sim_out_ports;
+          incr cycle ]
+    ]
     in
-    let cycle () = 
-        sim.sim_cycle();
-        trace !cycle in_ports sim.sim_in_ports;
-        trace !cycle out_ports sim.sim_out_ports;
-        incr cycle
+    let cycle = List.concat [ 
+        sim.sim_cycle;
+        [ fun () -> 
+          trace !cycle in_ports sim.sim_in_ports;
+          trace !cycle out_ports sim.sim_out_ports;
+          incr cycle ]
+    ]
     in
     {
         sim_cycle = cycle;

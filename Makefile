@@ -25,7 +25,7 @@ all:
 # icarus verilog VPI cosim interface
 vpi: 
 	ocamlbuild -use-ocamlfind $(BUILD_OPTS) cosim_icarus.cmo vpi.cmo
-	ocamlfind c -output-obj -package ctypes.foreign -linkpkg -o cosim_o.o \
+	ocamlfind c -output-obj -package bigarray,num,ctypes.foreign -linkpkg -o cosim_o.o \
 		_build/HardCaml.cma _build/vpi/vpi.cmo _build/vpi/cosim_icarus.cmo
 	mv cosim_o.o _build/vpi/cosim_o.o
 	$(CC) -c `iverilog-vpi --cflags` -g vpi/cosim_c.c -o _build/vpi/cosim_c.o
@@ -42,11 +42,22 @@ vpi:
 
 # iocamljs notebook kernel
 iocamljs:
-	make -C ../../iocamljs all \
-		OPT=1 EXT=".hardcaml" \
-		CAMLP4=1 LWT=1 JSOO=1 \
-		SYNTAX="js_of_ocaml.syntax lwt.syntax.options lwt.syntax hardcaml.syntax" \
-		PACKAGES="hardcaml hardcaml.js" MODULES="HardCaml HardCamlJS"
+	jsoo_mktop \
+		-verbose \
+		-dont-export-unit gc \
+		-top-syntax lwt.syntax \
+		-top-syntax js_of_ocaml.syntax \
+		-top-syntax hardcaml.syntax \
+		-export-package lwt \
+		-export-package js_of_ocaml \
+		-export-package hardcaml \
+		-export-package iocamljs-kernel \
+		-jsopt +weak.js -jsopt +toplevel.js -jsopt +nat.js \
+		-jsopt -I -jsopt ./ \
+		-o iocaml.byte
+	cat *.cmis.js \
+		`opam config var lib`/iocamljs-kernel/kernel.js iocaml.js > \
+		`opam config var share`/iocamljs-kernel/profile/static/services/kernels/js/kernel.hardcaml.js
 
 doc:
 	ocamlbuild -use-ocamlfind $(BUILD_OPTS) HardCaml.docdir/index.html

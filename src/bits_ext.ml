@@ -103,17 +103,17 @@ struct
     let abits_int32_of_big_int = abits_of_big_int'
         32 Int32.logand Int32.logor Int32.lognot Int32.shift_left 
         (-1l) 0l 1l
-        Array.get Array.set Array.create Big_int.int32_of_big_int
+        Array.get Array.set Array.make Big_int.int32_of_big_int
 
     let abits_int64_of_big_int = abits_of_big_int'
         64 Int64.logand Int64.logor Int64.lognot Int64.shift_left 
         (-1L) 0L 1L
-        Array.get Array.set Array.create Big_int.int64_of_big_int
+        Array.get Array.set Array.make Big_int.int64_of_big_int
 
     let abits_nint_of_big_int = abits_of_big_int'
         platform_bits Nativeint.logand Nativeint.logor Nativeint.lognot Nativeint.shift_left 
         (-1n) 0n 1n
-        Array.get Array.set Array.create Big_int.nativeint_of_big_int
+        Array.get Array.set Array.make Big_int.nativeint_of_big_int
 
     let big_int_of_abits_int32 = big_int_of_abits'
         32 Int32.logand Int32.shift_left Int32.shift_right_logical
@@ -181,17 +181,17 @@ struct
     let bstr_of_abits' platform_bits (&.) (<<.) zero one get set width a = 
         if width = 0 then ""
         else
-            let b = String.make width '0' in
+            let b = Bytes.make width '0' in
             let rec build n =
                 let word = n / platform_bits in
                 let bit = n mod platform_bits in
                 if ((get a word) &. (one <<. bit)) <> zero then
-                    b.[width - n - 1] <- '1';
+                    Bytes.set b (width - n - 1) '1';
                 if n <> 0 then
                     build (n-1)
             in
             build (width-1);
-            b
+            Bytes.to_string b
 
     let babits_int32_of_bstr = abits_of_bstr' 32 (Int32.logor) (Int32.shift_left) 0l 1l 
         Bigarray.Array1.get Bigarray.Array1.set 

@@ -1,3 +1,12 @@
+(* 
+ * hardcaml - hardware design in OCaml
+ *
+ *   (c) 2014 MicroJamJar Ltd
+ *
+ * Author(s): andy.ray@ujamjar.com
+ * Description: 
+ *
+ *)
 
 open Signal.Comb
 open Signal.Seq

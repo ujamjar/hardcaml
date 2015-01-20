@@ -1,3 +1,13 @@
+(* 
+ * hardcaml - hardware design in OCaml
+ *
+ *   (c) 2014 MicroJamJar Ltd
+ *
+ * Author(s): andy.ray@ujamjar.com
+ * Description: 
+ *
+ *)
+
 (** Hardware generation in an imperative style *)
 
 (** create sequential hardware designs using [if], [while] and [assignment] *)

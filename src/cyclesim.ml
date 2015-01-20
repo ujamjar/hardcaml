@@ -70,23 +70,25 @@ let find_elements circuit =
 module Api = 
 struct
 
+    type tasks = (unit -> unit) list
+
     type 'a cyclesim =
         {
             sim_in_ports : (string * 'a ref) list; 
             sim_out_ports : (string * 'a ref) list;
             sim_internal_ports : (string * 'a ref) list;
-            sim_reset : unit->unit;
-            sim_cycle_check : unit->unit;
-            sim_cycle_comb : unit->unit;
-            sim_cycle_seq : unit->unit;
-            sim_cycle : unit->unit;
+            sim_reset : tasks;
+            sim_cycle_check : tasks;
+            sim_cycle_comb : tasks;
+            sim_cycle_seq : tasks;
+            sim_cycle : tasks;
         }
 
-    let cycle sim = sim.sim_cycle()
-    let cycle_check sim = sim.sim_cycle_check()
-    let cycle_comb sim = sim.sim_cycle_comb()
-    let cycle_seq sim = sim.sim_cycle_seq()
-    let reset sim = sim.sim_reset()
+    let cycle sim = List.iter (fun f -> f()) sim.sim_cycle
+    let cycle_check sim = List.iter (fun f -> f()) sim.sim_cycle_check
+    let cycle_comb sim = List.iter (fun f -> f()) sim.sim_cycle_comb
+    let cycle_seq sim = List.iter (fun f -> f()) sim.sim_cycle_seq
+    let reset sim = List.iter (fun f -> f()) sim.sim_reset
     
     let in_port sim name = try List.assoc name sim.sim_in_ports with _ ->
         failwith ("couldn't find input port " ^ name)
@@ -380,21 +382,16 @@ struct
 
         log "done";
 
-        let iter l = 
-          let l = List.concat l in
-          (fun () -> List.iter (fun f -> f()) l)
-        in
-
         (* simulator structure *)
         {
             sim_in_ports = in_ports;
             sim_out_ports = out_ports;
             sim_internal_ports = internal_ports;
-            sim_cycle_check = iter [ tasks_check ];
-            sim_cycle_comb = iter [ tasks_comb ];
-            sim_cycle_seq = iter [ tasks_seq ];
-            sim_cycle = iter [ tasks_check; tasks_comb; tasks_seq; tasks_comb ];
-            sim_reset = (fun () -> List.iter (fun f -> f()) resets);
+            sim_cycle_check = tasks_check;
+            sim_cycle_comb = tasks_comb;
+            sim_cycle_seq = tasks_seq;
+            sim_cycle = List.concat [ tasks_check; tasks_comb; tasks_seq; tasks_comb ];
+            sim_reset = resets;
         }
 
     exception Sim_comparison_failure of int * string * string * string
@@ -405,25 +402,26 @@ struct
         let op0,op1 = List.sort compare s0.sim_out_ports,
                       List.sort compare s1.sim_out_ports in
         let cycle_no = ref 0 in
-        let cycle () = 
+        let cycle = List.concat [
             (* copy input data *)
-            List.iter2 (fun (_,d0) (_,d1) -> d1 := !d0) ip0 ip1;
+            [ fun () -> List.iter2 (fun (_,d0) (_,d1) -> d1 := !d0) ip0 ip1 ];
             (* run both simulators *)
-            s0.sim_cycle();
-            s1.sim_cycle();
+            s0.sim_cycle;
+            s1.sim_cycle;
             (* compare results *)
-            List.iter2 (fun (n,d0) (_,d1) -> 
+            [ fun () -> List.iter2 (fun (n,d0) (_,d1) -> 
                 if !d0 <> !d1 then
                     raise (Sim_comparison_failure(!cycle_no, n, 
                                 Bits.to_string !d0, 
                                 Bits.to_string !d1))
-            ) op0 op1;
-            incr cycle_no
+            ) op0 op1 ];
+            [ fun () -> incr cycle_no ]
+        ]
         in
-        let cycle_check() = s0.sim_cycle_check(); s1.sim_cycle_check() in
-        let cycle_comb() = s0.sim_cycle_comb(); s1.sim_cycle_comb() in
-        let cycle_seq() = s0.sim_cycle_seq(); s1.sim_cycle_seq() in
-        let reset () = s0.sim_reset(); s1.sim_reset() in
+        let cycle_check = List.concat [ s0.sim_cycle_check; s1.sim_cycle_check ] in
+        let cycle_comb = List.concat [ s0.sim_cycle_comb; s1.sim_cycle_comb ] in
+        let cycle_seq = List.concat [ s0.sim_cycle_seq; s1.sim_cycle_seq ] in
+        let reset = List.concat [ s0.sim_reset; s1.sim_reset ] in
 
         {
             sim_in_ports = ip0;
@@ -481,17 +479,17 @@ struct
         List.map fst l, List.map snd l
       in
 
-      let cycle () = 
-        List.iter (fun f -> f()) copy_inputs;
-        s0.sim_cycle();
-        s1.sim_cycle();
-        List.iter (fun f -> f()) check_outputs;
-        incr cycle_no
-      in
-      let cycle_check() = s0.sim_cycle_check(); s1.sim_cycle_check() in
-      let cycle_comb() = s0.sim_cycle_comb(); s1.sim_cycle_comb() in
-      let cycle_seq() = s0.sim_cycle_seq(); s1.sim_cycle_seq() in
-      let reset () = s0.sim_reset(); s1.sim_reset() in
+      let cycle = List.concat [
+        [ fun () -> List.iter (fun f -> f()) copy_inputs ];
+        s0.sim_cycle;
+        s1.sim_cycle;
+        [ fun () -> List.iter (fun f -> f()) check_outputs ];
+        [ fun () -> incr cycle_no ]
+      ] in
+      let cycle_check = List.concat [ s0.sim_cycle_check; s1.sim_cycle_check ] in
+      let cycle_comb = List.concat [ s0.sim_cycle_comb; s1.sim_cycle_comb ] in
+      let cycle_seq = List.concat [ s0.sim_cycle_seq; s1.sim_cycle_seq ] in
+      let reset  = List.concat [ s0.sim_reset; s1.sim_reset ] in
       {
         sim_in_ports = inputs;
         sim_out_ports = outputs;

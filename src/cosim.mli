@@ -1,3 +1,13 @@
+(* 
+ * hardcaml - hardware design in OCaml
+ *
+ *   (c) 2014 MicroJamJar Ltd
+ *
+ * Author(s): andy.ray@ujamjar.com
+ * Description: 
+ *
+ *)
+
 (** Icarus Verilog Cosimulation interface *)
 
 (** run [sets], then [gets] then schedule next callback at cur_time+[delta_time]*)

@@ -118,8 +118,9 @@ struct
         write_header();
 
         (* reset *)
-        let reset () =
-            sim.sim_reset();
+        let reset = List.concat [
+          sim.sim_reset;
+          [ fun () ->
             osl ("#"^si (!time));
             osl "0!";
             osl "1\"";
@@ -129,11 +130,13 @@ struct
                 (S.to_bstr !(t.data))) trace_out;
             List.iter (fun t -> write_var t.id (S.to_bstr !(t.data)) t.w; t.prev :=
                 (S.to_bstr !(t.data))) trace_internal;
-            time := !(time) + vcdcycle
+            time := !(time) + vcdcycle ]
+        ]
         in
         (* cycle *)
-        let cycle () = 
-            sim.sim_cycle();
+        let cycle = List.concat [ 
+          sim.sim_cycle;
+          [ fun () -> 
             osl ("#"^si (!time));
             osl "1!";
             osl "0\"";
@@ -154,7 +157,8 @@ struct
             ) trace_internal;
             osl ("#"^si (!(time) + (vcdcycle/2)));
             osl "0!";
-            time := !(time) + vcdcycle
+            time := !(time) + vcdcycle ];
+        ]
         in
         {
             sim_cycle = cycle;

@@ -79,6 +79,8 @@ sig
     val mux_init : t -> int -> (int -> t) -> t
     val cases : t -> t -> (int * t) list -> t
     val pmux : (t * t) list -> t -> t
+    val pmuxl : (t * t) list -> t
+    val pmux1h : (t * t) list -> t
     val ( &: ) : t -> t -> t
     val ( &:. ) : t -> int -> t
     val (&&:) : t -> t -> t
@@ -147,7 +149,7 @@ sig
     val sresize : t -> int -> t
     val ue : t -> t
     val se : t -> t
-    val reduce : (t -> t -> t) -> t list -> t
+    val reduce : ('a -> 'a -> 'a) -> 'a list -> 'a
     val reverse : t -> t 
     val mod_counter : int -> t -> t
     val tree : int -> ('a list -> 'a) -> 'a list -> 'a
@@ -312,9 +314,6 @@ struct
         mux sel (Array.to_list a)
       else
         mux sel (Array.to_list a @ [default])
-
-    let pmux list last = 
-      (List.fold_left (fun f (c, d) -> (fun s -> f (mux2 c d s))) (fun s -> s) list) last
 
     (* logical *)
     let (&:) a b = 
@@ -520,6 +519,13 @@ struct
 
     let (||:) a b = (reduce (|:) (bits a)) |: (reduce (|:) (bits b))
     let (&&:) a b = (reduce (|:) (bits a)) &: (reduce (|:) (bits b))
+
+    let pmux list last = 
+      (List.fold_left (fun f (c, d) -> (fun s -> f (mux2 c d s))) (fun s -> s) list) last
+
+    let pmuxl list = snd (reduce (fun (s0,d0) (s1,d1) -> (s0 |: s1), mux2 s0 d0 d1) list)
+
+    let pmux1h list = reduce (|:) (List.map (fun (s,d) -> sresize s (width d) &: d) list)
 
     let reverse a = concat (List.rev (bits a))
 

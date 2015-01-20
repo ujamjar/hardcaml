@@ -229,8 +229,14 @@ sig
     (** case mux *)
     val cases : t -> t -> (int * t) list -> t
 
-    (** priority mux *)
+    (** priority mux (with default) *)
     val pmux : (t * t) list -> t -> t
+
+    (** log depth priority mux (no default) *)
+    val pmuxl : (t * t) list -> t
+
+    (** onehot priority mux (default=0) *)
+    val pmux1h : (t * t) list -> t
 
     (** logical and *)
     val (&:) : t -> t -> t
@@ -397,7 +403,7 @@ sig
     val se : t -> t
 
     (** fold 'op' though list *)
-    val reduce : (t -> t -> t) -> t list -> t
+    val reduce : ('a -> 'a -> 'a) -> 'a list -> 'a
 
     (** reverse bits *)
     val reverse : t -> t

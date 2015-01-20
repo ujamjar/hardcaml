@@ -25,11 +25,12 @@ struct
         | Quit
 
     let run chan sim = 
+        let () = printf "? for options\n" in
 
         let rec get_command() = 
             let line = 
                 if chan <> stdin then input_line chan
-                else read_line () 
+                else (printf "> %!"; read_line ())
             in
             let split str =
                 let rec split l c chars = 
@@ -51,33 +52,30 @@ struct
             match split line with
             | [] -> 
                 get_command ()
-            | [ "!" ] -> 
-                Reset
-            | [ "!quit" ] ->
-                Quit
-            | [ "#" ] -> 
-                Cycle 1
-            | [ "?" ] ->
-                Info
-            | "#" :: n :: [] -> 
-                (try Cycle (int_of_string n)
-                with _ -> get_command ())
-            | var :: [] -> 
-                Print var
-            | var :: value :: [] -> 
-                Set (var, value)
-            | _ -> 
-                printf "Couldn't parse command";
-                get_command ()
+            | [ "!" ] -> Reset
+            | [ "!quit" ] -> Quit
+            | [ "#" ] -> Cycle 1
+            | [ "?" ] -> Info
+            | "#" :: n :: [] -> (try Cycle (int_of_string n) with _ -> get_command ())
+            | var :: [] -> Print var
+            | var :: value :: [] -> Set (var, value)
+            | _ -> printf "Couldn't parse command"; get_command ()
         in
 
         let info () = 
-            List.iter (fun (n,v) ->
-                printf "Input : [%4i] %s\n" (B.width !v) n
-            ) (Api.in_ports sim);
-            List.iter (fun (n,v) ->
-                printf "Output: [%4i] %s\n" (B.width !v) n
-            ) (Api.out_ports sim)
+          let h v = Utils.(hstr_of_bstr Unsigned B.(to_bstr v)) in
+          printf "Commands:\n";
+          printf "> ?         show state\n";
+          printf "> !         reset\n";
+          printf "> !quit     quit\n";
+          printf "> #         cycle\n";
+          printf "> #n        n cycles\n";
+          printf "> data      display value of port 'data'\n";
+          printf "> data d13  set value of port 'data' to decimal 13 (b1101 for binary, h3a for hex)\n\n";
+          printf "Input ports:\n";
+          List.iter (fun (n,v) -> printf " %s[%i] = h%s\n" n (B.width !v) (h !v)) (Api.in_ports sim);
+          printf "Output ports:\n";
+          List.iter (fun (n,v) -> printf " %s[%i] = h%s\n" n (B.width !v) (h !v)) (Api.out_ports sim)
         in
 
         let get_interactive_input ()=
@@ -108,10 +106,10 @@ struct
                     (match get_var var with 
                      | Some(x) -> 
                         (let b = B.to_bstr !x in
-                        printf "Binary : %s\n" b;
-                        printf "Decimal: %s\n" 
+                        printf "b%s / d%s / h%s\n" b
                             (Big_int.string_of_big_int
-                                (Bits_ext.Utils_ext.big_int_of_bstr b)))
+                                (Bits_ext.Utils_ext.big_int_of_bstr b))
+                            (Utils.hstr_of_bstr Utils.Unsigned b))
                      | None -> printf "Couldn't find %s\n" var)
                 | Quit -> printf "Goodbye!\n"; quit := true);
                 if not !quit then get_interactive_input ()
@@ -274,8 +272,6 @@ struct
             ) ports
         )
 
-    let seq f () = List.iter (fun f -> f()) f 
-
     open Api
 
     (* wrap a simulator and read/write binary dump files *)
@@ -288,8 +284,8 @@ struct
             else [] 
         in
         let f3 = if cfg.write_outputs then [ write cfg.write_outputs_chan out_ports ] else [] in
-        seq (List.concat [ f0; f1; [reset]; f2; f3 ]),
-        seq (List.concat [ f0; f1; [cycle]; f2; f3 ])
+        (List.concat [ f0; f1; reset; f2; f3 ]),
+        (List.concat [ f0; f1; cycle; f2; f3 ])
 
     let errfn name _ _ = failwith ("Mismatch: " ^ name)
 

@@ -22,6 +22,8 @@ val find_elements : Circuit.t -> (signal list * signal list * signal list * sign
 module Api : 
 sig
 
+    type tasks = (unit -> unit) list
+
     (** base type of the cycle based simulators *)
     type 'a cyclesim =
         {
@@ -29,11 +31,11 @@ sig
             sim_in_ports : (string * 'a ref) list; 
             sim_out_ports : (string * 'a ref) list;
             sim_internal_ports : (string * 'a ref) list;
-            sim_reset : unit->unit;
-            sim_cycle_check : unit -> unit;
-            sim_cycle_comb : unit -> unit;
-            sim_cycle_seq : unit -> unit;
-            sim_cycle : unit->unit;
+            sim_reset : tasks;
+            sim_cycle_check : tasks;
+            sim_cycle_comb : tasks;
+            sim_cycle_seq : tasks;
+            sim_cycle : tasks;
         }
 
     (** advance by 1 clock cycle (check->comb->seq->comb) *)
