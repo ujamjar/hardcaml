@@ -9,12 +9,8 @@
  *)
 
 (** Pre-built API functors *)
-
 module type S = sig
   module B : Comb.S
-  module Comb : module type of Signal.Comb
-  module Seq : module type of Signal.Seq
-  module S : module type of Cyclesim.Api
   module Cyclesim : module type of Cyclesim.Make(B)
   module Cosim : module type of Cosim.Make(B)
   module Vcd : module type of Vcd.Make(B)
@@ -25,9 +21,14 @@ module type S = sig
     module Sim : module type of Interface.Sim(B)
   end
   type bits = B.t
-  type signal = Comb.t
+  type signal = Signal.Comb.t
 end
 
 module Make(Bits : Comb.S) : S
+
+module Comb : module type of Signal.Comb
+module Seq : module type of Signal.Seq
+module Cs : module type of Cyclesim.Api
+  with type 'a cyclesim = 'a Cyclesim.Api.cyclesim
 
 include module type of Make(Bits.Comb.IntbitsList)
