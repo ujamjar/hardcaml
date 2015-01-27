@@ -1,0 +1,23 @@
+# OASIS_START
+# DO NOT EDIT (digest: 1f0e0fde1a574755c26442ec64166f7d)
+version = "1.1"
+description = "Hardware in OCaml"
+requires = "bytes bigarray num"
+archive(byte) = "HardCaml.cma"
+archive(byte, plugin) = "HardCaml.cma"
+archive(native) = "HardCaml.cmxa"
+archive(native, plugin) = "HardCaml.cmxs"
+exists_if = "HardCaml.cma"
+package "syntax" (
+ version = "1.1"
+ description = "Hardware in OCaml"
+ requires = "camlp4"
+ archive(syntax, preprocessor) = "pa_hardcaml.cma"
+ archive(syntax, toploop) = "pa_hardcaml.cma"
+ archive(syntax, preprocessor, native) = "pa_hardcaml.cmxa"
+ archive(syntax, preprocessor, native, plugin) = "pa_hardcaml.cmxs"
+ requires(toploop) = "hardcaml"
+ exists_if = "pa_hardcaml.cma"
+)
+# OASIS_STOP
+

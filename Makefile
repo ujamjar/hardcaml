@@ -12,15 +12,14 @@
 
 BUILD_OPTS=
 
-HARDCAML_TGT = _build/HardCaml.cmi _build/HardCaml.cmxa _build/HardCaml.cma _build/HardCaml.a
-PA_HARDCAML_TGT = _build/src/pa_hardcaml.cmo _build/src/pa_hardcaml.cmi
-HARDCAML_JS_TGT = _build/HardCamlJS.cmi _build/HardCamlJS.cma 
+all: setup.data
+	ocaml setup.ml -build
 
-all: 
-	ocamlbuild -use-ocamlfind $(BUILD_OPTS) HardCaml.cma 
-	ocamlbuild -use-ocamlfind $(BUILD_OPTS) HardCaml.cmxa
-	ocamlbuild -use-ocamlfind $(BUILD_OPTS) pa_hardcaml.cmo
-	ocamlbuild -use-ocamlfind $(BUILD_OPTS) HardCamlJS.cma   
+setup.ml:
+	oasis setup
+
+setup.data: setup.ml
+	ocaml setup.ml -configure
 
 # icarus verilog VPI cosim interface
 vpi: 
@@ -65,14 +64,12 @@ doc:
 ####################################################
 
 install: all
-	$(SUDO) ocamlfind install hardcaml META \
-		$(HARDCAML_TGT) $(HARDCAML_JS_TGT) $(PA_HARDCAML_TGT) \
-		_build/vpi/cosim.vpi tools/hardcaml_cosim.sh tools/hardcaml_vvp.sh
-	
+	ocaml setup.ml -install
+
 uninstall:
-	$(SUDO) ocamlfind remove hardcaml
+	ocaml setup.ml -uninstall
 
 clean:
-	ocamlbuild -clean
+	ocaml setup.ml -clean
 	- find . -name "*~" | xargs rm
 

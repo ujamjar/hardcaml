@@ -1,3 +1,5 @@
+# OASIS_START
+# DO NOT EDIT (digest: 4c9dd8974c31081f08eebb299b730994)
 Utils
 Comb
 Bits
@@ -22,3 +24,4 @@ Structural
 Structural_lib
 Cosim
 Api
+# OASIS_STOP

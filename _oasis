@@ -1,0 +1,46 @@
+OASISFormat: 0.4
+Name:        hardcaml
+Version:     1.1
+Synopsis:    Hardware in OCaml
+Description: Design, simulate, analyse and transform RTL
+  level hardware designs.
+
+Authors:     Andy Ray
+Maintainers: Andy Ray <andy.ray@unjamjar.org>
+Homepage:    https://github.com/ujamjar/hardcaml
+License:     ISC
+Plugins:     META (0.4)
+BuildTools:  ocamlbuild
+
+Library HardCaml
+  Path:          src
+  Findlibname:   hardcaml
+  Pack:          true
+  Modules:       Utils, Comb, Bits, Bits_raw, Bits_ext, Signal, Syntax,
+                 Circuit, Rtl, Fixed, Const_prop, Transform, Cyclesim,
+                 Cyclesim_ext, Vcd, Vcd_ext, Interface, Recipe, Xilinx,
+                 C, Structural, Structural_lib, Cosim, Api
+  BuildDepends:  bytes, bigarray, num
+  XMETARequires: bytes, bigarray, num
+
+Library pa_hardcaml
+  Path:           src
+  FindLibName:    syntax
+  FindLibParent:  HardCaml
+  Modules:        Pa_hardcaml
+  BuildDepends:   camlp4
+  XMETAType:      syntax
+  XMETAExtraLines: requires(toploop) = "hardcaml"
+
+#Document HardCaml
+#  Title:                HardCaml documentation
+#  Type:                 ocamlbuild (0.3)
+#  BuildTools+:          ocamldoc
+#  Install:              true
+#  XOCamlbuildPath:      src
+#  XOCamlbuildLibraries: HardCamlWaveTerm
+
+SourceRepository master
+  Type:     git
+  Location: https://github.com/ujamjar/hardcaml-examples.git
+  Browser:  https://github.com/ujamjar/hardcaml-examples
