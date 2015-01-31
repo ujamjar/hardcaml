@@ -21,24 +21,6 @@ setup.ml:
 setup.data: setup.ml
 	ocaml setup.ml -configure
 
-# icarus verilog VPI cosim interface
-vpi: 
-	ocamlbuild -use-ocamlfind $(BUILD_OPTS) cosim_icarus.cmo vpi.cmo
-	ocamlfind c -output-obj -package bigarray,num,ctypes.foreign -linkpkg -o cosim_o.o \
-		_build/HardCaml.cma _build/vpi/vpi.cmo _build/vpi/cosim_icarus.cmo
-	mv cosim_o.o _build/vpi/cosim_o.o
-	$(CC) -c `iverilog-vpi --cflags` -g vpi/cosim_c.c -o _build/vpi/cosim_c.o
-	$(CC) -o _build/vpi/cosim.vpi \
-		`iverilog-vpi --ldflags` \
-		_build/vpi/cosim_o.o _build/vpi/cosim_c.o \
-		-L`opam config var lib`/ocaml \
-		-L`opam config var lib`/ctypes \
-		-lunix -lbigarray -lcamlstr \
-		-lctypes_stubs -lctypes-foreign-base_stubs \
-		-lcamlrun_shared -lffi -ldl -lm \
-		`iverilog-vpi --ldlibs` \
-		-Wl,-E
-
 # iocamljs notebook kernel
 iocamljs:
 	jsoo_mktop \
@@ -66,8 +48,8 @@ doc:
 install: all
 	ocaml setup.ml -install
 
-uninstall: setup.data
-	ocaml setup.ml -uninstall
+uninstall: 
+	ocamlfind remove hardcaml
 
 clean:
 	ocaml setup.ml -clean
