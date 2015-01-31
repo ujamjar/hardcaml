@@ -275,17 +275,21 @@ struct
     open Api
 
     (* wrap a simulator and read/write binary dump files *)
-    let wrap' cfg reset cycle in_ports out_ports =
-        let f0 = if cfg.read_inputs then [ read cfg.read_inputs_chan in_ports ] else [] in
-        let f1 = if cfg.write_inputs then [ write cfg.write_inputs_chan in_ports ] else [] in
-        let f2 = 
-            if cfg.compare_outputs then 
-                [ compare cfg.compare_outputs_chan out_ports cfg.compare_error_fn ] 
-            else [] 
-        in
-        let f3 = if cfg.write_outputs then [ write cfg.write_outputs_chan out_ports ] else [] in
-        (List.concat [ f0; f1; reset; f2; f3 ]),
-        (List.concat [ f0; f1; cycle; f2; f3 ])
+    let wrap' cfg in_ports out_ports =
+      let id () = () in
+      let f0 = if cfg.read_inputs then read cfg.read_inputs_chan in_ports else id in
+      let f1 = if cfg.write_inputs then write cfg.write_inputs_chan in_ports else id in
+      let f2 = 
+        if cfg.compare_outputs then 
+          compare cfg.compare_outputs_chan out_ports cfg.compare_error_fn 
+        else id
+      in
+      let f3 = 
+        if cfg.write_outputs then write cfg.write_outputs_chan out_ports 
+        else id
+      in
+      (fun () -> f0(); f1 ()),
+      (fun () -> f2(); f3 ())
 
     let errfn name _ _ = failwith ("Mismatch: " ^ name)
 
@@ -294,24 +298,25 @@ struct
     let wrap ?(rdin=None) ?(wrin=None) ?(cmpout=None) ?(cmpfn=errfn) ?(wrout=None) sim = 
         let ui i = match i with Some(x) -> x | _ -> stdin in
         let uo o = match o with Some(x) -> x | _ -> stdout in
-        let reset, cycle =
-            wrap' 
-                {
-                    read_inputs = rdin <> None;
-                    read_inputs_chan = ui rdin;
-                    write_inputs = wrin <> None;
-                    write_inputs_chan = uo wrin;
-                    compare_outputs = cmpout <> None;
-                    compare_outputs_chan = ui cmpout;
-                    compare_error_fn = cmpfn;
-                    write_outputs = wrout <> None;
-                    write_outputs_chan = uo wrout;
-                }
-                sim.sim_reset sim.sim_cycle sim.sim_in_ports sim.sim_out_ports
+        let pre, post =
+          wrap' 
+            {
+              read_inputs = rdin <> None;
+              read_inputs_chan = ui rdin;
+              write_inputs = wrin <> None;
+              write_inputs_chan = uo wrin;
+              compare_outputs = cmpout <> None;
+              compare_outputs_chan = ui cmpout;
+              compare_error_fn = cmpfn;
+              write_outputs = wrout <> None;
+              write_outputs_chan = uo wrout;
+            }
+            sim.sim_in_ports sim.sim_out_ports
         in
         { sim with
-            sim_reset = reset;
-            sim_cycle = cycle;
+          sim_reset = (fun () -> pre(); Api.reset sim; post());
+          sim_cycle_check = (fun () -> pre(); Api.cycle_check sim);
+          sim_cycle_comb1 = (fun () -> Api.cycle_comb1 sim; post());
         }
 
 end

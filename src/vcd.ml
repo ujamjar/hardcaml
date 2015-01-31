@@ -118,57 +118,45 @@ struct
         write_header();
 
         (* reset *)
-        let reset = List.concat [
-          sim.sim_reset;
-          [ fun () ->
-            osl ("#"^si (!time));
-            osl "0!";
-            osl "1\"";
-            List.iter (fun t -> write_var t.id (S.to_bstr !(t.data)) t.w; t.prev :=
-                (S.to_bstr !(t.data))) trace_in;
-            List.iter (fun t -> write_var t.id (S.to_bstr !(t.data)) t.w; t.prev :=
-                (S.to_bstr !(t.data))) trace_out;
-            List.iter (fun t -> write_var t.id (S.to_bstr !(t.data)) t.w; t.prev :=
-                (S.to_bstr !(t.data))) trace_internal;
-            time := !(time) + vcdcycle ]
-        ]
+        let write_reset () = 
+          osl ("#"^si (!time));
+          osl "0!";
+          osl "1\"";
+          List.iter (fun t -> write_var t.id (S.to_bstr !(t.data)) t.w; t.prev :=
+              (S.to_bstr !(t.data))) trace_in;
+          List.iter (fun t -> write_var t.id (S.to_bstr !(t.data)) t.w; t.prev :=
+              (S.to_bstr !(t.data))) trace_out;
+          List.iter (fun t -> write_var t.id (S.to_bstr !(t.data)) t.w; t.prev :=
+              (S.to_bstr !(t.data))) trace_internal;
+          time := !(time) + vcdcycle 
         in
         (* cycle *)
-        let cycle = List.concat [ 
-          sim.sim_cycle;
-          [ fun () -> 
-            osl ("#"^si (!time));
-            osl "1!";
-            osl "0\"";
-            List.iter (fun t -> 
-                let data = S.to_bstr !(t.data) in
-                if data <> !(t.prev) then
-                    (write_var t.id data t.w; t.prev := data)
-            ) trace_in;
-            List.iter (fun t -> 
-                let data = S.to_bstr !(t.data) in
-                if data <> !(t.prev) then
-                    (write_var t.id data t.w; t.prev := data)
-            ) trace_out;
-            List.iter (fun t -> 
-                let data = S.to_bstr !(t.data) in
-                if data <> !(t.prev) then
-                    (write_var t.id data t.w; t.prev := data)
-            ) trace_internal;
-            osl ("#"^si (!(time) + (vcdcycle/2)));
-            osl "0!";
-            time := !(time) + vcdcycle ];
-        ]
+        let write_cycle () = 
+          osl ("#"^si (!time));
+          osl "1!";
+          osl "0\"";
+          List.iter (fun t -> 
+              let data = S.to_bstr !(t.data) in
+              if data <> !(t.prev) then
+                  (write_var t.id data t.w; t.prev := data)
+          ) trace_in;
+          List.iter (fun t -> 
+              let data = S.to_bstr !(t.data) in
+              if data <> !(t.prev) then
+                  (write_var t.id data t.w; t.prev := data)
+          ) trace_out;
+          List.iter (fun t -> 
+              let data = S.to_bstr !(t.data) in
+              if data <> !(t.prev) then
+                  (write_var t.id data t.w; t.prev := data)
+          ) trace_internal;
+          osl ("#"^si (!(time) + (vcdcycle/2)));
+          osl "0!";
+          time := !(time) + vcdcycle 
         in
-        {
-            sim_cycle = cycle;
-            sim_cycle_check = sim.sim_cycle_check;
-            sim_cycle_comb = sim.sim_cycle_comb;
-            sim_cycle_seq = sim.sim_cycle_seq;
-            sim_reset = reset;
-            sim_in_ports = sim.sim_in_ports;
-            sim_out_ports = sim.sim_out_ports;
-            sim_internal_ports = sim.sim_internal_ports;
+        { sim with
+            sim_reset = (fun () -> reset sim; write_reset());
+            sim_cycle_seq = (fun () -> cycle_seq sim; write_cycle());
         }
 
 end
