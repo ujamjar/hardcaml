@@ -66,7 +66,7 @@ doc:
 install: all
 	ocaml setup.ml -install
 
-uninstall:
+uninstall: setup.data
 	ocaml setup.ml -uninstall
 
 clean:
