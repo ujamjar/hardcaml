@@ -177,6 +177,8 @@ sig
 
     module Unsigned : TypedMath 
     module Signed : TypedMath
+    module Uop : TypedMath with type v := t
+    module Sop : TypedMath with type v := t
 
 end
 
@@ -773,6 +775,9 @@ struct
         let (==:) = re0 (==:) 
         let (<>:) = re0 (<>:)
     end
+
+    module Uop = Unsigned
+    module Sop = Signed
 
 end
 

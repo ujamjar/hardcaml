@@ -447,12 +447,18 @@ sig
     end
 
     (* general arithmetic on unsigned signals.  operands and results are resized
-     * to fit a appropriate *)
+     * to fit as appropriate *)
     module Unsigned : TypedMath 
 
     (* general arithmetic on signed signals.  operands and results are resized
-     * to fit a appropriate *)
+     * to fit as appropriate *)
     module Signed : TypedMath
+
+    (** Unsigned operations compatible with type t *)
+    module Uop : TypedMath with type v := t
+
+    (** Signed operations compatible with type t *)
+    module Sop : TypedMath with type v := t
 
 end
 

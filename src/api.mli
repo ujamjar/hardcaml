@@ -25,6 +25,8 @@ module type S = sig
 end
 
 module Make(Bits : Comb.S) : S
+  with type B.t = Bits.t
+   and type signal = Signal.Comb.t
 
 module Comb : module type of Signal.Comb
 module Seq : module type of Signal.Seq

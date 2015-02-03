@@ -355,7 +355,8 @@ struct
             map (function Some(x) -> x | _ -> failwith "error") l
         in
         let tasks_check = map check_input inputs in
-        let tasks_comb = filter_none (map compile (schedule @ regs)) in
+        let tasks_comb = filter_none (map compile schedule) in
+        let tasks_regs = filter_none (map compile regs) in
         let tasks_seq = (map compile_mem_update mems) @ (map compile_reg_update regs) in
 
         (* reset *)
@@ -394,7 +395,7 @@ struct
             sim_out_ports = out_ports;
             sim_internal_ports = internal_ports;
             sim_cycle_check = task tasks_check;
-            sim_cycle_comb0 = task tasks_comb;
+            sim_cycle_comb0 = task (tasks_comb @ tasks_regs);
             sim_cycle_seq = task tasks_seq;
             sim_cycle_comb1 = task tasks_comb;
             sim_reset = task resets;

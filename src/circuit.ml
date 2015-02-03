@@ -90,7 +90,7 @@ let find_inputs outputs =
                 match List.length (names signal) with
                 | 0 -> failwith "Input found with no name"
                 | 1 -> signal :: arg
-                | _ -> failwith "Input found with multiple names"
+                | _ -> failwith ("Input found with multiple names: " ^ String.concat " " (names signal))
             else 
                 arg
         | _ -> 
