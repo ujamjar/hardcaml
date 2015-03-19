@@ -39,8 +39,8 @@ module Comms : sig
   val create_client : string -> int -> file_descr
   val create_server : string -> int -> file_descr
   val accept_client : file_descr -> file_descr
-  val send : file_descr -> Bytes.t -> int
-  val recv : file_descr -> Bytes.t
+  val send : file_descr -> string -> int
+  val recv : file_descr -> string
 
   val send_string : file_descr -> string -> int
   val recv_string : file_descr -> string

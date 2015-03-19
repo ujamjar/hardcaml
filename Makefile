@@ -8,7 +8,7 @@
 #
 ########################################
 
-.PHONY: clean all vpi iocamljs install uninstall 
+.PHONY: clean all iocamljs install uninstall 
 
 BUILD_OPTS=
 
@@ -54,4 +54,7 @@ uninstall:
 clean:
 	ocaml setup.ml -clean
 	- find . -name "*~" | xargs rm
+
+distclean:
+	ocaml setup.ml -distclean
 

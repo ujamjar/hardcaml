@@ -30,7 +30,7 @@ module Comms = struct
 
   open Unix
 
-  let empty = Bytes.create 0
+  let empty = ""
 
   let create_client server port = 
     let sock = socket PF_INET SOCK_STREAM 0 in
@@ -49,7 +49,7 @@ module Comms = struct
   let accept_client sock = fst (accept sock)
 
   (* send value stored in byte buffer *)
-  let send sock bytes = write sock bytes 0 (Bytes.length bytes)
+  let send sock bytes = write sock (Bytes.of_string bytes) 0 (String.length bytes)
 
   (* recv marshalled value to a buffer *)
   let recv sock = 
@@ -64,10 +64,10 @@ module Comms = struct
       if data_size <> read sock data 0 data_size then 
         failwith "recv_marshalled Marshal.data_size"
     in
-    Bytes.concat empty [ header; data ]
+    String.concat empty [ Bytes.to_string header; Bytes.to_string data ]
 
-  let send_string socket str = send socket (Marshal.to_bytes str [])
-  let recv_string socket = (Marshal.from_bytes (recv socket) 0 : string)
+  let send_string socket str = send socket (Marshal.to_string str [])
+  let recv_string socket = (Marshal.from_string (recv socket) 0 : string)
   let recv_string_is socket expected = 
     let got = recv_string socket in
     if got <> expected then 
@@ -76,11 +76,11 @@ module Comms = struct
 end
 
 let control server message = 
-  let _ = Comms.send server (Marshal.to_bytes message []) in
+  let _ = Comms.send server (Marshal.to_string message []) in
   match message with
   | Finish -> []
   | Run ({ gets; }) when gets=[] -> []
-  | _ -> (Marshal.from_bytes (Comms.recv server) 0 : response_message)
+  | _ -> (Marshal.from_string (Comms.recv server) 0 : response_message)
 
 let testbench_name name = name ^ "_hardcaml_testbench"
 let instance_name name = "the_hardcaml_" ^ name
@@ -140,12 +140,12 @@ let derive_clocks_and_resets circuit =
   in
   let module SSet = Set.Make(struct type t = string let compare = compare end) in
   let unique_names l = 
-    List.fold_left 
-      (fun set s ->
-        try SSet.add (List.hd (names s)) set
-        with _ -> set) 
-      SSet.empty l
-    |> SSet.elements
+    SSet.elements 
+      (List.fold_left 
+        (fun set s ->
+          try SSet.add (List.hd (names s)) set
+          with _ -> set) 
+        SSet.empty l)
   in
   unique_names (List.map fst clocks_and_resets),
   unique_names (List.map snd clocks_and_resets)
@@ -197,7 +197,7 @@ module Make(B : Comb.S) = struct
     
     (* say hello *)
     let () = Comms.recv_string_is server "hello hardcaml" in
-    let _ = Comms.send server (Marshal.to_bytes (List.map fst (inputs@outputs)) []) in
+    let _ = Comms.send server (Marshal.to_string (List.map fst (inputs@outputs)) []) in
  
     (* set all input ports to zero *)
     let _ = control server 

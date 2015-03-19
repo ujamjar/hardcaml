@@ -42,5 +42,5 @@ Library pa_hardcaml
 
 SourceRepository master
   Type:     git
-  Location: https://github.com/ujamjar/hardcaml-examples.git
-  Browser:  https://github.com/ujamjar/hardcaml-examples
+  Location: https://github.com/ujamjar/hardcaml.git
+  Browser:  https://github.com/ujamjar/hardcaml

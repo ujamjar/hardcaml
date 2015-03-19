@@ -48,3 +48,4 @@ true: annot, bin_annot
 <src/*.ml{,i,y}>: pkg_camlp4
 # OASIS_STOP
 <src/pa_hardcaml.ml>: camlp4orf
+#true: safe_string
