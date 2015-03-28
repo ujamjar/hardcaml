@@ -6,7 +6,7 @@ Description: Design, simulate, analyse and transform RTL
   level hardware designs.
 
 Authors:     Andy Ray
-Maintainers: Andy Ray <andy.ray@unjamjar.org>
+Maintainers: Andy Ray <andy.ray@ujamjar.com>
 Homepage:    https://github.com/ujamjar/hardcaml
 License:     ISC
 Plugins:     META (0.4)
