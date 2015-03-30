@@ -1,5 +1,5 @@
 # OASIS_START
-# DO NOT EDIT (digest: 1f0e0fde1a574755c26442ec64166f7d)
+# DO NOT EDIT (digest: cef91654bcc80fe259769a048a615a09)
 version = "1.1"
 description = "Hardware in OCaml"
 requires = "bytes bigarray num"
@@ -18,6 +18,17 @@ package "syntax" (
  archive(syntax, preprocessor, native, plugin) = "pa_hardcaml.cmxs"
  requires(toploop) = "hardcaml"
  exists_if = "pa_hardcaml.cma"
+)
+
+package "dynlink" (
+ version = "1.1"
+ description = "Hardware in OCaml"
+ requires = "hardcaml dynlink"
+ archive(byte) = "HardCamlDynlink.cma"
+ archive(byte, plugin) = "HardCamlDynlink.cma"
+ archive(native) = "HardCamlDynlink.cmxa"
+ archive(native, plugin) = "HardCamlDynlink.cmxs"
+ exists_if = "HardCamlDynlink.cma"
 )
 # OASIS_STOP
 

@@ -1,5 +1,5 @@
 (* OASIS_START *)
-(* DO NOT EDIT (digest: 8c4db0679df64cc440584020f0d19a58) *)
+(* DO NOT EDIT (digest: e573af881998edf41502b0e0311b9957) *)
 module OASISGettext = struct
 (* # 22 "src/oasis/OASISGettext.ml" *)
 
@@ -608,7 +608,11 @@ open Ocamlbuild_plugin;;
 let package_default =
   {
      MyOCamlbuildBase.lib_ocaml =
-       [("HardCaml", ["src"], []); ("pa_hardcaml", ["src"], [])];
+       [
+          ("HardCaml", ["src"], []);
+          ("HardCamlDynlink", ["src"], []);
+          ("pa_hardcaml", ["src"], [])
+       ];
      lib_c = [];
      flags = [];
      includes = []
@@ -619,6 +623,6 @@ let conf = {MyOCamlbuildFindlib.no_automatic_syntax = false}
 
 let dispatch_default = MyOCamlbuildBase.dispatch_default conf package_default;;
 
-# 623 "myocamlbuild.ml"
+# 627 "myocamlbuild.ml"
 (* OASIS_STOP *)
 Ocamlbuild_plugin.dispatch dispatch_default;;

@@ -23,6 +23,15 @@ Library HardCaml
   BuildDepends:  bytes, bigarray, num
   XMETARequires: bytes, bigarray, num
 
+Library HardCamlDynlink
+  Path:          src
+  Findlibname:   dynlink
+  FindLibParent: HardCaml
+  Pack:          true
+  Modules:       Sim_provider
+  BuildDepends:  hardcaml, dynlink
+  XMETARequires: hardcaml, dynlink
+
 Library pa_hardcaml
   Path:           src
   FindLibName:    syntax
