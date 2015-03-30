@@ -1,6 +1,6 @@
 OASISFormat: 0.4
 Name:        hardcaml
-Version:     1.1
+Version:     1.1.1
 Synopsis:    Hardware in OCaml
 Description: Design, simulate, analyse and transform RTL
   level hardware designs.
