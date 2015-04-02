@@ -8,7 +8,7 @@
  *
  *)
 
-(** Cycle based simulator *)
+(** Cycle accurate simulator *)
 
 open Signal.Types
 
@@ -27,9 +27,9 @@ sig
     (** base type of the cycle based simulators *)
     type 'a cyclesim =
         {
-
             sim_in_ports : (string * 'a ref) list; 
             sim_out_ports : (string * 'a ref) list;
+            sim_out_ports_next : (string * 'a ref) list;
             sim_internal_ports : (string * 'a ref) list;
             sim_reset : task;
             sim_cycle_check : task;
@@ -62,6 +62,9 @@ sig
     (** get output port given a name *)
     val out_port : 'a cyclesim -> string -> 'a ref
     
+    (** get output port given a name *)
+    val out_port_next : 'a cyclesim -> string -> 'a ref
+
     (** get internal port given a name *)
     val internal_port : 'a cyclesim -> string -> 'a ref
 
@@ -70,6 +73,9 @@ sig
 
     (** get list of output ports *)
     val out_ports : 'a cyclesim -> (string * 'a ref) list
+
+    (** get list of output ports *)
+    val out_ports_next : 'a cyclesim -> (string * 'a ref) list
 
     (** get list of internal nodes *)
     val internal_ports : 'a cyclesim -> (string * 'a ref) list
@@ -105,11 +111,6 @@ sig
         Copying and checking only occurs on signals which exist in 
         both simulators. *)
     val combine_relaxed : cyclesim -> cyclesim -> cyclesim
-
-    val obj : cyclesim ->
-        < cycle : unit;
-          reset : unit;
-          port : string -> t ref >
 
     module InstOps : sig
         type add_inst = string -> run_inst -> signal array -> int array -> 
@@ -149,4 +150,36 @@ sig
 
 end with type t = Bits.t)
 
+module Sim_obj_if : sig
+
+  module type S = sig
+    type t
+    type i = <
+      i : int -> unit;
+      i32 : int32 -> unit;
+      i64 : int64 -> unit;
+      d : string -> unit;
+      hu : string -> unit;
+      hs : string -> unit;
+      c : string -> unit;
+      ibl : int list -> unit;
+      bits : t ref;
+    >
+    val input : t ref -> i
+    type o = <
+      i : int;
+      s : int;
+      i32 : int32;
+      s32 : int32;
+      i64 : int64;
+      s64 : int64;
+      str : string;
+      bits : t
+    >
+    val output : t ref -> o
+  end
+
+  module Make(B : Comb.S) : S with type t = B.t
+
+end
 

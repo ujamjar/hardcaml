@@ -249,6 +249,7 @@ module Make(B : Comb.S) = struct
     Cyclesim.Api.({
       sim_in_ports = inputs;
       sim_out_ports = outputs;
+      sim_out_ports_next = outputs;
       sim_internal_ports = [];
       sim_reset = freset;
       sim_cycle_check = (fun () -> ());

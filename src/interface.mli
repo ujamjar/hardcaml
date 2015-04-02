@@ -34,12 +34,12 @@ val postfix : string -> (module S) -> (module S)
 
 module Gen(B : Comb.S)(I : S)(O : S) : sig
   val make : string -> (Signal.Comb.t I.t -> Signal.Comb.t O.t) ->
-    (Circuit.t * B.t Cyclesim.Api.cyclesim * B.t ref I.t * B.t ref O.t)
+    (Circuit.t * B.t Cyclesim.Api.cyclesim * B.t ref I.t * B.t ref O.t * B.t ref O.t)
 end
 
 module Gen_cosim(B : Comb.S)(I : S)(O : S) : sig
   val make : string -> (Signal.Comb.t I.t -> Signal.Comb.t O.t) ->
-    (Circuit.t * B.t Cyclesim.Api.cyclesim * B.t ref I.t * B.t ref O.t)
+    (Circuit.t * B.t Cyclesim.Api.cyclesim * B.t ref I.t * B.t ref O.t * B.t ref O.t)
 end
 
 module Circ(I : S)(O : S) : sig
@@ -49,7 +49,7 @@ end
 
 module Sim(B : Comb.S)(I : S)(O : S) : sig
   val make : string -> (Signal.Comb.t I.t -> Signal.Comb.t O.t) ->
-    (Circuit.t * B.t Cyclesim.Api.cyclesim * B.t ref I.t * B.t ref O.t)
+    (Circuit.t * B.t Cyclesim.Api.cyclesim * B.t ref I.t * B.t ref O.t * B.t ref O.t)
 end
 
 module Inst(I : S)(O : S) : sig

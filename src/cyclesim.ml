@@ -76,6 +76,7 @@ struct
         {
             sim_in_ports : (string * 'a ref) list; 
             sim_out_ports : (string * 'a ref) list;
+            sim_out_ports_next : (string * 'a ref) list;
             sim_internal_ports : (string * 'a ref) list;
             sim_reset : task;
             sim_cycle_check : task;
@@ -99,11 +100,14 @@ struct
         failwith ("couldn't find input port " ^ name)
     let out_port sim name = try List.assoc name sim.sim_out_ports with _ ->
         failwith ("cound't find output port " ^ name)
+    let out_port_next sim name = try List.assoc name sim.sim_out_ports_next with _ ->
+        failwith ("cound't find output port " ^ name)
     let internal_port sim name = try List.assoc name sim.sim_internal_ports with _ ->
         failwith ("cound't find internal port " ^ name)
 
     let in_ports sim = sim.sim_in_ports
     let out_ports sim = sim.sim_out_ports
+    let out_ports_next sim = sim.sim_out_ports_next
     let internal_ports sim = sim.sim_internal_ports
 
 end
@@ -378,6 +382,11 @@ struct
                 (Circuit.outputs circuit)
         in
 
+        let out_ports_cur = List.map (fun (n,p) -> (n,ref !p)) out_ports in
+        let task_out_ports_cur = 
+          (fun () -> List.iter2 (fun (_,pc) (_,pn) -> pc := !pn) out_ports_cur out_ports) 
+        in
+
         (* List of internal ports *)
         let internal_ports = 
             List.concat (
@@ -392,10 +401,11 @@ struct
         let task tasks = fun () -> (List.iter (fun f -> f()) tasks) in 
         {
             sim_in_ports = in_ports;
-            sim_out_ports = out_ports;
+            sim_out_ports = out_ports_cur;
+            sim_out_ports_next = out_ports;
             sim_internal_ports = internal_ports;
             sim_cycle_check = task tasks_check;
-            sim_cycle_comb0 = task (tasks_comb @ tasks_regs);
+            sim_cycle_comb0 = task (tasks_comb @ tasks_regs @ [task_out_ports_cur]);
             sim_cycle_seq = task tasks_seq;
             sim_cycle_comb1 = task tasks_comb;
             sim_reset = task resets;
@@ -434,6 +444,7 @@ struct
         {
             sim_in_ports = ip0;
             sim_out_ports = op0;
+            sim_out_ports_next = op0;
             sim_internal_ports = [];
             sim_reset = reset;
             sim_cycle_check = cycle_check;
@@ -500,6 +511,7 @@ struct
       {
         sim_in_ports = inputs;
         sim_out_ports = outputs;
+        sim_out_ports_next = outputs;
         sim_internal_ports = [];
         sim_reset = reset;
         sim_cycle_check = cycle_check;
@@ -507,17 +519,6 @@ struct
         sim_cycle_seq = cycle_seq;
         sim_cycle_comb1 = cycle_comb1;
       }
-
-    let obj sim = 
-        object
-            method cycle = Api.cycle sim
-            method reset = Api.reset sim
-            method port name = 
-                (try Api.in_port sim name
-                 with _ ->
-                    (try Api.out_port sim name
-                     with _ -> Api.internal_port sim name))
-        end
 
     module InstOps = struct
 
@@ -665,6 +666,86 @@ struct
 
     end
 
+
+end
+
+module Sim_obj_if = struct
+
+  module type S = sig
+    type t
+    type i = <
+      i : int -> unit;
+      i32 : int32 -> unit;
+      i64 : int64 -> unit;
+      d : string -> unit;
+      hu : string -> unit;
+      hs : string -> unit;
+      c : string -> unit;
+      ibl : int list -> unit;
+      bits : t ref;
+    >
+    val input : t ref -> i
+    type o = <
+      i : int;
+      s : int;
+      i32 : int32;
+      s32 : int32;
+      i64 : int64;
+      s64 : int64;
+      str : string;
+      bits : t
+    >
+    val output : t ref -> o
+  end
+
+  module Make(B : Comb.S) = struct
+    type t = B.t
+    type i = < 
+      i : int -> unit;
+      i32 : int32 -> unit;
+      i64 : int64 -> unit;
+      d : string -> unit;
+      hu : string -> unit;
+      hs : string -> unit;
+      c : string -> unit;
+      ibl : int list -> unit;
+      bits : t ref;
+    >
+    let input s = 
+      let w = B.width !s in
+      object
+        method i v = s := B.consti w v
+        method i32 v = s := B.consti32 w v
+        method i64 v = s := B.consti64 w v
+        method d v = s := B.constd w v
+        method hu v = s := B.consthu w v
+        method hs v = s := B.consths w v
+        method c v = s := B.const v
+        method ibl v = s := B.constibl v
+        method bits = s
+      end
+    type o = <
+      i : int;
+      s : int;
+      i32 : int32;
+      s32 : int32;
+      i64 : int64;
+      s64 : int64;
+      str : string;
+      bits : t
+    >
+    let output s = 
+      object
+        method i = B.to_int !s
+        method s = B.to_sint !s
+        method i32 = B.to_int32 !s
+        method s32 = B.to_sint32 !s
+        method i64 = B.to_int64 !s
+        method s64 = B.to_sint64 !s
+        method str = B.to_bstr !s
+        method bits = !s
+      end
+  end 
 
 end
 

@@ -73,9 +73,10 @@ module Gen(B : Comb.S)(I : S)(O : S) = struct
         let sim = S.make 
             ~internal:(Some(fun s -> Signal.Types.names s <> []))
             circuit in
-        let inputs = I.(map (fun (n,_) -> try Cs.in_port sim n with _ -> ref B.empty) t) in
-        let outputs = O.(map (fun (n,_) -> try Cs.out_port sim n with _ -> ref B.empty) t) in
-        circuit, sim, inputs, outputs
+        let inputs = I.(map (fun (n,b) -> try Cs.in_port sim n with _ -> ref B.(zero b)) t) in
+        let outputs = O.(map (fun (n,b) -> try Cs.out_port sim n with _ -> ref B.(zero b)) t) in
+        let next = O.(map (fun (n,b) -> try Cs.out_port_next sim n with _ -> ref B.(zero b)) t) in
+        circuit, sim, inputs, outputs, next
 
 end
 
@@ -92,9 +93,10 @@ module Gen_cosim(B : Comb.S)(I : S)(O : S) = struct
         let sim = S.make 
             ~dump_file:(name ^ ".vcd")
             circuit in
-        let inputs = I.(map (fun (n,_) -> try Cs.in_port sim n with _ -> ref B.empty) t) in
-        let outputs = O.(map (fun (n,_) -> try Cs.out_port sim n with _ -> ref B.empty) t) in
-        circuit, sim, inputs, outputs
+        let inputs = I.(map (fun (n,b) -> try Cs.in_port sim n with _ -> ref B.(zero b)) t) in
+        let outputs = O.(map (fun (n,b) -> try Cs.out_port sim n with _ -> ref B.(zero b)) t) in
+        let next = O.(map (fun (n,b) -> try Cs.out_port_next sim n with _ -> ref B.(zero b)) t) in
+        circuit, sim, inputs, outputs, next
 
 end
 
@@ -116,9 +118,10 @@ module Sim(B : Comb.S)(I : S)(O : S) = struct
         let sim = S.make 
             ~internal:(Some(fun s -> Signal.Types.names s <> []))
             circuit in
-        let inputs = I.(map (fun (n,_) -> Cs.in_port sim n) t) in
-        let outputs = O.(map (fun (n,_) -> Cs.out_port sim n) t) in
-        circuit, sim, inputs, outputs
+        let inputs = I.(map (fun (n,b) -> try Cs.in_port sim n with _ -> ref B.(zero b)) t) in
+        let outputs = O.(map (fun (n,b) -> try Cs.out_port sim n with _ -> ref B.(zero b)) t) in
+        let next = O.(map (fun (n,b) -> try Cs.out_port_next sim n with _ -> ref B.(zero b)) t) in
+        circuit, sim, inputs, outputs, next
 end
 
 module Inst(I : S)(O : S) = struct
@@ -138,6 +141,5 @@ module Hier(I : S)(O : S) = struct
         let name = Circuit.Hierarchy.add db circuit in
         I.make name
 end
-
 
 
