@@ -1,5 +1,6 @@
 # v1.1.1
 
+* add out_port_next function to simulator - update on out_port reverts to old behaviour
 * add dynamic simulation plugin back end registering (for llvmsim)
 * fix vpi cosim module search path
 
