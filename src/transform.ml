@@ -168,11 +168,171 @@ struct
     module Nor = Comb.Make(MakeNor(Signal.Comb))
 end
 
-type transform_fn = (uid -> signal) -> signal -> signal
+type 'a transform_fn' = (uid -> 'a) -> signal -> 'a
+type transform_fn = signal transform_fn'
+
+module type TransformFn' =
+sig
+  type t
+  val transform : t transform_fn'
+  val rewrite : t transform_fn' -> signal UidMap.t -> signal list -> t list
+  val rewrite_signals : t transform_fn' -> signal list -> t list
+end
 
 module type TransformFn =
 sig
     val transform : transform_fn
+end
+
+module MakePureCombTransform(B : Comb.T) = struct
+
+    open Utils
+
+    type t = B.t
+
+    let transform find signal = 
+        let dep n = find (uid (List.nth (deps signal) n)) in
+        let new_signal = 
+            match signal with
+            | Signal_op(id,op) ->
+            begin
+                let op2 op = op (dep 0) (dep 1) in
+                match op with
+                | Signal_add -> op2 B.(+:)
+                | Signal_sub -> op2 B.(-:)
+                | Signal_mulu -> op2 B.( *: )
+                | Signal_muls -> op2 B.( *+ )
+                | Signal_and -> op2 B.(&:)
+                | Signal_or -> op2 B.(|:)
+                | Signal_xor -> op2 B.(^:)
+                | Signal_eq -> op2 B.(==:)
+                | Signal_not -> B.(~:) (dep 0)
+                | Signal_lt -> op2 B.(<:)
+                | Signal_cat -> B.concat (deps signal |> List.map (find << uid))
+                | Signal_mux -> 
+                    let sel = List.hd (deps signal) |> (find << uid) in
+                    let cases = List.tl (deps signal) |> List.map (find << uid) in
+                    B.mux sel cases
+            end
+            | Signal_empty -> B.empty
+            | Signal_wire(id,d) -> 
+                let w = B.wire (width signal) in
+                if !d <> empty then B.(<==) w ((find << uid) !d);
+                w
+            | Signal_const(_,b) -> B.const b
+            | Signal_select(id,h,l) -> B.select (dep 0) h l
+            | Signal_reg(id,r) -> failwith "MakePureCombTransform: no registers"
+            | Signal_mem(_,_,r,m) -> failwith "MakePureCombTransform: no memories"
+            | Signal_inst(id,uid',i) -> failwith "MakePureCombTransform: no instantiations"
+        in
+        (* apply names *)
+        if new_signal = B.empty then
+            new_signal
+        else
+            List.fold_left (fun s n -> B.(--) s n) new_signal (names signal)
+
+  let copy_names s t = 
+      List.fold_left (fun t n -> B.(--) t n) t (names s)
+
+  let partition compare set = 
+      UidSet.fold (fun k (tr,fl) -> 
+          if compare k then UidSet.add k tr, fl
+          else tr, UidSet.add k fl) set (UidSet.empty,UidSet.empty)
+
+  let rewrite (fn:B.t transform_fn') id_to_sig outputs = 
+      let idv k v = k in
+      let set_of_map f map = UidMap.fold (fun k v s -> UidSet.add (f k v) s) map UidSet.empty in 
+      let set_of_list f l = List.fold_left (fun s v -> UidSet.add (f v) s) UidSet.empty [] in
+
+      let partition compare set = 
+          UidSet.fold (fun k (tr,fl) -> 
+              if compare k then UidSet.add k tr, fl
+              else tr, UidSet.add k fl) set (UidSet.empty,UidSet.empty)
+      in
+
+      let find uid = UidMap.find uid id_to_sig in
+      
+      (*let partition_const = partition (find >> is_const) in*)
+      let partition_wire = partition (find >> is_wire) in
+
+      let partition_ready ready remaining = 
+          let ready s = 
+              let s = find s in (* look up the signal *)
+              let dep_set = set_of_list uid (deps s) in
+              UidSet.subset dep_set ready
+          in
+          let new_ready, not_ready = partition ready remaining in
+          if UidSet.cardinal new_ready = 0 then failwith "Could not schedule anything"
+          else new_ready, not_ready
+      in
+
+      (*
+      let all_set = set_of_map idv id_to_sig in
+      let const_set,remaining_set = partition_const all_set in
+      let wire_set,remaining_set = partition_wire remaining_set in
+      let ready_set = UidSet.union wire_set const_set in
+      *)
+      let all_set = set_of_map idv id_to_sig in
+      let wire_set,remaining_set = partition_wire all_set in
+      let ready_set = wire_set in
+
+      (* copy the wires and constants.  We potentially dont need to do this for
+      * the constants, but the wires must be done this way to break combinatorial
+      * dependancies *)
+      let map : B.t UidMap.t = 
+          UidSet.fold (fun uid map ->
+              let signal = find uid in
+              match signal with
+              | Signal_wire(_) -> UidMap.add uid (copy_names signal (B.wire (width signal))) map
+              (*| Signal_const(_) -> UidMap.add uid signal map*)
+              | _ -> failwith "unexpected signal"
+          ) ready_set UidMap.empty
+      in
+
+      (* now recursively rewrite nodes as they become ready *)
+      let rec rewrite map ready remaining = 
+          if UidSet.cardinal remaining = 0 then map
+          else
+              let find_new map uid = UidMap.find uid map in
+              let new_ready, new_remaining = partition_ready ready remaining in
+              (* rewrite the ready nodes *)
+              let map = 
+                  UidSet.fold (fun uid map ->
+                      let old_signal = find uid in
+                      let new_signal = fn (find_new map) old_signal in
+                      UidMap.add uid new_signal map
+                  ) new_ready map
+              in
+              rewrite map (UidSet.union ready new_ready) new_remaining
+      in
+
+      let map = rewrite map ready_set remaining_set in
+
+      (* reattach all wires *)
+      UidSet.iter (fun uid' ->
+          let o = UidMap.find uid' id_to_sig in
+          let n = UidMap.find uid' map in
+          match o with 
+          | Signal_wire(id,d) -> 
+              if !d <> empty then
+                  let d = UidMap.find (uid !d) map in
+                  B.(n <== d)
+          | _ -> failwith "expecting a wire") wire_set;
+
+      (* find new outputs *)
+      let outputs = 
+          List.map (fun signal -> UidMap.find (uid signal) map) 
+              outputs
+      in
+      outputs
+
+  let rewrite_signals fn signals = 
+      let id_to_sig = Circuit.search
+          (fun map signal -> UidMap.add (uid signal) signal map)
+          Circuit.id UidMap.empty signals
+      in
+      rewrite fn id_to_sig signals
+
 end
 
 module MakeCombTransform(B : (Comb.T with type t = signal)) = 
@@ -614,6 +774,7 @@ let rewrite fn id_to_sig outputs =
                 let d = UidMap.find (uid !d) map in
                 n <== d
         | _ -> failwith "expecting a wire") wire_set;
+
     (* find new outputs *)
     let outputs = 
         List.map (fun signal -> UidMap.find (uid signal) map) 

@@ -29,7 +29,16 @@ sig
     module Nor : (Comb.S with type t = signal)
 end
 
-type transform_fn = (uid -> signal) -> signal -> signal
+type 'a transform_fn' = (uid -> 'a) -> signal -> 'a
+type transform_fn = signal transform_fn'
+
+module type TransformFn' =
+sig
+  type t
+  val transform : t transform_fn'
+  val rewrite : t transform_fn' -> signal UidMap.t -> signal list -> t list
+  val rewrite_signals : t transform_fn' -> signal list -> t list
+end
 
 module type TransformFn =
 sig
@@ -37,7 +46,10 @@ sig
     val transform : transform_fn
 end
 
-(** functor to build the function to map a signal to a new combinatorial representation *)
+(** functor to build the function to map a signal to a new combinatorial signal representation *)
+module MakePureCombTransform(B : Comb.T) : TransformFn' with type t = B.t
+
+(** functor to build the function to map a signal to a new combinatorial signal representation *)
 module MakeCombTransform(B : (Comb.T with type t = signal)) : TransformFn
 
 (** AIG gate mapping *)
