@@ -1,5 +1,5 @@
 # OASIS_START
-# DO NOT EDIT (digest: 20969b88105e0dfb7ddaca1ff5427716)
+# DO NOT EDIT (digest: b94cfb5491f8fd1de938d146819bf7f3)
 version = "1.1.1"
 description = "Hardware in OCaml"
 requires = "bytes bigarray num"
@@ -18,6 +18,17 @@ package "syntax" (
  archive(syntax, preprocessor, native, plugin) = "pa_hardcaml.cmxs"
  requires(toploop) = "hardcaml"
  exists_if = "pa_hardcaml.cma"
+)
+
+package "js" (
+ version = "1.1.1"
+ description = "Hardware in OCaml"
+ requires = "hardcaml lwt js_of_ocaml"
+ archive(byte) = "HardCamlJS.cma"
+ archive(byte, plugin) = "HardCamlJS.cma"
+ archive(native) = "HardCamlJS.cmxa"
+ archive(native, plugin) = "HardCamlJS.cmxs"
+ exists_if = "HardCamlJS.cma"
 )
 
 package "dynlink" (

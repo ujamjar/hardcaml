@@ -23,6 +23,10 @@ Library HardCaml
   BuildDepends:  bytes, bigarray, num
   XMETARequires: bytes, bigarray, num
 
+Flag js
+  Description: Build javascript utility library
+  Default: false
+
 Library HardCamlDynlink
   Path:          src
   Findlibname:   dynlink
@@ -40,6 +44,16 @@ Library pa_hardcaml
   BuildDepends:   camlp4
   XMETAType:      syntax
   XMETAExtraLines: requires(toploop) = "hardcaml"
+
+Library HardCamlJS
+  Build$:        flag(js)
+  Path:          js
+  Findlibname:   js
+  FindLibParent: HardCaml
+  Pack:          true
+  Modules:       Wave
+  BuildDepends:  hardcaml, lwt, lwt.syntax, js_of_ocaml, js_of_ocaml.syntax
+  XMETARequires: hardcaml, lwt, js_of_ocaml
 
 #Document HardCaml
 #  Title:                HardCaml documentation

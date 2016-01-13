@@ -79,32 +79,19 @@ let wrap sim =
     let out_ports = ports sim.sim_out_ports in
     let trace i x = List.iter2 (fun a b -> set a.data i !(snd b)) x in
     let cycle = ref 0 in
-    let reset = List.concat [
-        sim.sim_reset;
-        [ fun () -> 
-          trace !cycle in_ports sim.sim_in_ports;
-          trace !cycle out_ports sim.sim_out_ports;
-          incr cycle ]
-    ]
+    let sim_reset () = 
+        sim.sim_reset ();
+        trace !cycle in_ports sim.sim_in_ports;
+        trace !cycle out_ports sim.sim_out_ports;
+        incr cycle
     in
-    let cycle = List.concat [ 
-        sim.sim_cycle;
-        [ fun () -> 
-          trace !cycle in_ports sim.sim_in_ports;
-          trace !cycle out_ports sim.sim_out_ports;
-          incr cycle ]
-    ]
+    let sim_cycle_seq () = 
+        sim.sim_cycle_seq ();
+        trace !cycle in_ports sim.sim_in_ports;
+        trace !cycle out_ports sim.sim_out_ports;
+        incr cycle 
     in
-    {
-        sim_cycle = cycle;
-        sim_reset = reset;
-        sim_cycle_comb = sim.sim_cycle_comb;
-        sim_cycle_seq = sim.sim_cycle_seq;
-        sim_cycle_check = sim.sim_cycle_check;
-        sim_in_ports = sim.sim_in_ports;
-        sim_out_ports = sim.sim_out_ports;
-        sim_internal_ports = sim.sim_internal_ports;
-    }, 
+    { sim with sim_reset = sim_reset; sim_cycle_seq = sim_cycle_seq },
     Array.of_list (in_ports @ out_ports)
 
 module Gui = struct
