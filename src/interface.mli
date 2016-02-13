@@ -62,5 +62,47 @@ module Hier(I : S)(O : S) : sig
     Signal.Comb.t I.t -> Signal.Comb.t O.t
 end
 
+open Signal.Types
+
+type param = string * int
+type ienv = param -> signal
+type oenv = param -> signal -> signal
+
+module Tuple : sig type _ t end
+module Curried : sig type (_,_) t end
+
+module Fn : sig
+
+  exception Parameter_validation of string * int * int
+
+  val (!) : param -> signal Tuple.t
+
+  val (@) : 'a Tuple.t -> 'b Tuple.t -> ('a * 'b) Tuple.t
+
+  val ( @-> ) : param -> ('a, 'b) Curried.t -> (signal -> 'a, 'b) Curried.t 
+  
+  val returning : 'a Tuple.t -> ('a, 'a) Curried.t
+
+  type ('a,'b) defn = ('a,'b) Curried.t * 'a
+
+  val define : ('a,'b) Curried.t -> 'a -> ('a,'b) defn 
+
+  val call : ('a,'b) defn -> 'a 
+
+  type inst_env = 
+    {
+      input : ienv;
+      output : oenv;
+    }
+
+  val inst : inst_env -> ('a,'b) defn -> 'b 
+
+  val returns : ('a,'b) defn -> 'b -> signal list
+
+  val ioenv : inst_env
+
+  val circuit : string -> ('a,'b) defn -> Circuit.t
+
+end
 
 
