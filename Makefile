@@ -32,7 +32,6 @@ iocamljs:
 		-export-package lwt \
 		-export-package js_of_ocaml \
 		-export-package hardcaml \
-		-export-package hardcaml.js \
 		-export-package iocamljs-kernel \
 		-jsopt +dynlink.js -jsopt +weak.js -jsopt +toplevel.js -jsopt +nat.js \
 		-jsopt -I -jsopt ./ \
