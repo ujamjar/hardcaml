@@ -83,6 +83,9 @@ struct
             sim_cycle_comb0 : task;
             sim_cycle_seq : task;
             sim_cycle_comb1 : task;
+            sim_lookup_signal : uid -> 'a;
+            sim_lookup_reg : uid -> 'a;
+            sim_lookup_memory : uid -> int -> 'a;
         }
 
     let cycle_check sim = sim.sim_cycle_check ()
@@ -409,6 +412,9 @@ struct
             sim_cycle_seq = task tasks_seq;
             sim_cycle_comb1 = task tasks_comb;
             sim_reset = task resets;
+            sim_lookup_signal = (fun uid -> failwith "sim_lookup_signal not implemented");
+            sim_lookup_reg = (fun uid -> failwith "sim_lookup_reg not implemented");
+            sim_lookup_memory = (fun uid addr -> failwith "sim_lookup_memory not implemented");
         }
 
     exception Sim_comparison_failure of int * string * string * string
@@ -441,7 +447,7 @@ struct
                              compare_results (); incr_cycle() in
         let reset () = s0.sim_reset(); s1.sim_reset() in
 
-        {
+        { s0 with
             sim_in_ports = ip0;
             sim_out_ports = op0;
             sim_out_ports_next = op0;
@@ -508,7 +514,7 @@ struct
       let cycle_comb1 () = s0.sim_cycle_comb1(); s1.sim_cycle_comb1();
                            check_outputs(); incr_cycle () in
       let reset () = s0.sim_reset(); s1.sim_reset() in
-      {
+      { s0 with
         sim_in_ports = inputs;
         sim_out_ports = outputs;
         sim_out_ports_next = outputs;

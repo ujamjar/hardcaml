@@ -256,6 +256,9 @@ module Make(B : Comb.S) = struct
       sim_cycle_comb0 = fcycle; (* XXX SPLIT ME UP, and this thing might work properly! XXX *)
       sim_cycle_seq = (fun () -> ());
       sim_cycle_comb1 = (fun () -> ());
+      sim_lookup_signal = (fun uid -> failwith "sim_lookup_signal not implemented");
+      sim_lookup_reg = (fun uid -> failwith "sim_lookup_reg not implemented");
+      sim_lookup_memory = (fun uid addr -> failwith "sim_lookup_memory not implemented");
     })
 
   (* create simulator from hardcaml circuit *)
