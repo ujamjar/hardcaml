@@ -36,9 +36,9 @@ sig
             sim_cycle_comb0 : task;
             sim_cycle_seq : task;
             sim_cycle_comb1 : task;
-            sim_lookup_signal : uid -> 'a;
-            sim_lookup_reg : uid -> 'a;
-            sim_lookup_memory : uid -> int -> 'a;
+            sim_lookup_signal : uid -> 'a ref;
+            sim_lookup_reg : uid -> 'a ref;
+            sim_lookup_memory : uid -> 'a array;
         }
 
     (** advance by 1 clock cycle (check->comb->seq->comb) *)

@@ -83,9 +83,9 @@ struct
             sim_cycle_comb0 : task;
             sim_cycle_seq : task;
             sim_cycle_comb1 : task;
-            sim_lookup_signal : uid -> 'a;
-            sim_lookup_reg : uid -> 'a;
-            sim_lookup_memory : uid -> int -> 'a;
+            sim_lookup_signal : uid -> 'a ref;
+            sim_lookup_reg : uid -> 'a ref;
+            sim_lookup_memory : uid -> 'a array;
         }
 
     let cycle_check sim = sim.sim_cycle_check ()
@@ -400,6 +400,10 @@ struct
 
         log "done";
 
+        let sim_lookup_signal uid = UidMap.find uid data_map in
+        let sim_lookup_reg uid = UidMap.find uid reg_map in
+        let sim_lookup_memory uid = UidMap.find uid mem_map in
+
         (* simulator structure *)
         let task tasks = fun () -> (List.iter (fun f -> f()) tasks) in 
         {
@@ -412,9 +416,9 @@ struct
             sim_cycle_seq = task tasks_seq;
             sim_cycle_comb1 = task tasks_comb;
             sim_reset = task resets;
-            sim_lookup_signal = (fun uid -> failwith "sim_lookup_signal not implemented");
-            sim_lookup_reg = (fun uid -> failwith "sim_lookup_reg not implemented");
-            sim_lookup_memory = (fun uid addr -> failwith "sim_lookup_memory not implemented");
+            sim_lookup_signal;
+            sim_lookup_reg;
+            sim_lookup_memory;
         }
 
     exception Sim_comparison_failure of int * string * string * string
