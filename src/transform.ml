@@ -8,8 +8,125 @@
  *
  *)
 
+module type CombBaseGates = sig
+  type t
+  val width : t -> int
+  val const : string -> t
+  val empty : t
+  val select : t -> int -> int -> t
+  val concat : t list -> t
+  val wire : int -> t
+  val to_int : t -> int
+  val to_bstr : t -> string
+  val to_string : t -> string
+  val (<==) : t -> t -> unit
+  val (--) : t -> string -> t
+  val (~:) : t -> t 
+  val (&:) : t -> t -> t
+  val (|:) : t -> t -> t
+  val (^:) : t -> t -> t
+end
 
-(* generate the gate level Comb.T api, based on the 4 basic boolean operators *)
+module MakeCombGates(S : CombBaseGates) = struct
+  include S
+
+  (* utils *)
+  let vdd = const "1"
+  let gnd = const "0"
+  let bits_lsb x = 
+      let w = width x in
+      Array.to_list (Array.init w (fun i -> select x i i))
+  let bits_msb x = List.rev (bits_lsb x)
+  let reduce_bits def op a = List.fold_left op def (bits_lsb a)
+  let repeat s n = 
+      if n <= 0 then empty
+      else concat (Array.to_list (Array.init n (fun _ -> s)))
+  let concat_e l = 
+      let x = List.filter ((<>)empty) l in
+      if x = [] then empty
+      else concat x
+
+  let ripple_carry_adder cin a b =
+      let fa cin a b = 
+          let sum = (a ^: b) ^: cin in
+          let carry = (a &: b) |: (b &: cin) |: (cin &: a) in
+          sum, carry
+      in
+      let a = bits_lsb a in
+      let b = bits_lsb b in
+      let sum,_ = List.fold_left2 (fun (sum_in,carry_in) a b -> 
+          let sum,carry_out = fa carry_in a b in
+          sum::sum_in, carry_out) ([],cin) a b
+      in
+      concat sum
+
+  (** addition *)
+  let (+:) a b = ripple_carry_adder gnd a b
+  
+  (** subtraction *)
+  let (-:) a b = ripple_carry_adder vdd a (~: b) 
+  
+  (** unsigned multiplication *)
+  let ( *: ) a b = 
+      let _,r = List.fold_left (fun (i,acc) b -> 
+          let acc = concat_e [gnd; acc] in
+          let a = concat_e [ gnd ; a ; repeat gnd i ] in
+          i+1, (+:) acc ((&:) a (repeat b (width a)))
+      ) (0,(repeat gnd (width a))) (bits_lsb b) in
+      r
+  
+  (** signed multiplication *)
+  let ( *+ ) a b = 
+      let last = (width b) - 1 in
+      let msb x = select x (width x - 1) (width x -1 ) in
+      let _,r = List.fold_left (fun (i,acc) b -> 
+          let acc = concat_e [msb acc; acc] in
+          let a = concat_e [ msb a; a ; repeat gnd i ] in
+          i+1, (if i = last then (-:) else (+:)) acc ((&:) a (repeat b (width a)))
+      ) (0,(repeat gnd (width a))) (bits_lsb b) in
+      r
+
+  (** equality *)
+  let (==:) a b = 
+      let eq = (~: (a &: (~: b))) &: (~: ((~: a) &: b)) in
+      reduce_bits vdd (&:) eq
+  
+  (** less than *)
+  let (<:) a b = 
+      let w = width a in
+      let a,b = concat [gnd;a], concat [gnd;b] in
+      let d = a -: b in
+      select d w w
+  
+  (** multiplexer *)
+  let mux s d = 
+      let mux2 sel a b = 
+          assert (width sel = 1);
+          let s = repeat sel (width a) in
+          (s &: a) |: ((~: s) &: b) 
+      in
+      let d' = List.hd (List.rev d) in
+      (* generate the 'n' input mux structure 'bottom-up'.
+       * it works from the lsb of the select signal.  Pairs
+       * from the data list are mux'd together and we recurse 
+       * until the select is complete.  Proper 'default' handling 
+       * is included with the '[a]' case in 'zip' *)
+      let rec build s d = 
+          match s with 
+          | [] -> List.hd d
+          | s::s' ->
+              let rec zip l = 
+                  match l with
+                  | [] -> []
+                  | [a] -> [mux2 s d' a] 
+                  (* | [a] -> [a] simpler *)
+                  | a::b::tl -> mux2 s b a :: zip tl
+              in
+              build s' (zip d)
+      in
+      build (bits_lsb s) d
+end
+
 module MakeGates(B : Comb.T)(S : sig
     val (~:) : B.t -> B.t 
     val (&:) : B.t -> B.t -> B.t
@@ -17,109 +134,30 @@ module MakeGates(B : Comb.T)(S : sig
     val (^:) : B.t -> B.t -> B.t
 end) =
 struct
-    open B
-    include S
 
-    (* utils *)
-    let vdd = const "1"
-    let gnd = const "0"
-    let bits_lsb x = 
-        let w = width x in
-        Array.to_list (Array.init w (fun i -> select x i i))
-    let bits_msb x = List.rev (bits_lsb x)
-    let reduce_bits def op a = List.fold_left op def (bits_lsb a)
-    let repeat s n = 
-        if n <= 0 then empty
-        else concat (Array.to_list (Array.init n (fun _ -> s)))
-    let concat_e l = 
-        let x = List.filter ((<>)empty) l in
-        if x = [] then empty
-        else concat x
+  include MakeCombGates(struct
+      type t = B.t
+      let width = B.width
+      let const = B.const
+      let empty = B.empty
+      let select = B.select
+      let concat = B.concat
+      let wire = B.wire
+      let to_int = B.to_int
+      let to_bstr = B.to_bstr
+      let to_string = B.to_string
+      let (<==) = B.(<==)
+      let (--) = B.(--)
+      let (~:) = S.(~:)
+      let (&:) = S.(&:)
+      let (|:) = S.(|:)
+      let (^:) = S.(^:)
+  end)
 
-    let ripple_carry_adder cin a b =
-        let fa cin a b = 
-            let sum = (a ^: b) ^: cin in
-            let carry = (a &: b) |: (b &: cin) |: (cin &: a) in
-            sum, carry
-        in
-        let a = bits_lsb a in
-        let b = bits_lsb b in
-        let sum,_ = List.fold_left2 (fun (sum_in,carry_in) a b -> 
-            let sum,carry_out = fa carry_in a b in
-            sum::sum_in, carry_out) ([],cin) a b
-        in
-        concat sum
-
-    (** addition *)
-    let (+:) a b = ripple_carry_adder gnd a b
-    
-    (** subtraction *)
-    let (-:) a b = ripple_carry_adder vdd a (~: b) 
-    
-    (** unsigned multiplication *)
-    let ( *: ) a b = 
-        let _,r = List.fold_left (fun (i,acc) b -> 
-            let acc = concat_e [gnd; acc] in
-            let a = concat_e [ gnd ; a ; repeat gnd i ] in
-            i+1, (+:) acc ((&:) a (repeat b (width a)))
-        ) (0,(repeat gnd (width a))) (bits_lsb b) in
-        r
-    
-    (** signed multiplication *)
-    let ( *+ ) a b = 
-        let last = (width b) - 1 in
-        let msb x = select x (width x - 1) (width x -1 ) in
-        let _,r = List.fold_left (fun (i,acc) b -> 
-            let acc = concat_e [msb acc; acc] in
-            let a = concat_e [ msb a; a ; repeat gnd i ] in
-            i+1, (if i = last then (-:) else (+:)) acc ((&:) a (repeat b (width a)))
-        ) (0,(repeat gnd (width a))) (bits_lsb b) in
-        r
-
-    (** equality *)
-    let (==:) a b = 
-        let eq = (~: (a &: (~: b))) &: (~: ((~: a) &: b)) in
-        reduce_bits vdd (&:) eq
-    
-    (** less than *)
-    let (<:) a b = 
-        let w = width a in
-        let a,b = concat [gnd;a], concat [gnd;b] in
-        let d = a -: b in
-        select d w w
-    
-    (** multiplexer *)
-    let mux s d = 
-        let mux2 sel a b = 
-            assert (width sel = 1);
-            let s = repeat sel (width a) in
-            (s &: a) |: ((~: s) &: b) 
-        in
-        let d' = List.hd (List.rev d) in
-        (* generate the 'n' input mux structure 'bottom-up'.
-         * it works from the lsb of the select signal.  Pairs
-         * from the data list are mux'd together and we recurse 
-         * until the select is complete.  Proper 'default' handling 
-         * is included with the '[a]' case in 'zip' *)
-        let rec build s d = 
-            match s with 
-            | [] -> List.hd d
-            | s::s' ->
-                let rec zip l = 
-                    match l with
-                    | [] -> []
-                    | [a] -> [mux2 s d' a] 
-                    (* | [a] -> [a] simpler *)
-                    | a::b::tl -> mux2 s b a :: zip tl
-                in
-                build s' (zip d)
-        in
-        build (bits_lsb s) d
 end
 
 module MakeAig(B : Comb.T) = 
 struct
-    include B
     module S = MakeGates(B)(struct
         let (~:) = B.(~:)
         let (&:) = B.(&:)
@@ -131,7 +169,6 @@ end
 
 module MakeNand(B : Comb.T) = 
 struct
-    include B
     module S = MakeGates(B)(struct
         let nand a b = B.(~:) (B.(&:) a b)
         let (~:) a = nand a a
@@ -146,7 +183,6 @@ end
 
 module MakeNor(B : Comb.T) = 
 struct
-    include B
     module S = MakeGates(B)(struct
         let nor a b = B.(~:) (B.(|:) a b)
         let (~:) a = nor a a

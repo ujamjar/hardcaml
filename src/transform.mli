@@ -8,7 +8,34 @@
  *
  *)
 
-(** transform circuits to a different representation *)
+(** {2 transform circuits to a different representation} *)
+
+module type CombBaseGates = sig
+  type t
+  val width : t -> int
+  val const : string -> t
+  val empty : t
+  val select : t -> int -> int -> t
+  val concat : t list -> t
+  val wire : int -> t
+  val to_int : t -> int
+  val to_bstr : t -> string
+  val to_string : t -> string
+  val (<==) : t -> t -> unit
+  val (--) : t -> string -> t
+  val (~:) : t -> t 
+  val (&:) : t -> t -> t
+  val (|:) : t -> t -> t
+  val (^:) : t -> t -> t
+end
+
+module MakeCombGates(S : CombBaseGates) : Comb.T with type t = S.t
+module MakeGates(B : Comb.T)(S : sig
+  val (~:) : B.t -> B.t 
+  val (&:) : B.t -> B.t -> B.t
+  val (|:) : B.t -> B.t -> B.t
+  val (^:) : B.t -> B.t -> B.t
+end) : Comb.T with type t = B.t
 
 (** comb logic built from And-Invertor graphs *)
 module MakeAig(B : Comb.T) : (Comb.T with type t = B.t)
