@@ -68,7 +68,7 @@ end
 module CaseInsensitive = struct
     type t = string
     let compare a b = 
-        compare (String.uppercase a) (String.uppercase b)
+        compare (String.uppercase_ascii a) (String.uppercase_ascii b)
 end
 
 module type Mangler = sig
