@@ -1,8 +1,7 @@
-open HardCaml
 
 module B = Bits.Comb.ArraybitsInt32
 
-(** [compile_shared_lib name] compiles (with gcc) [<name>.c] to [lib<name>.so] *)
+(** [compile_shared_lib name] compile, with gcc, [<name>.c] to [lib<name>.so] *)
 val compile_shared_lib : string -> unit
 
 (** Load the shared library (recommend using an absolute path) and create a simulator *)

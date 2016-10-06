@@ -1,3 +1,5 @@
 "src": include
+
+# camlp4 syntax extension
 "src/pa_hardcaml.ml": package(camlp4), camlp4orf
 
