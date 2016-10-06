@@ -1124,8 +1124,7 @@ module C = struct
           os ("    }\n")
       end
 
-  let write ?(name="") os circuit = 
-      let name = if name = "" then Circuit.name circuit else name in
+  let write os circuit = 
       let name_ = "" in
       let soi = string_of_int in
       

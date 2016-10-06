@@ -21,11 +21,14 @@ module Vhdl : Rtl_S
 (** Verilog generation *)
 module Verilog : Rtl_S
 
+(** C model generations *)
+module C : Rtl_S
+
 (** Generate circuit with hierarchy *)
 module Hierarchy : sig
   (** [write ~transforms ~database circuit_name write_module circuit] recursively scans 
-      [circuit] and finds all sub-circuits (ie instantiations).  These are looked up [database]
-      and [write_module] is called for each sub-circuit.
+      [circuit] and finds all sub-circuits (ie instantiations).  These are looked up in
+      [database] and [write_module] is called for each sub-circuit.
       
       Appropriately designed circuits can thus be split over multiple layers of hierarchy
       and files. *)
