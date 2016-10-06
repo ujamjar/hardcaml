@@ -12,7 +12,7 @@ open Camlp4.PreCast
 open Syntax
 
 type ident = { lid : string; uid : string }
-let mk_ident s = { lid = String.lowercase s; uid = s }
+let mk_ident s = { lid = String.lowercase_ascii s; uid = s }
 
 type signal = 
     | Signal of ident * Syntax.Ast.expr 

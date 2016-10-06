@@ -14,476 +14,6 @@ open Signal.Comb
 open Utils
 open Printf
 
-(***********************************************************************)
-(* OCAML interface *)
-let ocaml dut = "#ifdef OCAML
-#include <stddef.h>
-#include <string.h>
-#include <caml/mlvalues.h>
-#include <caml/memory.h>
-#include <caml/alloc.h>
-#include <caml/fail.h>
-#include <caml/callback.h>
-#ifdef Custom_tag
-#include <caml/custom.h>
-#include <caml/bigarray.h>
-#endif
-#include <caml/camlidlruntime.h>
-
-void camlidl_ml2c_" ^ dut ^ "_struct__port(value _v1, struct _port * _c2, camlidl_ctx _ctx)
-{
-  value _v3;
-  value _v4;
-  value _v5;
-  _v3 = Field(_v1, 0);
-  (*_c2).name = camlidl_malloc_string(_v3, _ctx);
-  _v4 = Field(_v1, 1);
-  (*_c2).width = Int_val(_v4);
-  _v5 = Field(_v1, 2);
-  (*_c2).bits = Bigarray_val(_v5)->data;
-}
-
-value camlidl_c2ml_" ^ dut ^ "_struct__port(struct _port * _c1, camlidl_ctx _ctx)
-{
-  value _v2;
-  value _v3[3];
-  _v3[0] = _v3[1] = _v3[2] = 0;
-  Begin_roots_block(_v3, 3)
-    _v3[0] = copy_string((*_c1).name);
-    _v3[1] = Val_int((*_c1).width);
-    _v3[2] = alloc_bigarray_dims(
-            BIGARRAY_INT32 | BIGARRAY_C_LAYOUT | BIGARRAY_EXTERNAL,
-            1, (*_c1).bits, (((*_c1).width + 31) / 32));
-    _v2 = camlidl_alloc_small(3, 0);
-    Field(_v2, 0) = _v3[0];
-    Field(_v2, 1) = _v3[1];
-    Field(_v2, 2) = _v3[2];
-  End_roots()
-  return _v2;
-}
-
-void camlidl_ml2c_" ^ dut ^ "_port(value _v1, port * _c2, camlidl_ctx _ctx)
-{
-  camlidl_ml2c_" ^ dut ^ "_struct__port(_v1, &(*_c2), _ctx);
-}
-
-value camlidl_c2ml_" ^ dut ^ "_port(port * _c2, camlidl_ctx _ctx)
-{
-value _v1;
-  _v1 = camlidl_c2ml_" ^ dut ^ "_struct__port(&(*_c2), _ctx);
-  return _v1;
-}
-
-void camlidl_ml2c_" ^ dut ^ "_struct__simulator(value _v1, struct _simulator * _c2, camlidl_ctx _ctx)
-{
-  value _v3;
-  value _v4;
-  value _v5;
-  value _v6;
-  value _v7;
-  mlsize_t _c8;
-  mlsize_t _c9;
-  value _v10;
-  value _v11;
-  mlsize_t _c12;
-  mlsize_t _c13;
-  value _v14;
-  _v3 = Field(_v1, 0);
-  (*_c2).data = (int *) Field(_v3, 0);
-  _v4 = Field(_v1, 1);
-  (*_c2).regs = (int *) Field(_v4, 0);
-  _v5 = Field(_v1, 2);
-  (*_c2).mems = (int *) Field(_v5, 0);
-  _v6 = Field(_v1, 3);
-  (*_c2).muxs = (int *) Field(_v6, 0);
-  _v7 = Field(_v1, 4);
-  _c8 = Wosize_val(_v7);
-  (*_c2).in_ports = camlidl_malloc(_c8 * sizeof(port ), _ctx);
-  for (_c9 = 0; _c9 < _c8; _c9++) {
-    _v10 = Field(_v7, _c9);
-    camlidl_ml2c_" ^ dut ^ "_port(_v10, &(*_c2).in_ports[_c9], _ctx);
-  }
-  (*_c2).num_in_ports = _c8;
-  _v11 = Field(_v1, 5);
-  _c12 = Wosize_val(_v11);
-  (*_c2).out_ports = camlidl_malloc(_c12 * sizeof(port ), _ctx);
-  for (_c13 = 0; _c13 < _c12; _c13++) {
-    _v14 = Field(_v11, _c13);
-    camlidl_ml2c_" ^ dut ^ "_port(_v14, &(*_c2).out_ports[_c13], _ctx);
-  }
-  (*_c2).num_out_ports = _c12;
-}
-
-value camlidl_c2ml_" ^ dut ^ "_struct__simulator(struct _simulator * _c1, camlidl_ctx _ctx)
-{
-  value _v2;
-  value _v3[6];
-  mlsize_t _c4;
-  value _v5;
-  mlsize_t _c6;
-  value _v7;
-  memset(_v3, 0, 6 * sizeof(value));
-  Begin_roots_block(_v3, 6)
-    _v3[0] = camlidl_alloc_small(1, Abstract_tag);
-    Field(_v3[0], 0) = (value) (*_c1).data;
-    _v3[1] = camlidl_alloc_small(1, Abstract_tag);
-    Field(_v3[1], 0) = (value) (*_c1).regs;
-    _v3[2] = camlidl_alloc_small(1, Abstract_tag);
-    Field(_v3[2], 0) = (value) (*_c1).mems;
-    _v3[3] = camlidl_alloc_small(1, Abstract_tag);
-    Field(_v3[3], 0) = (value) (*_c1).muxs;
-    _v3[4] = camlidl_alloc((*_c1).num_in_ports, 0);
-    Begin_root(_v3[4])
-      for (_c4 = 0; _c4 < (*_c1).num_in_ports; _c4++) {
-        _v5 = camlidl_c2ml_" ^ dut ^ "_port(&(*_c1).in_ports[_c4], _ctx);
-        modify(&Field(_v3[4], _c4), _v5);
-      }
-    End_roots()
-    _v3[5] = camlidl_alloc((*_c1).num_out_ports, 0);
-    Begin_root(_v3[5])
-      for (_c6 = 0; _c6 < (*_c1).num_out_ports; _c6++) {
-        _v7 = camlidl_c2ml_" ^ dut ^ "_port(&(*_c1).out_ports[_c6], _ctx);
-        modify(&Field(_v3[5], _c6), _v7);
-      }
-    End_roots()
-    _v2 = camlidl_alloc_small(6, 0);
-    { mlsize_t _c8;
-      for (_c8 = 0; _c8 < 6; _c8++) Field(_v2, _c8) = _v3[_c8];
-    }
-  End_roots()
-  return _v2;
-}
-
-void camlidl_ml2c_" ^ dut ^ "_simulator(value _v1, simulator * _c2, camlidl_ctx _ctx)
-{
-  camlidl_ml2c_" ^ dut ^ "_struct__simulator(_v1, &(*_c2), _ctx);
-}
-
-value camlidl_c2ml_" ^ dut ^ "_simulator(simulator * _c2, camlidl_ctx _ctx)
-{
-value _v1;
-  _v1 = camlidl_c2ml_" ^ dut ^ "_struct__simulator(&(*_c2), _ctx);
-  return _v1;
-}
-
-value camlidl_" ^ dut ^ "_init(value _unit)
-{
-  simulator *_res;
-  value _v1;
-  value _vres;
-
-  struct camlidl_ctx_struct _ctxs = { CAMLIDL_TRANSIENT, NULL };
-  camlidl_ctx _ctx = &_ctxs;
-  _res = " ^ dut ^ ".init();
-  if (_res == NULL) {
-    _vres = Val_int(0);
-  } else {
-    _v1 = camlidl_c2ml_" ^ dut ^ "_simulator(&*_res, _ctx);
-    Begin_root(_v1)
-      _vres = camlidl_alloc_small(1, 0);
-      Field(_vres, 0) = _v1;
-    End_roots();
-  }
-  camlidl_free(_ctx);
-  return _vres;
-}
-
-value camlidl_" ^ dut ^ "_cycle(
-	value _v_sim)
-{
-  simulator *sim; /*in*/
-  value _v1;
-  simulator _c2;
-  struct camlidl_ctx_struct _ctxs = { CAMLIDL_TRANSIENT, NULL };
-  camlidl_ctx _ctx = &_ctxs;
-  if (_v_sim == Val_int(0)) {
-    sim = NULL;
-  } else {
-    _v1 = Field(_v_sim, 0);
-    sim = &_c2;
-    camlidl_ml2c_" ^ dut ^ "_simulator(_v1, &_c2, _ctx);
-  }
-  " ^ dut ^ ".cycle(sim);
-  camlidl_free(_ctx);
-  return Val_unit;
-}
-
-value camlidl_" ^ dut ^ "_reset(
-	value _v_sim)
-{
-  simulator *sim; /*in*/
-  value _v1;
-  simulator _c2;
-  struct camlidl_ctx_struct _ctxs = { CAMLIDL_TRANSIENT, NULL };
-  camlidl_ctx _ctx = &_ctxs;
-  if (_v_sim == Val_int(0)) {
-    sim = NULL;
-  } else {
-    _v1 = Field(_v_sim, 0);
-    sim = &_c2;
-    camlidl_ml2c_" ^ dut ^ "_simulator(_v1, &_c2, _ctx);
-  }
-  " ^ dut ^ ".reset(sim);
-  camlidl_free(_ctx);
-  return Val_unit;
-}
-#endif//OCAML
-"
-
-(***********************************************************************)
-(* C testbench *)
-let c dut = "#ifdef TEST
-
-#include <stdio.h>
-#include <string.h>
-
-void error(char *msg) {
-    fprintf(stderr, \"%s\\n\", msg);
-    exit(-1);
-}
-
-int words(int n) { return (n+31) >> 5; }
-
-uint32_t mask(int n) {
-    n = n&31;
-    if (n == 0) return 0xFFFFFFFF;
-    else return 0xFFFFFFFF >> (32 - n);
-}
-
-void maska(uint32_t *a, int n) {
-    int w = words(n) - 1;
-    a[w] = a[w] & mask(n);
-}
-
-char *read_line(FILE *f) {
-    int len = 32;
-    char *s = malloc(len);
-    char c;
-    int i=0;
-    do {
-        // extend string
-        if (i == len) {
-            len *= 2;
-            s = realloc(s, len);
-        }
-        // get char
-        c = fgetc(f);
-        // check for end of line
-        if (c == '\\n' || c == '\\r' || c == '\\0' || c == EOF) {
-            // return string
-            s[i] = '\\0';
-            return s;
-        }
-        // insert char
-        s[i] = c;
-        i++;
-    } while (1);
-}
-
-struct sim_ports {
-    port **ports;
-    int *io;
-    int num_ports;
-};
-char *delim = \";,\\t \";
-
-char *copy(char *s) {
-    int l = strlen(s) + 1;
-    char *p = malloc(l);
-    strcpy(p, s);
-    return p;
-}
-
-port *port_by_name(port *p, int n, char *t) {
-    int i;
-    for (i=0; i<n; i++) {
-        if (0 == strcmp(p[i].name, t)) return p + i;
-    }
-    return 0;
-}
-
-// read 1st line of csv file and look up ports in simulator
-struct sim_ports get_ports(simulator *sim, FILE *f) {
-    struct sim_ports ports;
-    char *l = read_line(f), *p, *s;
-    int cnt, i;
-
-    // count ports
-    s = copy(l);
-    p = s;
-    cnt = 0;
-    while (strtok(p,delim)) { p = 0; cnt++; }
-    free(s);
-
-    // allocate port datastucture
-    ports.ports = malloc(sizeof(port *) * cnt);
-    ports.io = malloc(sizeof(int) * cnt);
-    ports.num_ports = cnt;
-
-    // look up ports
-    s = copy(l);
-    i = 0;
-    p = l;
-    while (i < cnt) {
-        port *port;
-        char *t = strtok(p,delim);
-        p = 0;
-        // check for input port
-        if (port = port_by_name(sim->in_ports, sim->num_in_ports, t)) {
-            ports.ports[i] = port;
-            ports.io[i] = 1;
-        // check for output port
-        } else if (port = port_by_name(sim->out_ports, sim->num_out_ports, t)) {
-            ports.ports[i] = port;
-            ports.io[i] = 0;
-        } else {
-            error(\"couldnt find port\");
-        }
-        i++;
-    }
-    free(s);
-    free(l);
-    return ports;
-}
-
-uint32_t hex(char c) {
-    if (c >= '0' && c <= '9') return c - '0';
-    else if (c >= 'a' && c <= 'f') return c - 'a' + 10;
-    else if (c >= 'A' && c <= 'F') return c - 'A' + 10;
-    else error(\"bad hex value\");
-}
-
-void set_value(simulator *sim, char *t, port *p) {
-    int w = words(p->width);
-    int w8 = w * 8;
-    int l = strlen(t);
-    int i,j;
-    uint32_t *d = p->bits;
-
-    // clip to length of array (before masking)
-    if (l > w8) {
-        t += (l-w8);
-        l = w8;
-    }
-    for (i=0; i<w; i++) d[i] = 0;
-
-    for (i=l-1,j=0; i>=0; i--,j++) {
-        char c = t[i];
-        d[j>>3] |= hex(t[i]) << ((j&7) << 2);
-    }
-
-    maska(d, p->width);
-}
-
-int set_input_ports(simulator *sim, struct sim_ports ports, char *s) {
-    char *p, *l = copy(s);
-    int i;
-
-    i = 0;
-    p = l;
-    while (i < ports.num_ports) {
-        // get token
-        char *t = strtok(p, delim);
-        if (t == NULL || t[0] == '\\0') return 0;
-        p = 0;
-        // set port value if its and input 
-        if (ports.io[i] == 1) 
-            set_value(sim, t, ports.ports[i]);
-        i++;
-    }
-
-    free(l);
-    return 1;
-}
-
-int check_output_ports(simulator *sim, struct sim_ports ports, char *s) {
-    char *p, *l = copy(s);
-    int i;
-
-    i = 0;
-    p = l;
-    while (i < ports.num_ports) {
-        // get token
-        char *t = strtok(p, delim);
-        if (t == NULL || t[0] == '\\0') return 0;
-        p = 0;
-        // check port value if its an output
-        if (ports.io[i] == 0) {
-            int j;
-            int w = words(ports.ports[i]->width);
-            uint32_t *d = malloc(sizeof(uint32_t)*w);
-            uint32_t *q = ports.ports[i]->bits;
-            memcpy(d, q, sizeof(uint32_t) * w);
-            set_value(sim, t, ports.ports[i]);
-            for (j=0; j<w; j++)
-                if (d[j] != q[j]) error(\"check failed\");
-        }
-        i++;
-    }
-
-    free(l);
-    return 1;
-}
-
-void write_output_port_names(simulator *sim, FILE *f) {
-    int i=0;
-    while (sim->out_ports[i].name) {
-        fprintf(f,\"%s\", sim->out_ports[i].name);
-        if (sim->out_ports[i+1].name) fprintf(f, \",\");
-        i++;
-    }
-    fprintf(f, \"\\n\");
-}
-
-void write_output_ports(simulator *sim, FILE *f) {
-    int i=0;
-    while (sim->out_ports[i].name) {
-        int w = words(sim->out_ports[i].width);
-        int j;
-        uint32_t *d = sim->out_ports[i].bits;
-        for (j=w-1; j>=0; j--) fprintf(f,\"%.8x\", d[j]);
-        if (sim->out_ports[i+1].name) fprintf(f, \",\");
-        i++;
-    }
-    fprintf(f, \"\\n\");
-}
-
-int main(int argc, char *argv[]) {
-
-    FILE *fin = stdin;
-    FILE *fout = stdout;
-
-    simulator *sim = " ^ dut ^ ".init();
-    struct sim_ports ports;
-    
-    // write output names
-    write_output_port_names(sim, fout);
-
-    // find ports from csv file and associate with simulation
-    ports = get_ports(sim, fin);
-
-    // run the simulator
-    " ^ dut ^ ".reset(sim);
-    do {
-        char *l = read_line(fin);
-        if (set_input_ports(sim, ports, l)) {
-            " ^ dut ^ ".cycle(sim);
-            check_output_ports(sim, ports, l);
-            write_output_ports(sim, fout);
-        } else break;
-    } while (1);
-
-    return 0;
-}
-
-#endif//TEST
-
-"
-
-(***********************************************************************)
-(***********************************************************************)
-(***********************************************************************)
-
 let array_mul
     os
     signed                  (* signed/unsigned multiplication *)
@@ -550,6 +80,7 @@ let array_mul
 
 let write ?(name="") os circuit = 
     let name = if name = "" then Circuit.name circuit else name in
+    let name_ = "" in
     let soi = string_of_int in
     
     (* schedule the simulation *)
@@ -604,8 +135,7 @@ let write ?(name="") os circuit =
     List.iter key [ inputs; schedule; regs; mems ];
     os "*/\n";
 
-    (* write init function
-     * NOTE: 1 extra IO port so we can 'detect' how many *)
+    (* write init function *)
     let num_in_ports = List.length (Circuit.inputs circuit) in
     let num_out_ports = List.length (Circuit.outputs circuit) in
     os ("#include <stdint.h>
@@ -626,16 +156,7 @@ typedef struct _simulator {
     int num_out_ports;
 } simulator;
 
-typedef struct _simulator_interface {
-    // create simulator
-    simulator *(*init)(void);
-    // reset simulation registers (as appropriate)
-    void (*reset)(simulator *);
-    // perform simulation cycle
-    void (*cycle)(simulator *);
-} simulator_interface;
-
-static simulator *init() {
+simulator *"^name_^"init() {
     simulator *sim = malloc(sizeof(simulator));
     sim->data = calloc(sizeof(uint32_t), " ^ soi data_length ^ ");
     sim->regs = calloc(sizeof(uint32_t), " ^ soi reg_length ^ ");
@@ -688,7 +209,7 @@ static simulator *init() {
     os "    return sim;\n}\n\n";
 
     (* reset function *)
-    os "static void reset(simulator *sim) {\n";
+    os ("void "^name_^"reset(simulator *sim) {\n");
     let compile_reset signal =
         match signal with
         | Signal_reg(_,r) ->
@@ -707,7 +228,7 @@ static simulator *init() {
     os "}\n\n";
 
     (* cycle function *)
-    os "static void cycle(simulator *sim) {\n";
+    os ("void "^name_^"cycle(simulator *sim) {\n");
 
     let mask w tgt=  
         let q = w / 32 in
@@ -997,15 +518,7 @@ static simulator *init() {
     List.iter compile regs;
     List.iter compile_mem_update mems;
     List.iter compile_reg_update regs;
-    os "}\n\n";
-
-    (* generate interface structure *)
-    os ("simulator_interface " ^ name ^ " = {\n");
-    os ("  init, reset, cycle\n");
-    os ("};\n\n");
-    os (c name);
-    os (ocaml name)
-
-    
+    os "}\n\n"
+ 
 (*****************************************************************)
 

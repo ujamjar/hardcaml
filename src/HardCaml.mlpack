@@ -4,7 +4,6 @@ Utils
 Comb
 Bits
 Bits_raw
-Bits_ext
 Signal
 Syntax
 Circuit
@@ -13,9 +12,7 @@ Fixed
 Const_prop
 Transform
 Cyclesim
-Cyclesim_ext
 Vcd
-Vcd_ext
 Interface
 Recipe
 Xilinx

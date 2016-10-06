@@ -14,8 +14,8 @@ module type S = sig
   module B : Comb.S
   module Cyclesim : module type of Cyclesim.Make(B)
   module Cosim : module type of Cosim.Make(B)
+  module Gtkwave : module type of Vcd.Gtkwave(B) 
   module Vcd : module type of Vcd.Make(B)
-  module Gtkwave : module type of Vcd_ext.Make(B) 
   module Interface : sig
     module Gen : module type of Interface.Gen(B)
     module Gen_cosim : module type of Interface.Gen_cosim(B)
@@ -32,8 +32,8 @@ module Make(Bits : Comb.S) = struct
   module Cyclesim = Cyclesim.Make(Bits)
   module Cosim = Cosim.Make(Bits)
 
+  module Gtkwave = Vcd.Gtkwave(Bits)
   module Vcd = Vcd.Make(Bits)
-  module Gtkwave = Vcd_ext.Make(Bits)
 
   module Interface = struct
     module Gen = Interface.Gen(Bits)

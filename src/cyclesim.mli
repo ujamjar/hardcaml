@@ -186,3 +186,29 @@ module Sim_obj_if : sig
 
 end
 
+(** Interactive simulator *)
+module Interactive(B : Comb.S) : 
+sig
+
+    (** Run interactive simulator *)
+    val run : Pervasives.in_channel -> B.t Api.cyclesim -> unit
+
+end
+
+module BinaryIO :
+sig
+
+    type t = Bits.Ext.Comb.BigarraybitsNativeint.t
+
+    type cyclesim = t Api.cyclesim
+
+    val wrap : 
+        ?rdin:Pervasives.in_channel option ->
+        ?wrin:Pervasives.out_channel option ->
+        ?cmpout:Pervasives.in_channel option ->
+        ?cmpfn:(string-> t -> t -> unit) ->
+        ?wrout:Pervasives.out_channel option ->
+        cyclesim -> cyclesim
+
+end
+
