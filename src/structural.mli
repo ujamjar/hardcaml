@@ -134,3 +134,15 @@ module Base2 : Comb.T with type t = signal (* + consts *)
 
 val write_verilog : (string -> unit) -> circuit -> unit
 
+module Lib : sig
+
+  val reg : clock:signal -> en:signal -> signal -> signal
+  val reg_r : clock:signal -> reset:signal -> ?def:int -> en:signal -> signal -> signal
+  val reg_c : clock:signal -> clear:signal -> ?def:int -> en:signal -> signal -> signal
+  val reg_rc : clock:signal -> reset:signal -> clear:signal -> ?def:int -> en:signal -> 
+      signal -> signal
+
+  val tristate_buffer : en:signal -> i:signal -> t:signal -> signal
+
+end
+
