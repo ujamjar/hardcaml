@@ -1785,7 +1785,7 @@ module Raw = struct
 
   end
 
-  module Base(B : ArraybitsBase) = struct
+  module Base(B : ArraybitsBase) : T with type t = Build(B).t = struct
     module X = Build(B)
     type t = X.t
     let mk1 w f a =
@@ -1837,9 +1837,13 @@ module Raw = struct
     let to_string = X.to_string
     let to_int = X.to_int
     let to_bstr = X.to_bstr
-  end
+  end 
 
-  module Comb(B : ArraybitsBase) = Make(Base(B))
+  module Comb = struct
+    module ArraybitsInt32 = Make(Base(ArraybitsInt32Api))
+    module ArraybitsInt64 = Make(Base(ArraybitsInt64Api))
+    module ArraybitsNativeint = Make(Base(ArraybitsNativeintApi))
+  end
 
 end
 

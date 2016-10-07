@@ -714,7 +714,7 @@ end
 
 (* TODO: actually test me - somewhat copied from the ConstantPropagation_old
  * version *)
-module ConstantPropagation = MakeCombTransform(Const_prop.Base)
+module ConstantPropagation = MakeCombTransform(Signal.Const_prop.Comb)
 
 module NandTransform = MakeCombTransform(Signals.Nand)
 module NorTransform = MakeCombTransform(Signals.Nor)

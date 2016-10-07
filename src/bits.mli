@@ -47,6 +47,10 @@ sig
 
 end
 
+module ArraybitsInt32Api : ArraybitsBase
+module ArraybitsInt64Api : ArraybitsBase
+module ArraybitsNativeintApi : ArraybitsBase
+
 module ArraybitsBuilder(B : ArraybitsBase) : (Comb.T with type t = B.barray * int)
 
 module Ext : sig
@@ -260,8 +264,18 @@ module Raw : sig
 
   end
 
-  module Base(B : ArraybitsBase) : Comb.T
-  module Comb(B : ArraybitsBase) : Comb.S
+  module Comb : sig
+
+    (** bits described using array of int32 *)
+    module ArraybitsInt32 : Comb.S
+
+    (** bits described using array of int64 *)
+    module ArraybitsInt64 : Comb.S 
+
+    (** bits described using array of nativeint *)
+    module ArraybitsNativeint : Comb.S 
+
+  end
 
 end
 
