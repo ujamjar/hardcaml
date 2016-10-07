@@ -20,5 +20,5 @@
 <js/*.cmx> and not "js/HardCamlJS.cmx": for-pack(HardCamlJS)
 <js/*.ml{,i}>: syntax(camlp4o), package(js_of_ocaml), package(js_of_ocaml.syntax)
 
-true: bin_annot
+true: bin_annot, package(bytes)
 
