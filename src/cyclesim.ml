@@ -8,6 +8,7 @@
  *
  *)
 
+open Astring
 open Circuit
 open Signal.Types
 
@@ -791,7 +792,7 @@ struct
                         else if h = ' ' then
                             split (c :: l) "" t
                         else
-                            split l (c ^ Char.escaped h) t
+                            split l (c ^ Char.Ascii.escape_char h) t
                 in
                 List.rev 
                     (List.filter ((<>) "") 
@@ -913,7 +914,7 @@ struct
             let rec read_name str len off = 
                 if len = 0 then str, off
                 else
-                    let c = Char.escaped (Char.chr (ti ba.{off})) in
+                    let c = Char.Ascii.escape_char (Char.of_byte (ti ba.{off})) in
                     read_name (str ^ c) (len-1) (off+1)
             in
             let name, off = read_name "" name_len (offset+2) in
@@ -1001,7 +1002,7 @@ struct
         (* this is probably bleedin' slow *)
         let wr x = Marshal.to_channel chan x [ Marshal.No_sharing ] in
         let wri x = wr (Nativeint.of_int x) in
-        let wrc x = wri (Char.code x) in
+        let wrc x = wri (Char.to_int x) in
         wri (List.length ports);
         List.map (fun (n,d) ->
             wri (width !d);

@@ -8,6 +8,8 @@
  *
  *)
 
+open Astring
+
 (** VCD (Verilog Change Dump) generation *)
 module Make(S : Comb.S) = 
 struct
@@ -51,7 +53,7 @@ struct
                 else d :: gen (x-range) 
             in
             let code x = List.fold_left (fun a x -> 
-                (String.make 1 (Char.chr (x + vcdmin))) ^ a) "" (gen x) in
+                (String.v ~len:1 (fun _ -> Char.of_byte (x + vcdmin))) ^ a) "" (gen x) in
             (fun () ->
                 let x = !i in
                 incr i;
@@ -69,7 +71,7 @@ struct
         (* list of signals to trace *)
         let trace signals = 
             let width s = String.length (to_bstr s) in
-            let xs w = String.make w 'x' in
+            let xs w = String.v w (fun _ -> 'x') in
             List.map (fun (n,s) -> 
                 {
                     w = width !s;

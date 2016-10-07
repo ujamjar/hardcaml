@@ -16,6 +16,7 @@ depends: [
   "topkg" {build}
   "base-bytes" 
   "base-unix" 
+  "astring"
 ]
 depopts: [ 
   "camlp4" 

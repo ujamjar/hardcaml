@@ -123,18 +123,6 @@ module Ext : sig
     (** big array of native int to binary string *)
     val bstr_of_babits_nint : int -> bani -> string
 
-    (** get pathname *)
-    val filepath : string -> string
-
-    (** get filename, including extension *)
-    val filename : string -> string
-
-    (** get filename, excluding extension *)
-    val filebase : string -> string
-
-    (** get filename extension, or [""] if none *)
-    val fileext : string -> string
-
   end
 
   module BigarraybitsInt32_Bits : (Comb.S with type t = Utils_ext.ba32 * int)

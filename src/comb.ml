@@ -7,6 +7,7 @@
  * Description: 
  *
  *)
+open Astring
 
 module type T = 
 sig
@@ -220,8 +221,8 @@ struct
     
     let vdd = constb "1" -- "vdd"
     let gnd = constb "0" -- "gnd"
-    let zero w = if w = 0 then empty else constb (String.make w '0')
-    let ones w = if w = 0 then empty else constb (String.make w '1')
+    let zero w = if w = 0 then empty else constb (String.v ~len:w (fun _ -> '0'))
+    let ones w = if w = 0 then empty else constb (String.v ~len:w (fun _ -> '1'))
     let one w = 
         match w with
         | 0 -> empty
@@ -598,6 +599,9 @@ struct
       in
       f b (msbs b)
 
+    let ssub v off len = String.Sub.to_string @@ String.sub ~start:off ~stop:(off+len) v
+    let smake len c = String.v ~len (fun _ -> c)
+
     (* complex constant generators *)
     let rec constd bits v = 
         let l = String.length v in
@@ -624,7 +628,7 @@ struct
         if l=0 then failwith "constd: string lenth=0"
         else
             if v.[0] = '-' then
-                zero bits -: (constd bits (String.sub v 1 (l-1)))
+                zero bits -: (constd bits (ssub v 1 (l-1)))
             else
                 (* convert *)
                 let rec sum i mulfac prod = 
@@ -637,15 +641,13 @@ struct
                     (sum (l-1) (consti 1 1) (consti 1 0))
                     bits
 
-
-
     let constv s = 
         let slen, sval = 
             let rec split2 n c s t = 
                 if t.[n] = c then
-                    s, String.sub t (n + 1) (String.length t - n - 1)
+                    s, ssub t (n + 1) (String.length t - n - 1)
                 else
-                    split2 (n+1) c (s ^ (String.make 1 t.[n])) t
+                    split2 (n+1) c (s ^ (smake 1 t.[n])) t
             in
             let s0,s1 = 
                 try split2 0 '\'' "" s
@@ -657,20 +659,20 @@ struct
         in
         let len = int_of_string slen in
         let ctrl = sval.[0] in
-        let sval = String.sub sval 1 (String.length sval - 1) in
+        let sval = ssub sval 1 (String.length sval - 1) in
         match ctrl with
         | 'd' -> constd len sval
         | 'x' | 'h' -> consthu len sval
         | 'X' | 'H' -> consths len sval
         | 'b' -> 
           let slen = String.length sval in
-          if slen < len then constb ((String.make (len-slen) '0' ) ^ sval)
-          else if slen > len then constb (String.sub sval (slen-len) len)
+          if slen < len then constb ((smake (len-slen) '0' ) ^ sval)
+          else if slen > len then constb (ssub sval (slen-len) len)
           else constb sval
         | 'B' ->
           let slen = String.length sval in
-          if slen < len then constb ((String.make (len-slen) sval.[0]) ^ sval)
-          else if slen > len then constb (String.sub sval (slen-len) len)
+          if slen < len then constb ((smake (len-slen) sval.[0]) ^ sval)
+          else if slen > len then constb (ssub sval (slen-len) len)
           else constb sval
         | _ -> failwith ("Invalid verilog style constant bad control character " ^ s)
 

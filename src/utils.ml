@@ -8,6 +8,8 @@
  *
  *)
 
+open Astring
+
 exception Failure of string
 let failwith str = raise (Failure str)
 
@@ -124,6 +126,8 @@ let int_of_hstr s =
     done;
     !v
 
+let ssub v o l = String.Sub.to_string @@ String.sub ~start:o ~stop:(o+l) v
+
 let bstr_of_hstr sign width hex =
     let len = String.length hex in
     let len4 = len * 4 in
@@ -132,9 +136,9 @@ let bstr_of_hstr sign width hex =
         else (make_string (i-1)) ^ (bstr_of_int 4 (int_of_hchar hex.[i-1])) in
     let result = make_string len in 
     if width < len4 then
-        String.sub result (len4-width) (width)
+        ssub result (len4-width) (width)
     else
-        (String.make (width - len4) (if sign = Signed then result.[0] else '0')) ^ result
+        (String.v ~len:(width - len4) (fun _ -> (if sign = Signed then result.[0] else '0'))) ^ result
 
 let rec hstr_of_bstr sign s = 
     let hex_of_bin s = 
@@ -160,9 +164,12 @@ let rec hstr_of_bstr sign s =
     let len = String.length s in
     match len with
     | 0 -> failwith "Invalid string"
-    | 1 | 2 | 3 -> hex_of_bin ((if sign = Signed then String.make (4-len) s.[0] else String.make (4-len) '0') ^ s)
+    | 1 | 2 | 3 -> 
+      hex_of_bin 
+        ((if sign = Signed then String.v ~len:(4-len) (fun _ -> s.[0]) 
+          else String.v ~len:(4-len) (fun _ -> '0')) ^ s)
     | 4 -> hex_of_bin s
-    | _ -> hstr_of_bstr sign (String.sub s 0 (len-4)) ^ hex_of_bin (String.sub s (len-4) 4)
+    | _ -> hstr_of_bstr sign (ssub s 0 (len-4)) ^ hex_of_bin (ssub s (len-4) 4)
 
 (* ... *)
 

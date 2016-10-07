@@ -8,6 +8,8 @@
  *
  *)
 
+open Astring
+
 exception Failure of string
 let failwith str = raise (Failure str)
 

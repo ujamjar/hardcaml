@@ -8,6 +8,7 @@
  *
  *)
 
+open Astring
 open Comb
 
 exception Failure of string
@@ -830,7 +831,7 @@ module Ext = struct
       let one = Big_int.unit_big_int in
       let two = Big_int.big_int_of_int 2 in
 
-      let str = String.make width '0' in
+      let str = String.v ~len:width (fun _ -> '0') in
       let len = String.length str in
 
       let rec make_string i = 
@@ -1020,18 +1021,6 @@ module Ext = struct
 
     let bstr_of_babits_nint = bstr_of_abits' platform_bits (Nativeint.logand) (Nativeint.shift_left) 0n 1n
         Bigarray.Array1.get Bigarray.Array1.set 
-
-    (* filename operations *)
-
-    let filepath f = Filename.dirname f
-    let filename f = Filename.basename f
-    let filebase f = try Filename.chop_extension (filename f) with _ -> filename f
-    let fileext f = 
-      let f = filename f in
-      let b = filebase f in
-      if b = f then ""
-      else
-        String.sub f (String.length b) (String.length f - 1)
 
   end
 

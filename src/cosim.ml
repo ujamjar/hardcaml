@@ -8,6 +8,8 @@
  *
  *)
 
+open Astring
+
 type delta_message = 
   {
     sets : (string * string) list;
@@ -64,7 +66,7 @@ module Comms = struct
       if data_size <> read sock data 0 data_size then 
         failwith "recv_marshalled Marshal.data_size"
     in
-    String.concat empty [ Bytes.to_string header; Bytes.to_string data ]
+    String.concat ~sep:empty [ Bytes.to_string header; Bytes.to_string data ]
 
   let send_string socket str = send socket (Marshal.to_string str [])
   let recv_string socket = (Marshal.from_string (recv socket) 0 : string)
@@ -112,7 +114,7 @@ let write_testbench ?dump_file ~name ~inputs ~outputs os =
   end;
   os ("  " ^ name ^ " " ^ instance_name name ^ " (");
   let ports = List.map (fun s -> "." ^ fst s ^ "(" ^ fst s ^ ")") (inputs @ outputs) in
-  os (String.concat ", "  ports);
+  os (String.concat ~sep:", "  ports);
   os ");\n";
   os "endmodule"
 
@@ -125,7 +127,7 @@ let write_testbench_from_circuit ?dump_file os circuit =
   write_testbench ?dump_file ~name:cname ~inputs ~outputs os
 
 let compile verilog vvp = 
-  match Unix.system ("iverilog -o " ^ vvp ^ " " ^ (String.concat " " verilog)) with
+  match Unix.system ("iverilog -o " ^ vvp ^ " " ^ (String.concat ~sep:" " verilog)) with
   | Unix.WEXITED(0) -> ()
   | _ -> failwith ("Failed to compile verilog to vvp")
 

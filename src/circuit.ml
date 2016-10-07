@@ -8,6 +8,7 @@
  *
  *)
 
+open Astring
 open Signal.Types
 open Signal.Base
 
@@ -90,7 +91,7 @@ let find_inputs outputs =
                 match List.length (names signal) with
                 | 0 -> failwith "Input found with no name"
                 | 1 -> signal :: arg
-                | _ -> failwith ("Input found with multiple names: " ^ String.concat " " (names signal))
+                | _ -> failwith ("Input found with multiple names: " ^ String.concat ~sep:" " (names signal))
             else 
                 arg
         | _ -> 

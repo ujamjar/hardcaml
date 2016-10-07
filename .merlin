@@ -1,4 +1,5 @@
 SRC src
 SRC test
 PKG ctypes.foreign
+PKG astring
 B _build/src

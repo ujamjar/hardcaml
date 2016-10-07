@@ -10,6 +10,7 @@
 
 (* generic rtl writing for vhdl/verilog *)
 
+open Astring
 open Signal.Types
 open Signal.Comb 
 open Signal.Seq 
@@ -27,7 +28,7 @@ type type_decl =
     | Mem of int
     | Constant of string
 
-let tab n = String.make n ' '
+let tab n = String.v ~len:n (fun _ -> ' ')
 let t4 = tab 4 
 let t8 = tab 8 
 
@@ -68,7 +69,7 @@ end
 module CaseInsensitive = struct
     type t = string
     let compare a b = 
-        compare (String.uppercase_ascii a) (String.uppercase_ascii b)
+        compare (String.Ascii.uppercase a) (String.Ascii.uppercase b)
 end
 
 module type Mangler = sig

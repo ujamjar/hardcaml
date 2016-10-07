@@ -42,6 +42,8 @@ NOTE: It would be nice if many of the rules below could be encoded into the
 
 *)
 
+open Astring
+
 module StringMap = Map.Make(String)
 module StringSet = Set.Make(String)
 
@@ -321,7 +323,7 @@ let const b =
         c
     end
 
-let constz w = const (String.make w 'z')
+let constz w = const (String.v ~len:w (fun _ -> 'z'))
 
 let check_readable l = 
     let ok s = if not (is_readable s) then raise (Rtl_op_arg_not_readable s) in

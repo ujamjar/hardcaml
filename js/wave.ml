@@ -12,6 +12,8 @@
 
 (************************************************************)
 
+open Astring
+
 module B = HardCaml.Bits.Comb.IntbitsList
 open B
 
@@ -171,7 +173,7 @@ module Gui = struct
                 length is 1 (excluding the dot) then fail *)
               let len = String.length str in
               if len > 1 then begin
-                  text true x (String.sub str 0 (len-1)) w
+                  text true x (String.Sub.to_string @@ String.sub str ~start:0 ~stop:(len-1)) w
               end
           end else
               ctx##fillText (jstr, float (x*sx+ox+2), float (oy+2))
