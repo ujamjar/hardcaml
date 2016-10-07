@@ -1,6 +1,4 @@
-# OASIS_START
-# DO NOT EDIT (digest: b94cfb5491f8fd1de938d146819bf7f3)
-version = "1.1.1"
+version = "2.0.0"
 description = "Hardware in OCaml"
 requires = "bytes bigarray num"
 archive(byte) = "HardCaml.cma"
@@ -8,21 +6,20 @@ archive(byte, plugin) = "HardCaml.cma"
 archive(native) = "HardCaml.cmxa"
 archive(native, plugin) = "HardCaml.cmxs"
 exists_if = "HardCaml.cma"
+
 package "syntax" (
- version = "1.1.1"
- description = "Hardware in OCaml"
+ version = "2.0.0"
+ description = "Hardware in OCaml - syntax extension"
  requires = "camlp4"
- archive(syntax, preprocessor) = "pa_hardcaml.cma"
- archive(syntax, toploop) = "pa_hardcaml.cma"
- archive(syntax, preprocessor, native) = "pa_hardcaml.cmxa"
- archive(syntax, preprocessor, native, plugin) = "pa_hardcaml.cmxs"
+ archive(syntax, preprocessor) = "pa_hardcaml.cmo"
+ archive(syntax, toploop) = "pa_hardcaml.cmo"
  requires(toploop) = "hardcaml"
- exists_if = "pa_hardcaml.cma"
+ exists_if = "pa_hardcaml.cmo"
 )
 
 package "js" (
- version = "1.1.1"
- description = "Hardware in OCaml"
+ version = "2.0.0"
+ description = "Hardware in OCaml - js_of_ocaml APIs"
  requires = "hardcaml lwt js_of_ocaml"
  archive(byte) = "HardCamlJS.cma"
  archive(byte, plugin) = "HardCamlJS.cma"
@@ -32,8 +29,8 @@ package "js" (
 )
 
 package "dynlink" (
- version = "1.1.1"
- description = "Hardware in OCaml"
+ version = "2.0.0"
+ description = "Hardware in OCaml - dynamic simulator loading"
  requires = "hardcaml dynlink"
  archive(byte) = "HardCamlDynlink.cma"
  archive(byte, plugin) = "HardCamlDynlink.cma"
@@ -41,5 +38,15 @@ package "dynlink" (
  archive(native, plugin) = "HardCamlDynlink.cmxs"
  exists_if = "HardCamlDynlink.cma"
 )
-# OASIS_STOP
+
+package "csim" (
+ version = "2.0.0"
+ description = "Hardware in OCaml - C based simulation"
+ requires = "hardcaml ctypes.foreign"
+ archive(byte) = "HardCamlCSim.cma"
+ archive(byte, plugin) = "HardCamlCSim.cma"
+ archive(native) = "HardCamlCSim.cmxa"
+ archive(native, plugin) = "HardCamlCSim.cmxs"
+ exists_if = "HardCamlCSim.cma"
+)
 

@@ -1,16 +1,24 @@
-opam-version: "1.1"
+opam-version: "1.2"
 maintainer: "andy.ray@ujamjar.com"
+authors: "andy.ray@ujamjar.com"
 homepage: "https://github.com/ujamjar/hardcaml"
-build: [
-  [make "all"]
-  [make "install"]
-]
-remove: [
-  [make "uninstall"]
+dev-repo: "https://github.com/ujamjar/hardcaml"
+bug-reports: "https://github.com/ujamjar/hardcaml/issues"
+build: [ 
+  ["ocaml" "pkg/pkg.ml" "build"
+    "--with-ctypes-foreign" "%{ctypes-foreign:installed}%"
+    "--with-camlp4" "%{camlp4:installed}%"
+  ] 
 ]
 depends: [
-  "ocamlfind"
-  "base-bytes"
-  "camlp4"
+  "ocamlfind" {build}
+  "ocamlbuild" {build}
+  "topkg" {build}
+  "base-bytes" 
+  "base-unix" 
 ]
-ocaml-version: [ >= "4.01.0" ]
+depopts: [ 
+  "camlp4" 
+  "ctypes-foreign" 
+]
+available: [ "ocaml-version" >= "4.01.0" ]

@@ -1,0 +1,4 @@
+SRC src
+SRC test
+PKG ctypes.foreign
+B _build/src

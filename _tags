@@ -1,5 +1,6 @@
 # main libary
 "src": include
+<src/*.cmx> and not "src/HardCaml.cmx": for-pack(HardCaml)
 
 # camlp4 syntax extension
 "syntax": include
@@ -7,6 +8,17 @@
 
 # c-simulation
 "csim": include
+<csim/*.cmx> and not "csim/HardCamlCSim.cmx": for-pack(HardCamlCSim)
+<csim/*.ml>: package(ctypes.foreign)
 
 # dynamic sim api
 "dynlink": include
+<dynlink/*.cmx> and not "dynlink/HardCamlDynlink.cmx": for-pack(HardCamlDynlink)
+
+# js_of_ocaml stuff
+"js": include
+<js/*.cmx> and not "js/HardCamlJS.cmx": for-pack(HardCamlJS)
+<js/*.ml{,i}>: syntax(camlp4o), package(js_of_ocaml), package(js_of_ocaml.syntax)
+
+true: bin_annot
+

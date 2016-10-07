@@ -12,6 +12,28 @@ HardCaml is an OCaml library for designing hardware.
 
 [Try it online!](http://ujamjar.github.io/hardcaml)
 
+# Build
+
+With opam
+
+```
+$ opam install hardcaml
+```
+
+The package (optionally) depends on `camlp4` for the syntax extension and `ctypes-foreign` for the C based simulator.
+
+To build locally use
+
+```
+$ ocaml pkg/pkg.ml build --with-camlp4 [true|false] --with-ctypes-foreigh [true|false]
+```
+
+An `IOcamlJS` notebook kernel can also be built with
+
+```
+$ ocamlbuild kernel.hardcaml.js
+```
+
 # Related tools
 
 * [Examples and framework](https://github.com/ujamjar/hardcaml-examples) - simple to mildly complex example designs
@@ -23,4 +45,5 @@ HardCaml is an OCaml library for designing hardware.
 
 * [Reed-Solomon CODEC](https://github.com/ujamjar/hardcaml-reedsolomon) configurable Reed-Solomon encoder/decoder
 * [OpenRISC](https://github.com/ujamjar/hardcaml-mor1kx) direct port of mork1x cpu _very alpha, not tested as yet_
+
 
