@@ -1,3 +1,9 @@
+# v2.0.0
+
+* Reorganise and merge a bunch of modules (esp _ext_.ml) which were split out
+  previously due to js\_of\_ocaml but is no longer needed.
+* Replace oasis with ocamlbuild and topkg
+
 # v1.1.1
 
 * add out_port_next function to simulator - update on out_port reverts to old behaviour
