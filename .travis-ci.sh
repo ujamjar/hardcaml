@@ -21,5 +21,5 @@ export OPAMYES=1
 opam init 
 eval `opam config env`
 opam pin add hardcaml -k git .
-opam -y depext hardcaml
+opam depext -y hardcaml
 opam install hardcaml

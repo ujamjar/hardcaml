@@ -22,5 +22,6 @@ depends: [
 depopts: [ 
   "camlp4" 
   "ctypes-foreign" 
+  "js_of_ocaml"
 ]
 available: [ "ocaml-version" >= "4.01.0" ]
