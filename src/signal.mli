@@ -167,11 +167,17 @@ sig
 
 end
 
+open Comb
+
 (** internal signal implementation *)
-module Base : (Comb.T with type t = Types.signal)
+module Base : (T with type t = Types.signal)
 
 (** Combinatorial signal API *)
-module Comb : (Comb.S with type t = Types.signal)
+module Comb : (S with type t = Types.signal)
+
+module Const_prop : sig
+  module Comb : (S with type t = Types.signal)
+end
 
 (** Sequential logic (register + memories) *)
 module Seq :

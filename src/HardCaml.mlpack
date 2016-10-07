@@ -5,7 +5,6 @@ Signal
 Circuit
 Rtl
 Fixed
-Const_prop
 Transform
 Cyclesim
 Vcd
