@@ -8,6 +8,7 @@ build: [
   ["ocaml" "pkg/pkg.ml" "build"
     "--with-ctypes-foreign" "%{ctypes-foreign:installed}%"
     "--with-camlp4" "%{camlp4:installed}%"
+    "--with-js_of_ocaml" "%{js_of_ocaml:installed}%"
   ] 
 ]
 depends: [
