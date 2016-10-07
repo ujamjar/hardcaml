@@ -1,5 +1,12 @@
+# main libary
 "src": include
 
 # camlp4 syntax extension
-#"src/pa_hardcaml.ml": package(camlp4), camlp4orf
+"syntax": include
+"syntax/pa_hardcaml.ml": package(camlp4), camlp4orf
 
+# c-simulation
+"csim": include
+
+# dynamic sim api
+"dynlink": include

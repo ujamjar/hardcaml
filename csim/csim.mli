@@ -1,3 +1,4 @@
+open HardCaml
 
 module B = Bits.Comb.ArraybitsInt32
 

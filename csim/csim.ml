@@ -1,3 +1,6 @@
+open HardCaml
+
+module B = Bits.Comb.ArraybitsInt32 
 
 type port = 
   {
@@ -68,7 +71,6 @@ let compile_shared_lib name =
   | _ -> failwith ("failed to compile "^name)
 
 let make_from_shared_lib dll = 
-  let module B = Bits.Comb.ArraybitsInt32 in
   let from = Dl.dlopen ~filename:dll ~flags:[Dl.RTLD_NOW] in
   let sim = C.init from () in
   let reset = C.reset from in
@@ -113,9 +115,9 @@ let make ?(name="tmp") circ =
   let cname = name ^ ".c" in
   let lname = "lib" ^ name ^ ".so" in
   let f = open_out cname in
-  let () = C.write (output_string cname) circ in
+  let () = Rtl.C.write (output_string f) circ in
   let () = close_out f in
   let () = compile_shared_lib cname in
-  make_from_shared_lib ("./" ^ name ^ ".so"
+  make_from_shared_lib ("./" ^ lname ^ ".so")
 
 
