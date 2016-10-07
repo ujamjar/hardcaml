@@ -20,12 +20,12 @@ With opam
 $ opam install hardcaml
 ```
 
-The package (optionally) depends on `camlp4` for the syntax extension and `ctypes-foreign` for the C based simulator.
+The package (optionally) depends on `camlp4` for the syntax extension and `ctypes-foreign` for the C based simulator.  The js\_of\_ocaml library requires `lwt` and `js_of_ocaml`
 
 To build locally use
 
 ```
-$ ocaml pkg/pkg.ml build --with-camlp4 [true|false] --with-ctypes-foreigh [true|false]
+$ ocaml pkg/pkg.ml build --with-camlp4 [true|false] --with-ctypes-foreigh [true|false] --with-lwt [true|false] --with-js_of_ocaml [true|false]
 ```
 
 An `IOcamlJS` notebook kernel can also be built with

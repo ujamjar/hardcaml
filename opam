@@ -9,6 +9,7 @@ build: [
     "--with-ctypes-foreign" "%{ctypes-foreign:installed}%"
     "--with-camlp4" "%{camlp4:installed}%"
     "--with-js_of_ocaml" "%{js_of_ocaml:installed}%"
+    "--with-lwt" "%{lwt:installed}%"
   ] 
 ]
 depends: [
@@ -23,5 +24,6 @@ depopts: [
   "camlp4" 
   "ctypes-foreign" 
   "js_of_ocaml"
+  "lwt"
 ]
 available: [ "ocaml-version" >= "4.01.0" ]

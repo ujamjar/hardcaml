@@ -1202,6 +1202,18 @@ module C = struct
       int num_out_ports;
   } simulator;
 
+  void "^name_^"destroy(simulator *sim) {
+      if (sim) {
+        if (sim->data) free(sim->data);
+        if (sim->regs) free(sim->regs);
+        if (sim->mems) free(sim->mems);
+        if (sim->muxs) free(sim->muxs);
+        if (sim->in_ports) free(sim->in_ports);
+        if (sim->out_ports) free(sim->out_ports);
+        free(sim);
+      }
+  }
+
   simulator *"^name_^"init() {
       simulator *sim = malloc(sizeof(simulator));
       sim->data = calloc(sizeof(uint32_t), " ^ soi data_length ^ ");

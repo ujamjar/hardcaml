@@ -35,7 +35,13 @@ module C = struct
   let num_out_ports = field sim_t "num_out_ports" int
   let () = seal sim_t
 
-  let init from = Foreign.foreign ~from "init" (void @-> returning (ptr sim_t))
+  let destroy from = Foreign.foreign ~from "destroy" (ptr sim_t @-> returning void)
+  let init from = 
+    let init = Foreign.foreign ~from "init" (void @-> returning (ptr sim_t)) in
+    (fun () ->
+       let sim = init () in
+       let () = Gc.finalise (destroy from) sim in
+       sim)
   let reset from = Foreign.foreign ~from "reset" (ptr sim_t @-> returning void)
   let cycle from = Foreign.foreign ~from "cycle" (ptr sim_t @-> returning void)
 
@@ -78,7 +84,6 @@ let make_from_shared_lib dll =
   let cycle = C.cycle from in
   let in_ports = C.get_ports sim C.in_ports C.num_in_ports in
   let out_ports = C.get_ports sim C.out_ports C.num_out_ports in
-  let none () = () in
   let sim_in_ports = Array.map (fun p -> (p.name, ref (B.zero p.width)), p) in_ports in
   let sim_out_ports = Array.map (fun p -> (p.name, ref (B.zero p.width)), p) out_ports in
   let to_ports x = List.map fst @@ Array.to_list x in
@@ -97,6 +102,7 @@ let make_from_shared_lib dll =
         d := (p.get (), w))
       sim_out_ports;
   in
+  let none () = () in
   {
     Cyclesim.Api.sim_in_ports = to_ports sim_in_ports;
     sim_out_ports = to_ports sim_out_ports;
@@ -118,7 +124,7 @@ let make ?(name="tmp") circ =
   let f = open_out cname in
   let () = Rtl.C.write (output_string f) circ in
   let () = close_out f in
-  let () = compile_shared_lib cname in
-  make_from_shared_lib ("./" ^ lname ^ ".so")
+  let () = compile_shared_lib name in
+  make_from_shared_lib ("./" ^ lname)
 
 
