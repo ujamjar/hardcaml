@@ -8,8 +8,6 @@
  *
  *)
 
-open Comb
-
 (** Modules which implement {!modtype: Comb.S} as directly usable data-structures *)
 
 (* exported to build the bigarray types in Bits_ext *)
@@ -50,36 +48,6 @@ sig
 end
 
 module ArraybitsBuilder(B : ArraybitsBase) : (Comb.T with type t = B.barray * int)
-
-(** Implemented API's *)
-module Comb :
-sig
-
-  (** bits described as lists of ints ie [0;1;1;1;0] - width implicit as length of list*)
-  module IntbitsList : (S with type t = int list)
-
-  (** bits described with ocamls ints and a width (<=31) *)
-  module Intbits : (S with type t = int*int)
-
-  (** bits described using int32 and a width (<=32) *)
-  module Int32bits : (S with type t = int32*int)
-
-  (** bits described using int64 and a width (<=64) *)
-  module Int64bits : (S with type t = int64*int)
-
-  (** bits described using nativeint and a width (max size platform dependant) *)
-  module Nativeintbits : (S with type t = nativeint*int)
-
-  (** bits described using array of int32 *)
-  module ArraybitsInt32 : (S with type t = int32 array * int)
-
-  (** bits described using array of int64 *)
-  module ArraybitsInt64 : (S with type t = int64 array * int)
-
-  (** bits described using array of nativeint *)
-  module ArraybitsNativeint : (S with type t = nativeint array * int)
-
-end
 
 module Ext : sig
 
@@ -165,16 +133,16 @@ module Ext : sig
 
   end
 
-  module BigarraybitsInt32_Bits : (S with type t = Utils_ext.ba32 * int)
-  module BigarraybitsInt64_Bits : (S with type t = Utils_ext.ba64 * int)
-  module BigarraybitsNativeint_Bits : (S with type t = Utils_ext.bani * int)
+  module BigarraybitsInt32_Bits : (Comb.S with type t = Utils_ext.ba32 * int)
+  module BigarraybitsInt64_Bits : (Comb.S with type t = Utils_ext.ba64 * int)
+  module BigarraybitsNativeint_Bits : (Comb.S with type t = Utils_ext.bani * int)
 
   module Comb :
   sig
 
     module type T = 
     sig
-      include S
+      include Comb.S
 
       (** is the data type mutable *)
       val is_mutable : bool
@@ -196,7 +164,7 @@ module Ext : sig
     module type S = 
     sig
 
-      include S
+      include Comb.S
 
       (** is the data type mutable *)
       val is_mutable : bool
@@ -244,7 +212,7 @@ end
 
 module Raw : sig
 
-  module Make(B : ArraybitsBase) : sig
+  module Build(B : ArraybitsBase) : sig
 
     type t = 
         {
@@ -259,6 +227,7 @@ module Raw : sig
     val to_int : t -> int
     val to_bstr : t -> string
 
+    val create : int -> t
     val copy : t -> t -> unit
 
     val const : string -> t
@@ -278,6 +247,7 @@ module Raw : sig
     val (-:) : t -> t -> t -> unit
 
     val (==:) : t -> t -> t -> unit
+    val (<>:) : t -> t -> t -> unit
     val (<:) : t -> t -> t -> unit
 
     val mux : t -> t -> t list -> unit
@@ -289,6 +259,39 @@ module Raw : sig
     val ( *+ ) : t -> t -> t -> unit
 
   end
+
+  module Base(B : ArraybitsBase) : Comb.T
+  module Comb(B : ArraybitsBase) : Comb.S
+
+end
+
+(** Implemented API's *)
+module Comb :
+sig
+
+  (** bits described as lists of ints ie [0;1;1;1;0] - width implicit as length of list*)
+  module IntbitsList : (Comb.S with type t = int list)
+
+  (** bits described with ocamls ints and a width (<=31) *)
+  module Intbits : (Comb.S with type t = int*int)
+
+  (** bits described using int32 and a width (<=32) *)
+  module Int32bits : (Comb.S with type t = int32*int)
+
+  (** bits described using int64 and a width (<=64) *)
+  module Int64bits : (Comb.S with type t = int64*int)
+
+  (** bits described using nativeint and a width (max size platform dependant) *)
+  module Nativeintbits : (Comb.S with type t = nativeint*int)
+
+  (** bits described using array of int32 *)
+  module ArraybitsInt32 : (Comb.S with type t = int32 array * int)
+
+  (** bits described using array of int64 *)
+  module ArraybitsInt64 : (Comb.S with type t = int64 array * int)
+
+  (** bits described using array of nativeint *)
+  module ArraybitsNativeint : (Comb.S with type t = nativeint array * int)
 
 end
 

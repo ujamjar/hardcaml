@@ -1557,7 +1557,7 @@ end
 
 module Raw = struct
 
-  module Make(B : ArraybitsBase) = 
+  module Build(B : ArraybitsBase) = 
   struct
 
       open B
@@ -1583,6 +1583,8 @@ module Raw = struct
           let top_word = word (width-1) in
           let mask = mask (width mod B.nbits) in 
           set s.data top_word ((get s.data top_word) &. mask)
+
+      let create w = { data = create w; width = w }
 
       let copy t f = 
           assert (width t = width f);
@@ -1678,6 +1680,12 @@ module Raw = struct
           let eq = ref true in
           iterback (fun a b -> if a <> b then eq := false) a b;
           if !eq then copy c vdd
+          else copy c gnd
+
+      let (<>:) c a b = 
+          let neq = ref false in
+          iterback (fun a b -> if a <> b then neq := true) a b;
+          if !neq then copy c vdd
           else copy c gnd
 
       let (<:) c a b =
@@ -1776,6 +1784,62 @@ module Raw = struct
       copy c { data=d; width=w }
 
   end
+
+  module Base(B : ArraybitsBase) = struct
+    module X = Build(B)
+    type t = X.t
+    let mk1 w f a =
+      let x = X.create w in
+      f x a;
+      x
+    let mk2 w f a b = 
+      let x = X.create w in
+      f x a b;
+      x
+    let mk3 w f a b c = 
+      let x = X.create w in
+      f x a b c;
+      x
+ 
+    let empty = X.empty
+    let width = X.width
+    let const = X.const
+
+    let concat l = 
+      let w = List.fold_left (fun w y -> w + width y) 0 l in
+      mk1 w X.concat l
+
+    let mux s l = 
+      let w = width (List.hd l) in
+      mk2 w X.mux s l
+
+    let select s h l = 
+      let w = h-l+1 in
+      mk3 w X.select s h l
+
+    let wire = X.wire
+    let (--) = X.(--)
+
+    let (&:) a = mk2 (width a) X.(&:) a
+    let (|:) a = mk2 (width a) X.(|:) a
+    let (^:) a = mk2 (width a) X.(^:) a
+    let (~:) a = mk1 (width a) X.(~:) a 
+  
+    let (+:) a = mk2 (width a) X.(+:) a
+    let (-:) a = mk2 (width a) X.(-:) a
+    let ( *: ) a b = mk2 (width a + width b) X.( *: ) a b
+    let ( *+ ) a b = mk2 (width a + width b) X.( *+ ) a b
+
+    let (==:) = mk2 1 X.(==:)
+    let (<:) = mk2 1 X.(<:)
+
+    let (<==) = X.(<==)
+    let to_string = X.to_string
+    let to_int = X.to_int
+    let to_bstr = X.to_bstr
+  end
+
+  module Comb(B : ArraybitsBase) = Make(Base(B))
 
 end
 
