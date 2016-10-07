@@ -20,6 +20,5 @@ sudo apt-get install -qq ocaml ocaml-native-compilers camlp4-extra opam
 export OPAMYES=1
 opam init 
 eval `opam config env`
-opam pin add hardcaml -k git .
 opam depext -y hardcaml
-opam install hardcaml
+opam pin add hardcaml -k git .
