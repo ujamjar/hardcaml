@@ -1,5 +1,5 @@
 # Edit this for your own project dependencies
-OPAM_DEPENDS="ocamlfind camlp4"
+OPAM_DEPENDS="ocamlfind camlp4 ctypes-foreign"
 
 # install OCaml + OPAM
 case "$OCAML_VERSION,$OPAM_VERSION" in
@@ -23,4 +23,4 @@ opam install ${OPAM_DEPENDS}
 eval `opam config env`
 
 # Test
-make
+ocaml pkg/pkg build
