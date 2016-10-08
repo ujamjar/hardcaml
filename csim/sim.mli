@@ -1,6 +1,6 @@
 open HardCaml
 
-module B = Bits.Comb.ArraybitsInt32
+module B : Comb.S with type t = Bits.Comb.ArraybitsInt32.t
 
 (** [compile_shared_lib name] compile, with gcc, [<name>.c] to [lib<name>.so] *)
 val compile_shared_lib : string -> unit
