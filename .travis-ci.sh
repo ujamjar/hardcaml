@@ -23,7 +23,7 @@ export OPAMYES=1
 opam init 
 
 eval `opam config env`
-opam depext -y $DEPPKGS $OPAMPKG
 opam pin add -n $OPAMPKG -k git .
+opam depext -y $DEPPKGS $OPAMPKG
 
 opam install $DEPPKGS $OPAMPKG
