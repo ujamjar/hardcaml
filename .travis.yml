@@ -1,4 +1,7 @@
 language: c
 script: bash -ex .travis-ci.sh
 env:
-  - OCAML_VERSION=4.01.0 OPAM_VERSION=1.2.0
+  - OCAML_VERSION=4.01.0 OPAM_VERSION=1.2.0 OPAMPKG=hardcaml DEPPKGS=""
+  - OCAML_VERSION=4.01.0 OPAM_VERSION=1.2.0 OPAMPKG=hardcaml DEPPKGS="lwt camlp4o js_of_ocaml ctypes ctypes-foreign"
+  - OCAML_VERSION=4.03.0 OPAM_VERSION=1.2.0 OPAMPKG=hardcaml DEPPKGS=""
+  - OCAML_VERSION=4.03.0 OPAM_VERSION=1.2.0 OPAMPKG=hardcaml DEPPKGS="lwt camlp4o js_of_ocaml ctypes ctypes-foreign"
