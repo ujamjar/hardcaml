@@ -1,4 +1,4 @@
-module B = HardCaml.Bits.Comb.IntbitsList
+module B : HardCaml.Comb.S with type t = HardCaml.Bits.Comb.IntbitsList.t
 
 type exarray = { mutable len : int; mutable data : B.t array; }
 val make : unit -> exarray
@@ -15,16 +15,14 @@ val wrap : B.t HardCaml.Cyclesim.Api.cyclesim -> B.t HardCaml.Cyclesim.Api.cycle
 
 module Gui :
   sig
-    module D = Dom_html
-
     val render_1 :
       int * int ->
       int * int ->
-      int -> D.canvasRenderingContext2D Js.t -> B.t array -> unit
+      int -> Dom_html.canvasRenderingContext2D Js.t -> B.t array -> unit
     val render_n :
       ('a -> string) ->
       int * int ->
-      int * int -> int -> D.canvasRenderingContext2D Js.t -> 'a array -> unit
+      int * int -> int -> Dom_html.canvasRenderingContext2D Js.t -> 'a array -> unit
 
     val mk_wave_table : #Dom.node Js.t -> int -> int -> wave array -> unit
   end
