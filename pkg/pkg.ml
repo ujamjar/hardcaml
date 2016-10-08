@@ -3,7 +3,8 @@
 #require "topkg,astring"
 open Topkg
 
-let ctypes = Conf.with_pkg ~default:false "ctypes-foreign"
+let ctypes = Conf.with_pkg ~default:false "ctypes"
+let ctypes_foreign = Conf.with_pkg ~default:false "ctypes-foreign"
 let camlp4 = Conf.with_pkg ~default:false "camlp4"
 let js_of_ocaml = Conf.with_pkg ~default:false "js_of_ocaml"
 let lwt = Conf.with_pkg ~default:false "lwt"
@@ -46,7 +47,7 @@ let mlpack ?cond name =
 
 let () = 
   Pkg.describe "hardcaml" @@ fun c ->
-  let ctypes = Conf.value c ctypes in
+  let ctypes = Conf.value c ctypes && Conf.value c ctypes_foreign in
   let camlp4 = Conf.value c camlp4 in
   let js_of_ocaml = Conf.value c js_of_ocaml in
   let lwt = Conf.value c lwt in

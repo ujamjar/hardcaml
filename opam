@@ -6,6 +6,7 @@ dev-repo: "https://github.com/ujamjar/hardcaml"
 bug-reports: "https://github.com/ujamjar/hardcaml/issues"
 build: [ 
   ["ocaml" "pkg/pkg.ml" "build"
+    "--with-ctypes" "%{ctypes:installed}%"
     "--with-ctypes-foreign" "%{ctypes-foreign:installed}%"
     "--with-camlp4" "%{camlp4:installed}%"
     "--with-js_of_ocaml" "%{js_of_ocaml:installed}%"
@@ -22,6 +23,7 @@ depends: [
 ]
 depopts: [ 
   "camlp4" 
+  "ctypes"
   "ctypes-foreign" 
   "js_of_ocaml"
   "lwt"
