@@ -229,6 +229,9 @@ sig
     (** case mux *)
     val cases : t -> t -> (int * t) list -> t
 
+    (** match mux *)
+    val matches : ?resize:(t -> int -> t) -> ?default:t -> t -> (int * t) list -> t
+
     (** priority mux (with default) *)
     val pmux : (t * t) list -> t -> t
 
@@ -401,6 +404,14 @@ sig
 
     (** signed resize by +1 bit *)
     val se : t -> t
+
+    (** [resize_list ?resize l] finds the maximum width in [l] and applies
+        [resize el max] to each element. *)
+    val resize_list : resize:(t -> int -> t) -> t list -> t list
+
+    (** [resize_op2 ~resize f a b] applies [resize x w] to [a] and [b] where
+        [w] is the maximum of their widths.  It then returns [f a b] *)
+    val resize_op2 : resize:(t -> int -> t) -> (t -> t -> t) -> t -> t -> t
 
     (** fold 'op' though list *)
     val reduce : ('a -> 'a -> 'a) -> 'a list -> 'a

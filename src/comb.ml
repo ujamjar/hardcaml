@@ -79,6 +79,7 @@ sig
     val mux2 : t -> t -> t -> t
     val mux_init : t -> int -> (int -> t) -> t
     val cases : t -> t -> (int * t) list -> t
+    val matches : ?resize:(t -> int -> t) -> ?default:t -> t -> (int * t) list -> t
     val pmux : (t * t) list -> t -> t
     val pmuxl : (t * t) list -> t
     val pmux1h : (t * t) list -> t
@@ -150,6 +151,8 @@ sig
     val sresize : t -> int -> t
     val ue : t -> t
     val se : t -> t
+    val resize_list : resize:(t -> int -> t) -> t list -> t list
+    val resize_op2 : resize:(t -> int -> t) -> (t -> t -> t) -> t -> t -> t
     val reduce : ('a -> 'a -> 'a) -> 'a list -> 'a
     val reverse : t -> t 
     val mod_counter : int -> t -> t
@@ -317,6 +320,76 @@ struct
         mux sel (Array.to_list a)
       else
         mux sel (Array.to_list a @ [default])
+
+    let matches
+      ?(resize=(fun s w -> s))
+      ?default
+      sel
+      cases = 
+
+      let open StdLabels in
+
+      (* sort cases *)
+      let cases = List.sort ~cmp:(fun (a,_) (b,_) -> compare a b) cases in
+
+      (* check cases are unique *)
+      let check_unique_cases cases = 
+        let module S = Set.Make(struct type t = int let compare = compare end) in
+        let add s (i,_) = S.add i s in
+        let s = List.fold_left ~f:add ~init:S.empty cases in
+        if S.cardinal s <> List.length cases then
+          failwith "cases must be unique"
+      in
+      check_unique_cases cases;
+
+      (* resize cases and default *)
+      let w = List.fold_left ~f:(fun w (_,d) -> max w (width d)) ~init:0 cases in
+      let w, default = 
+        match default with 
+        | None -> w, zero w 
+        | Some(d) -> 
+          let w = max w (width d) in
+          w, resize d w
+      in
+      let cases = List.map (fun (c,d) -> c, resize d w) cases in
+
+      (* filter cases that cannot be indexed by sel *)
+      let out_of_range_cases sgn sel cases = 
+        let w = width sel in
+        let min,max,msk = 
+          if sgn then 
+            let w = 1 lsl (w-1) in
+            -w, w-1, (w lsl 1)-1
+          else
+            let w = 1 lsl w in
+            0, w-1, w-1
+        in
+        List.map ~f:(fun (x,y) -> x land msk, y) @@
+        List.filter (fun (x,_) -> x >= min && x <= max) cases
+      in
+
+      let sgn = (fst @@ List.hd cases) < 0 in
+      let cases = out_of_range_cases sgn sel cases in
+
+      (* generate mux tree *)
+      let rec f sel c def = 
+        match width sel, c with
+        | 0, [] -> def
+        | 0, ((0,d)::_) -> d
+        | 0, _ -> def
+        | _, [] -> def
+        | _ ->
+          let e, o = List.partition (fun (i,_) -> (i land 1) = 0) c in
+          let e, o = 
+            let shift (a,b) = a lsr 1, b in
+            List.map shift e, List.map shift o
+          in
+          let sel2 = lsb sel in
+          let sel = try msbs sel with _ -> empty in
+          mux2 sel2 (f sel o def) (f sel e def)
+      in
+
+      f sel cases default
 
     (* logical *)
     let (&:) a b = 
@@ -512,6 +585,15 @@ struct
 
     let ue s = uresize s ((width s)+1)
     let se s = sresize s ((width s)+1)
+
+    let resize_list ~resize l = 
+      let w = List.fold_left (fun w e -> max (width e) w) 0 l in
+      List.map (fun e -> resize e w) l
+
+    let resize_op2 ~resize f a b = 
+      let w = max (width a) (width b) in
+      let a,b = resize a w, resize b w in
+      f a b
 
     let to_sint a = to_int (sresize a (Utils.platform_bits-1))
 
