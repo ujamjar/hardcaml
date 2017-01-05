@@ -1,4 +1,4 @@
-# v2.0.0
+# v1.2.0
 
 * Reorganise and merge a bunch of modules (esp _ext_.ml) which were split out
   previously due to js\_of\_ocaml but is no longer needed.
