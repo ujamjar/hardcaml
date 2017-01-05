@@ -1,4 +1,4 @@
-version = "2.0.0"
+version = "1.2.0"
 description = "Hardware in OCaml"
 requires = "bytes bigarray num astring"
 archive(byte) = "HardCaml.cma"
@@ -8,7 +8,7 @@ archive(native, plugin) = "HardCaml.cmxs"
 exists_if = "HardCaml.cma"
 
 package "syntax" (
- version = "2.0.0"
+ version = "1.2.0"
  description = "Hardware in OCaml - syntax extension"
  requires = "camlp4"
  archive(syntax, preprocessor) = "pa_hardcaml.cmo"
@@ -18,7 +18,7 @@ package "syntax" (
 )
 
 package "js" (
- version = "2.0.0"
+ version = "1.2.0"
  description = "Hardware in OCaml - js_of_ocaml APIs"
  requires = "hardcaml lwt js_of_ocaml"
  archive(byte) = "HardCamlJS.cma"
@@ -29,7 +29,7 @@ package "js" (
 )
 
 package "dynlink" (
- version = "2.0.0"
+ version = "1.2.0"
  description = "Hardware in OCaml - dynamic simulator loading"
  requires = "hardcaml dynlink"
  archive(byte) = "HardCamlDynlink.cma"
@@ -40,7 +40,7 @@ package "dynlink" (
 )
 
 package "csim" (
- version = "2.0.0"
+ version = "1.2.0"
  description = "Hardware in OCaml - C based simulation"
  requires = "hardcaml ctypes.foreign"
  archive(byte) = "HardCamlCSim.cma"
