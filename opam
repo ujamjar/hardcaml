@@ -29,3 +29,8 @@ depopts: [
   "lwt"
 ]
 available: [ "ocaml-version" >= "4.01.0" ]
+name: "hardcaml"
+version: "1.2.1"
+license: "ISC"
+substs:[ "pkg/META" ]
+
