@@ -107,10 +107,10 @@ module Make(B : Comb.S) : sig
           (** adition *)
           
         val (-:) : t -> t -> t
-          (** addition *)
+          (** subtraction *)
 
         val ( *: ) : t -> t -> t
-          (** subtraction *)
+          (** multiplication *)
 
         val (==:) : t -> t -> B.t
           (** equality *)
