@@ -1546,46 +1546,81 @@ end
 
 module Raw = struct
 
+  module type S = sig
+
+    type t 
+
+    val empty : t
+    val width : t -> int
+
+    val to_string : t -> string
+    val to_int : t -> int
+    val to_bstr : t -> string
+
+    val create : int -> t
+    val copy : t -> t -> unit
+
+    val const : string -> t
+    val vdd : t
+    val gnd : t
+
+    val wire : int -> t
+    val (--) : t -> string -> t 
+
+    val (&:) : t -> t -> t -> unit
+    val (|:) : t -> t -> t -> unit
+    val (^:) : t -> t -> t -> unit
+
+    val (~:) : t -> t -> unit
+
+    val (+:) : t -> t -> t -> unit
+    val (-:) : t -> t -> t -> unit
+
+    val (==:) : t -> t -> t -> unit
+    val (<>:) : t -> t -> t -> unit
+    val (<:) : t -> t -> t -> unit
+
+    val mux : t -> t -> t list -> unit
+
+    val concat : t -> t list -> unit
+    val select : t -> t -> int -> int -> unit
+  
+    val ( *: ) : t -> t -> t -> unit
+    val ( *+ ) : t -> t -> t -> unit
+
+  end
+
   module Build(B : ArraybitsBase) = 
   struct
 
       open B
 
-      type t = 
-          {
-              data : B.barray;
-              width : int;
-          }
-      let empty = 
-          {
-              data = create 0;
-              width = 0;
-          }
-      let width s = s.width
+      type t = B.barray * int
 
-      let to_string x = to_bstr (width x) x.data
-      let to_int x = to_int x.data
-      let to_bstr x = to_bstr (width x) x.data
+      let empty = create 0, 0
+
+      let width s = snd s
+      let data s = fst s
+
+      let to_string x = to_bstr (width x) (data x)
+      let to_int x = to_int (data x)
+      let to_bstr x = to_bstr (width x) (data x)
 
       let mask s = 
-          let width = s.width in
+          let width = width s in
           let top_word = word (width-1) in
           let mask = mask (width mod B.nbits) in 
-          set s.data top_word ((get s.data top_word) &. mask)
+          set (data s) top_word ((get (data s) top_word) &. mask)
 
-      let create w = { data = create w; width = w }
+      let create w = create w, w
 
       let copy t f = 
           assert (width t = width f);
-          for i=0 to (words t.width) - 1 do
-              set t.data i (get f.data i)
+          for i=0 to (words (width t)) - 1 do
+              set (data t) i (get (data f) i)
           done
 
-      let const b = 
-          {
-              data = to_bits b;
-              width = String.length b
-          }
+      let const b = to_bits b, String.length b
 
       let wire _ = empty
       let (--) a b = a
@@ -1597,7 +1632,7 @@ module Raw = struct
           let width = width a in
           let words = words width in
           for i=0 to words - 1 do
-              set c.data i (op (get a.data i) (get b.data i))
+            set (data c) i (op (get (data a) i) (get (data b) i))
           done;
           mask c
 
@@ -1608,9 +1643,9 @@ module Raw = struct
       let (~:) c a = 
           let width = width a in
           let words = words width in
-          let a = a.data in
+          let a = (data a) in
           for i=0 to words - 1 do
-              set c.data i (~. (get a i))
+            set (data c) i (~. (get a i))
           done;
           mask c
 
@@ -1659,8 +1694,8 @@ module Raw = struct
 
       let iterback op a b =
           let words = words (width a) in
-          let a = a.data in
-          let b = b.data in
+          let a = (data a) in
+          let b = (data b) in
           for i=words-1 downto 0 do
               op (get a i) (get b i)
           done
@@ -1707,11 +1742,12 @@ module Raw = struct
           let c_width = List.fold_left (fun a b -> a + width b) 0 l in
           assert (c_width = width c);
           let c_words = words c_width in
+          let c_with l = data c, l in
           let cat a b = 
               let a_width, a_words = width a, words (width a) in
               let b_width, b_words = width b, words (width b) in
               let a_bits = a_width mod nbits in
-              let a,b = a.data, b.data in
+              let a,b = (data a), (data b) in
               let _ = 
                   if a_bits = 0 then
                       (* aligned *)
@@ -1728,12 +1764,12 @@ module Raw = struct
                               set a (a_words+i) y
                       done
               in
-              { c with width = (a_width + b_width) }
+              c_with (a_width + b_width)
           in
           let l = List.rev l in
           if l = [] then ()
           else
-              let c = cat { c with width = 0 } (List.hd l) in
+              let c = cat (c_with 0) (List.hd l) in
               ignore (List.fold_left (fun c a -> cat c a) c (List.tl l))
 
       let select c s h l = 
@@ -1743,7 +1779,7 @@ module Raw = struct
           let s_bits = l mod nbits in
           let lo_word = word l in
           let hi_word = word h in
-          let s = s.data in
+          let s = (data s) in
           let merge i = 
               let a = get s i in
               let b = if i >= hi_word then zero else get s (i+1) in
@@ -1752,11 +1788,11 @@ module Raw = struct
           let _ = 
               if s_bits = 0 then
                   for i=0 to c_words-1 do
-                      set c.data i (get s (lo_word + i))
+                      set (data c) i (get s (lo_word + i))
                   done
               else
                   for i=0 to c_words-1 do
-                      set c.data i (merge (lo_word+i))
+                      set (data c) i (merge (lo_word+i))
                   done
           in
           mask c
@@ -1765,14 +1801,18 @@ module Raw = struct
     module M = ArraybitsBuilder(B)
 
     let ( *: ) c a b = 
-      let d,w = M.((a.data,a.width) *: (b.data,b.width)) in
-      copy c { data=d; width=w }
+      let d = M.(a *: b) in
+      copy c d
 
     let ( *+ ) c a b = 
-      let d,w = M.((a.data,a.width) *+ (b.data,b.width)) in
-      copy c { data=d; width=w }
+      let d = M.(a *+ b) in
+      copy c d
 
   end
+
+  module ArraybitsInt32 = Build(ArraybitsInt32Api)
+  module ArraybitsInt64 = Build(ArraybitsInt64Api)
+  module ArraybitsNativeint = Build(ArraybitsNativeintApi)
 
   module Base(B : ArraybitsBase) : T with type t = Build(B).t = struct
     module X = Build(B)
