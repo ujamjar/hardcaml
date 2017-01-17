@@ -204,13 +204,9 @@ end
 
 module Raw : sig
 
-  module Build(B : ArraybitsBase) : sig
+  module type S = sig
 
-    type t = 
-        {
-            data : B.barray;
-            width : int;
-        }
+    type t 
 
     val empty : t
     val width : t -> int
@@ -252,16 +248,27 @@ module Raw : sig
 
   end
 
+  module Build(B : ArraybitsBase) : (S with type t = B.barray * int)
+
+  (** mutable bits described using array of int32 *)
+  module ArraybitsInt32 : (S with type t = int32 array * int)
+
+  (** mutable bits described using array of int64 *)
+  module ArraybitsInt64 : (S with type t = int64 array * int)
+
+  (** mutable bits described using array of nativeint *)
+  module ArraybitsNativeint : (S with type t = nativeint array * int)
+
   module Comb : sig
 
     (** bits described using array of int32 *)
-    module ArraybitsInt32 : Comb.S
+    module ArraybitsInt32 : (Comb.S with type t = int32 array * int)
 
     (** bits described using array of int64 *)
-    module ArraybitsInt64 : Comb.S 
+    module ArraybitsInt64 : (Comb.S with type t = int64 array * int)
 
     (** bits described using array of nativeint *)
-    module ArraybitsNativeint : Comb.S 
+    module ArraybitsNativeint : (Comb.S with type t = nativeint array * int)
 
   end
 

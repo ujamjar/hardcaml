@@ -68,6 +68,112 @@ let find_elements circuit =
                 (regs, mems, consts, inputs ,signal::remaining)
         ) id ([],[],[],[],[]) (Circuit.outputs circuit)
 
+(* internally traced nodes *)
+let get_internal_ports circuit internal = 
+  (* create name mangler *)
+  let name = Circuit.mangle_names [] "_" circuit in
+  let i = match internal with
+    | None -> []
+    | Some(f) -> 
+      Circuit.filter (fun s ->
+          not (Circuit.is_input circuit s) &&
+          not (Circuit.is_output circuit s) &&
+          s <> Signal.Comb.empty && 
+          f s) (Circuit.outputs circuit)
+  in
+  (* create a wire for each node, and give it the mangled names.
+   * NOTE: these wire are required to make registers 'look' like
+   * they are updating correctly in simulation, however, they are
+   * not specifically needed for combinatorial nodes.  It does make
+   * the name mangling scheme a wee bit easier though. *)
+  List.map (fun s ->
+      let w = Signal.Comb.wire (Signal.Comb.width s) in
+      Signal.Comb.(<==) w s;
+      Utils.iteri (fun i _ -> 
+          ignore (Signal.Comb.(--) w (name (uid s) i))
+        ) (names s);
+      w) i
+
+type signal_bundles =
+  {
+    schedule : Signal.Comb.t list;
+    internal_ports : Signal.Comb.t list;
+    regs : Signal.Comb.t list;
+    mems : Signal.Comb.t list;
+    consts : Signal.Comb.t list;
+    inputs : Signal.Comb.t list;
+    remaining : Signal.Comb.t list;
+    ready : Signal.Comb.t list;
+  }
+
+let get_schedule circuit internal_ports = 
+  let regs, mems, consts, inputs, remaining = find_elements circuit in
+  let ready = regs @ inputs @ consts in
+  let deps' s = 
+    match s with 
+    | Signal_mem(_, _,  _, m) -> [m.mem_read_address]
+    | _ -> deps s
+  in
+  let schedule = scheduler deps' (internal_ports @ mems @ remaining) ready in
+  { schedule; internal_ports; regs; mems; consts; inputs; remaining; ready }
+
+let get_maps ~ref ~const ~zero ~bundle =
+  let data_add map signal = 
+    let value = match signal with
+      | Signal_const(_,v) -> const v
+      | _ -> zero (Signal.Comb.width signal)
+    in
+    UidMap.add (uid signal) (ref value) map
+  in
+  let data_map = UidMap.empty in
+  let data_map = List.fold_left data_add data_map bundle.ready in
+  let data_map = List.fold_left data_add data_map bundle.internal_ports in
+  let data_map = List.fold_left data_add data_map bundle.mems in
+  let data_map = List.fold_left data_add data_map bundle.remaining in
+
+  let reg_add map signal = 
+    UidMap.add (uid signal) (ref (zero (Signal.Comb.width signal))) map 
+  in
+  let reg_map = List.fold_left reg_add UidMap.empty bundle.regs in
+
+  let mem_add map signal =
+    match signal with
+    | Signal_mem(_, _, _, m) ->
+      let mem = Array.init m.mem_size 
+          (fun _ -> zero (Signal.Comb.width signal)) 
+      in
+      UidMap.add (uid signal) mem map
+    | _ -> failwith "Expecting memory"
+  in
+  let mem_map = List.fold_left mem_add UidMap.empty bundle.mems in
+  data_map, reg_map, mem_map
+
+let filter_none l =
+  let l = List.filter ((<>) None) l in
+  map (function Some(x) -> x | _ -> failwith "error") l
+
+let io_ports ~copy circuit data_map internal_ports = 
+  (* list of input ports *)
+  let in_ports = 
+    List.map (fun signal ->
+        (List.hd (names signal)), UidMap.find (uid signal) data_map) 
+      (Circuit.inputs circuit)
+  in
+  (* list of output ports *)
+  let out_ports = 
+    List.map (fun signal ->
+        (List.hd (names signal)), (UidMap.find (uid signal) data_map)) 
+      (Circuit.outputs circuit)
+  in
+  let out_ports_cur = List.map copy out_ports in
+  let internal_ports = 
+    List.concat (
+      List.map (fun signal ->
+          (List.map (fun name -> name,UidMap.find (uid signal) data_map) (names signal)))
+        internal_ports)
+  in 
+  in_ports, out_ports, out_ports_cur, internal_ports
+
 module Api = 
 struct
 
@@ -116,8 +222,7 @@ struct
 
 end
 
-module Make = functor (Bits : Comb.S) ->
-struct 
+module Make(Bits : Comb.S) = struct 
 
     open Api
 
@@ -133,81 +238,15 @@ struct
              ?(internal=None) 
              ?(inst=(fun s -> None)) circuit =  
 
-        log "internal ports";
+        log "build data maps";
 
         (* add internally traced nodes *)
-        let internal_ports = 
-            (* create name mangler *)
-            let name = Circuit.mangle_names [] "_" circuit in
-            let i = match internal with
-                | None -> []
-                | Some(f) -> 
-                    Circuit.filter (fun s ->
-                        not (Circuit.is_input circuit s) &&
-                        not (Circuit.is_output circuit s) &&
-                        s <> Signal.Comb.empty && 
-                        f s) (Circuit.outputs circuit)
-            in
-            (* create a wire for each node, and give it the mangled names.
-             * NOTE: these wire are required to make registers 'look' like
-             * they are updating correctly in simulation, however, they are
-             * not specifically needed for combinatorial nodes.  It does make
-             * the name mangling scheme a wee bit easier though. *)
-            List.map (fun s ->
-                let w = Signal.Comb.wire (Signal.Comb.width s) in
-                Signal.Comb.(<==) w s;
-                Utils.iteri (fun i _ -> 
-                    ignore (Signal.Comb.(--) w (name (uid s) i))
-                ) (names s);
-                w) i
-        in
+        let internal_ports = get_internal_ports circuit internal in
+        let bundle = get_schedule circuit internal_ports in
 
-        log "scheduler";
+        (* build maps *)
+        let data_map, reg_map, mem_map = get_maps ~ref ~const:Bits.const ~zero:Bits.zero ~bundle in
 
-        (* schedule the simulation *)
-        let regs, mems, consts, inputs, remaining = find_elements circuit in
-        let ready = regs @ inputs @ consts in
-        let deps' s = 
-            match s with 
-            | Signal_mem(_, _,  _, m) -> [m.mem_read_address]
-            | _ -> deps s
-        in
-        let schedule = scheduler deps' (internal_ports @ mems @ remaining) ready in
-
-        log "data map";
-
-        (* create the data needed for simulation *)
-        let data_map = 
-            List.fold_left (fun map signal -> 
-                let value = match signal with
-                    | Signal_const(_,v) -> Bits.const v
-                    | _ -> Bits.zero (Signal.Comb.width signal)
-                in
-                UidMap.add (uid signal) (ref value) map
-            ) UidMap.empty (try (ready @ internal_ports @ mems @ remaining) 
-                            with _ -> failwith "during concatenation")
-        in
-
-        log "reg map";
-        
-        let reg_map = 
-            List.fold_left (fun map signal -> 
-                UidMap.add (uid signal) (ref (Bits.zero (Signal.Comb.width signal))) map
-            ) UidMap.empty regs 
-        in
-        log "mem map";
-        let mem_map = 
-            List.fold_left (fun map signal ->
-                match signal with
-                | Signal_mem(_, _, _, m) ->
-                    let mem = Array.init m.mem_size 
-                        (fun _ -> Bits.zero (Signal.Comb.width signal)) 
-                    in
-                    UidMap.add (uid signal) mem map
-                | _ -> failwith "Expecting memory"
-            ) UidMap.empty mems
-        in
-        
         (* compilation *)
         let compile signal = 
             let tgt = UidMap.find (uid signal) data_map in
@@ -358,46 +397,24 @@ struct
 
         (* compile the task list *)
         log "compile tasks";
-        let filter_none l =
-            let l = List.filter ((<>) None) l in
-            map (function Some(x) -> x | _ -> failwith "error") l
-        in
-        let tasks_check = map check_input inputs in
-        let tasks_comb = filter_none (map compile schedule) in
-        let tasks_regs = filter_none (map compile regs) in
-        let tasks_seq = (map compile_mem_update mems) @ (map compile_reg_update regs) in
+        let tasks_check = map check_input bundle.inputs in
+        let tasks_comb = filter_none (map compile bundle.schedule) in
+        let tasks_regs = filter_none (map compile bundle.regs) in
+        let tasks_seq = (map compile_mem_update bundle.mems) @ 
+                        (map compile_reg_update bundle.regs) in
 
         (* reset *)
         log "compile reset";
-        let resets = filter_none (List.map compile_reset regs) in
+        let resets = filter_none (List.map compile_reset bundle.regs) in
 
         log "ports";
-        (* list of input ports *)
-        let in_ports = 
-            List.map (fun signal ->
-                (List.hd (names signal)), UidMap.find (uid signal) data_map) 
-                (Circuit.inputs circuit)
+        let in_ports, out_ports, out_ports_cur, internal_ports = 
+          io_ports ~copy:(fun (n,p) -> n, ref !p) circuit data_map internal_ports
         in
 
-        (* list of output ports *)
-        let out_ports = 
-            List.map (fun signal ->
-                (List.hd (names signal)), (UidMap.find (uid signal) data_map)) 
-                (Circuit.outputs circuit)
-        in
-
-        let out_ports_cur = List.map (fun (n,p) -> (n,ref !p)) out_ports in
         let task_out_ports_cur = 
           (fun () -> List.iter2 (fun (_,pc) (_,pn) -> pc := !pn) out_ports_cur out_ports) 
         in
-
-        (* List of internal ports *)
-        let internal_ports = 
-            List.concat (
-                List.map (fun signal ->
-                    (List.map (fun name -> name,UidMap.find (uid signal) data_map) (names signal)))
-                    internal_ports)
-        in 
 
         log "done";
 
@@ -677,6 +694,234 @@ struct
 
     end
 
+
+end
+
+module MakeRaw(Bits : Bits.Raw.S) = struct
+
+  open Api
+
+  type cyclesim = Bits.t Api.cyclesim
+  type get_internal = (Signal.Types.signal -> bool) option
+  type run_inst = Signal.Types.instantiation -> Bits.t list -> Bits.t list
+  type get_inst = string -> run_inst option
+
+  let make ?(log=(fun s -> ())) 
+           ?(internal=None) 
+           ?(inst=(fun s -> None)) circuit =  
+    log "build data maps";
+
+    (* add internally traced nodes *)
+    let internal_ports = get_internal_ports circuit internal in
+    let bundle = get_schedule circuit internal_ports in
+
+    (* build maps *)
+    let zero n = Bits.const (String.v ~len:n (fun _ -> '0')) in
+    let data_map, reg_map, mem_map = 
+      get_maps ~ref:(fun x -> x) ~const:Bits.const ~zero:zero ~bundle 
+    in
+
+    (* compilation *)
+    let compile signal = 
+      let tgt = UidMap.find (uid signal) data_map in
+      let deps = List.map (fun signal -> 
+          try UidMap.find (uid signal) data_map
+          with _ -> Bits.empty
+        ) (deps signal) in
+      match signal with
+      | Signal_empty -> failwith "cant compile empty signal"
+      | Signal_const(_) -> None 
+      | Signal_op(_,op) ->
+        begin
+          let op2 op = 
+            let a = List.nth deps 0 in
+            let b = List.nth deps 1 in
+            Some(fun () -> op tgt a b;)
+          in 
+          match op with
+          | Signal_add -> op2 Bits.(+:) 
+          | Signal_sub -> op2 Bits.(-:) 
+          | Signal_mulu -> op2 Bits.( *: ) 
+          | Signal_muls -> op2 Bits.( *+ )
+          | Signal_and -> op2 Bits.(&:)
+          | Signal_or -> op2 Bits.(|:)
+          | Signal_xor -> op2 Bits.(^:)
+          | Signal_eq -> op2 Bits.(==:)
+          | Signal_not -> Some(fun () -> Bits.(~:) tgt (List.hd deps))
+          | Signal_lt -> op2 Bits.(<:)
+          | Signal_cat -> Some(fun () -> Bits.concat tgt deps)
+          | Signal_mux -> 
+            (* tgt := Bits.mux !(List.hd deps) (List.map (!) (List.tl deps)) *)
+            (* this optimisation makes a large performance difference *)
+            let sel = List.hd deps in
+            let els = Array.of_list (List.tl deps) in
+            let max = Array.length els - 1 in
+            Some(fun () -> 
+                let sel = Bits.to_int sel in
+                let sel = if sel > max then max else sel in
+                Bits.copy tgt els.(sel))
+        end
+      | Signal_wire(_,d) -> 
+        let src = List.hd deps in
+        Some(fun () -> Bits.copy tgt src)
+      | Signal_select(_,h,l) -> 
+        let d = List.hd deps in
+        Some(fun () -> Bits.select tgt d h l) 
+      | Signal_reg(_,r) -> 
+        begin
+          let tgt = UidMap.find (uid signal) reg_map in
+          let src = List.hd deps in
+          let clr = 
+            if r.reg_clear <> Signal.Comb.empty then 
+              Some(UidMap.find (uid r.reg_clear) data_map,
+                   UidMap.find (uid r.reg_clear_value) data_map,
+                   Bits.to_int (UidMap.find (uid r.reg_clear_level) data_map))
+            else None 
+          in
+          let ena = 
+            if r.reg_enable <> Signal.Comb.empty then
+              Some(UidMap.find (uid r.reg_enable) data_map)
+            else None 
+          in
+          match clr,ena with
+          | None,None -> Some(fun () -> Bits.copy tgt src)
+          | Some(c,v,l),None -> 
+            Some(fun () -> 
+                if Bits.to_int c = l then Bits.copy tgt v
+                else Bits.copy tgt src)
+          | None,Some(e) -> Some(fun () -> if Bits.to_int e  = 1 then Bits.copy tgt src)
+          | Some(c,v,l),Some(e) -> 
+            Some(fun () -> 
+                if Bits.to_int c = l then Bits.copy tgt v
+                else if Bits.to_int e = 1 then Bits.copy tgt src)
+        end
+      | Signal_mem(_,_,r,m) -> 
+        begin
+          let mem = UidMap.find (uid signal) mem_map in
+          let addr = UidMap.find (uid m.mem_read_address) data_map in
+          Some(fun () ->
+              try 
+                Bits.copy tgt mem.(Bits.to_int addr)
+              with _ ->
+                Bits.copy tgt (zero (Signal.Comb.width signal))
+            )
+        end
+      | Signal_inst(_,_,i) -> 
+        begin
+          match inst i.inst_name with
+          | None -> failwith ("Instantiation " ^ i.inst_name ^ 
+                              " not supported in simulation")
+          | Some(f) -> begin
+              Some(fun () -> Bits.concat tgt (List.rev (f i deps))) 
+            end 
+        end
+    in
+
+    let compile_reg_update signal = 
+      match signal with
+      | Signal_reg(_,_) ->
+        let tgt = UidMap.find (uid signal) data_map in
+        let src = UidMap.find (uid signal) reg_map in
+        (fun () -> Bits.copy tgt src)
+      | _ -> failwith "error while compiling reg update"
+    in
+
+    let compile_mem_update signal = 
+      match signal with
+      | Signal_mem(_,_,r,m) ->
+        let mem = UidMap.find (uid signal) mem_map in
+        let we = UidMap.find (uid r.reg_enable) data_map in
+        let w = UidMap.find (uid m.mem_write_address) data_map in
+        let d = UidMap.find (uid (List.hd (deps signal))) data_map in
+        (fun () ->
+           (* XXX memories can have resets/clear etc as well *)
+           if Bits.to_int we = 1 then
+             Bits.copy mem.(Bits.to_int w) d
+        )
+      | _ -> failwith "error while compiling mem update"
+    in
+
+    let compile_reset signal = 
+      match signal with
+      | Signal_reg(_,r) ->
+        if r.reg_reset <> Signal.Comb.empty then
+          let tgt0 = UidMap.find (uid signal) data_map in
+          let tgt1 = UidMap.find (uid signal) reg_map in
+          let value = UidMap.find (uid r.reg_reset_value) data_map in
+          Some(fun () -> 
+              Bits.copy tgt0 value;
+              Bits.copy tgt1 value)
+        else 
+          None
+      | _ -> failwith "Only registers should have a reset"
+    in
+
+    let check_input signal = 
+      let signal_width = Signal.Comb.width signal in
+      let name = List.hd (names signal) in
+      let tgt = UidMap.find (uid signal) data_map in
+      (fun () ->
+         let data_width = Bits.width tgt in
+         if data_width != signal_width then
+           failwith 
+             (Printf.sprintf "'%s' has width %i but should be of width %i" 
+                name data_width signal_width))
+    in
+
+    (* compile the task list *)
+    log "compile tasks";
+    let tasks_check = map check_input bundle.inputs in
+    let tasks_comb = filter_none (map compile bundle.schedule) in
+    let tasks_regs = filter_none (map compile bundle.regs) in
+    let tasks_seq = (map compile_mem_update bundle.mems) @ 
+                    (map compile_reg_update bundle.regs) in
+
+    (* reset *)
+    log "compile reset";
+    let resets = filter_none (List.map compile_reset bundle.regs) in
+
+    log "ports";
+    let in_ports, out_ports, out_ports_cur, internal_ports = 
+      io_ports ~copy:(fun (n,p) -> n, zero (Bits.width p)) circuit data_map internal_ports
+    in
+
+    let task_out_ports_cur = 
+      (fun () -> List.iter2 (fun (_,pc) (_,pn) -> Bits.copy pc pn) out_ports_cur out_ports) 
+    in
+
+    log "done";
+
+    let sim_lookup_signal uid = ref (UidMap.find uid data_map) in
+    let sim_lookup_reg uid = ref (UidMap.find uid reg_map) in
+    let sim_lookup_memory uid = UidMap.find uid mem_map in
+
+    (* simulator structure *)
+    let task tasks = fun () -> (List.iter (fun f -> f()) tasks) in
+    let tasks tasks =
+      let t = List.map (fun t -> task t) tasks in
+      fun () -> List.iter (fun t -> t ()) t
+    in
+    let add_out_ref o = List.map (fun (n,b) -> n, ref b) o in
+    let in_ports, in_ports_task = 
+      let i = List.map (fun (n,b) -> n, ref (zero (Bits.width b))) in_ports in
+      let t () = List.iter2 (fun (_,tgt) (_,src) -> Bits.copy tgt !src) in_ports i in
+      i, t
+    in
+
+    {
+      sim_in_ports = in_ports;
+      sim_out_ports = add_out_ref out_ports_cur;
+      sim_out_ports_next = add_out_ref out_ports;
+      sim_internal_ports = add_out_ref internal_ports;
+      sim_cycle_check = task tasks_check;
+      sim_cycle_comb0 = tasks [[in_ports_task]; tasks_comb; tasks_regs; [task_out_ports_cur]];
+      sim_cycle_seq = task tasks_seq;
+      sim_cycle_comb1 = task tasks_comb;
+      sim_reset = task resets;
+      sim_lookup_signal;
+      sim_lookup_reg;
+      sim_lookup_memory;
+    }
 
 end
 

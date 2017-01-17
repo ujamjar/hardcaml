@@ -18,6 +18,24 @@ val scheduler : (signal -> signal list) -> signal list -> signal list -> signal 
 (** circuit searching *)
 val find_elements : Circuit.t -> (signal list * signal list * signal list * signal list * signal list)
 
+type signal_bundles =
+  {
+    schedule : Signal.Comb.t list;
+    internal_ports : Signal.Comb.t list;
+    regs : Signal.Comb.t list;
+    mems : Signal.Comb.t list;
+    consts : Signal.Comb.t list;
+    inputs : Signal.Comb.t list;
+    remaining : Signal.Comb.t list;
+    ready : Signal.Comb.t list;
+  }
+
+val get_maps :
+  ref:('a -> 'b) -> const:(string -> 'a) -> zero:(int -> 'a) -> bundle:signal_bundles ->
+  'b UidMap.t *
+  'b UidMap.t *
+  'a array UidMap.t
+
 (** Cycle based simulator type and API *)
 module Api : 
 sig
@@ -86,8 +104,7 @@ sig
 end
 
 (** Generate a simulator using the given Bits API *)
-module Make : functor (Bits : Comb.S) -> (
-sig
+module Make(Bits : Comb.S) : (sig
 
     type t
 
@@ -152,6 +169,20 @@ sig
     end
 
 end with type t = Bits.t)
+
+module MakeRaw(Bits : Bits.Raw.S) : sig
+
+  type cyclesim = Bits.t Api.cyclesim
+
+  type get_internal = (Signal.Types.signal -> bool) option
+  type run_inst = Signal.Types.instantiation -> Bits.t list -> Bits.t list
+  type get_inst = string -> run_inst option
+
+  val make : ?log:(string->unit) -> ?internal:get_internal -> 
+    ?inst:get_inst ->
+    Circuit.t -> cyclesim
+
+end
 
 module Sim_obj_if : sig
 
