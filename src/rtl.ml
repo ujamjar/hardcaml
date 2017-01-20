@@ -1590,30 +1590,37 @@ struct
         | Signal_inst(_,_,i) -> i.inst_name
         | _ -> failwith "expecting instantiation"
 
-    let rec write ?(transforms=[]) database path write_hdl circ = 
-        
-        let name = Circuit.name circ in
-        let fname = path ^ name ^ ".v" in
-        (* write this module *)
-        let circ = 
-            List.fold_left (fun circ fn ->
-                Transform.rewrite_circuit fn circ) circ transforms
-        in
-        write_hdl fname circ;
-        (* find instantiations *)
-        let insts = Circuit.search Circuit.id 
-            (fun l s -> if is_inst s then s::l else l)
-            [] (Circuit.outputs circ)
-        in
-        List.iter (fun inst -> (* XXX only write instantiations once for each unique name *)
-            let name = inst_name inst in
-            try
-                match Circuit.Hierarchy.get database name with
-                    | Some(c) -> write ~transforms:transforms database path write_hdl c
-                    | None -> ()
-            with 
-            | Circuit.Failure(e) -> failwith ("error generating " ^ name ^ ": " ^ e)
+    let rec write' ~transforms (seen : string list ref) database path write_hdl circ = 
+
+      let name = Circuit.name circ in
+      let fname = path ^ name ^ ".v" in
+      (* write this module *)
+      let circ = 
+        List.fold_left (fun circ fn ->
+            Transform.rewrite_circuit fn circ) circ transforms
+      in
+      write_hdl fname circ;
+      (* find instantiations *)
+      let insts = Circuit.search Circuit.id 
+          (fun l s -> if is_inst s then s::l else l)
+          [] (Circuit.outputs circ)
+      in
+      List.iter (fun inst -> (* XXX only write instantiations once for each unique name *)
+          let name = inst_name inst in
+          try
+            match Circuit.Hierarchy.get database name with
+            | Some(c) when not (List.mem name !seen) -> begin
+                seen := name :: !seen;
+              write' ~transforms:transforms seen database path write_hdl c
+            end
+            | _ -> ()
+          with 
+          | Circuit.Failure(e) -> failwith ("error generating " ^ name ^ ": " ^ e)
         ) insts
+
+    let write ?(transforms=[]) database path write_hdl circ = 
+      let seen = ref [] in
+      write' ~transforms seen database path write_hdl circ
 
 end
 
