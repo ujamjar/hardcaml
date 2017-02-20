@@ -153,7 +153,7 @@ let derive_clocks_and_resets circuit =
   unique_names (List.map snd clocks_and_resets)
 
 let load_sim vvp_file = 
-  let command = "`opam config var lib`/hardcaml-vpi/hardcaml_vvp.sh " ^ vvp_file in
+  let command = "`opam config var bin`/hardcaml_vvp.sh " ^ vvp_file in
   let _ = Unix.open_process_out command in
   ()
 
