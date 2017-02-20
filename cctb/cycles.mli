@@ -1,0 +1,2 @@
+val foo : unit -> unit
+

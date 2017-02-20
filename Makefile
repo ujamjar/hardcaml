@@ -5,6 +5,7 @@ WITH_CTYPES = $(shell if ocamlfind query ctypes >/dev/null 2>&1; then echo true;
 WITH_CTYPES_FOREIGN = $(shell if ocamlfind query ctypes-foreign >/dev/null 2>&1; then echo true; else echo false; fi)
 WITH_JSOO = $(shell if ocamlfind query js_of_ocaml >/dev/null 2>&1; then echo true; else echo false; fi)
 WITH_LWT = $(shell if ocamlfind query lwt >/dev/null 2>&1; then echo true; else echo false; fi)
+WITH_DELIMCC = $(shell if ocamlfind query delimcc >/dev/null 2>&1; then echo true; else echo false; fi)
 
 all: build
 
@@ -15,7 +16,8 @@ build:
 		--with-ctypes-foreign $(WITH_CTYPES_FOREIGN) \
 		--with-camlp4 $(WITH_CAMLP4) \
 		--with-js_of_ocaml $(WITH_JSOO) \
-		--with-lwt $(WITH_LWT)
+		--with-lwt $(WITH_LWT) \
+		--with-delimcc $(WITH_DELIMCC)
 
 clean:
 	ocaml pkg/pkg.ml clean

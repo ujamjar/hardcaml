@@ -8,6 +8,7 @@ let ctypes_foreign = Conf.with_pkg ~default:false "ctypes-foreign"
 let camlp4 = Conf.with_pkg ~default:false "camlp4"
 let js_of_ocaml = Conf.with_pkg ~default:false "js_of_ocaml"
 let lwt = Conf.with_pkg ~default:false "lwt"
+let delimcc = Conf.with_pkg ~default:false "delimcc"
 
 let mlpack ?cond name =  
   let dir = Fpath.dirname name in
@@ -51,11 +52,13 @@ let () =
   let camlp4 = Conf.value c camlp4 in
   let js_of_ocaml = Conf.value c js_of_ocaml in
   let lwt = Conf.value c lwt in
+  let delimcc = Conf.value c delimcc in
   Ok (
     mlpack "src/HardCaml" @
     mlpack "dynlink/HardCamlDynlink" @
     mlpack ~cond:(js_of_ocaml && lwt) "js/HardCamlJS" @
     mlpack ~cond:ctypes "csim/HardCamlCSim" @
+    mlpack ~cond:delimcc "cctb/HardCamlCCTB" @
     (if camlp4 then 
        [ Pkg.lib ~exts:Exts.(exts [".cmo"; ".cmx"; ".cmi"; ".cmti"]) "syntax/pa_hardcaml" ] 
      else [])
