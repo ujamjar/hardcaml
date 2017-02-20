@@ -23,6 +23,7 @@
 # delimcc testbenches
 "cctb": include
 <cctb/*.cmx> and not "cctb/HardCamlCCTB.cmx": for-pack(HardCamlCCTB)
+<cctb/*.ml{,i}>: package(delimcc)
 
 true: bin_annot, package(bytes), package(astring), safe_string
 
