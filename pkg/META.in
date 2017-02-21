@@ -50,3 +50,16 @@ package "csim" (
  exists_if = "HardCamlCSim.cma"
 )
 
+package "cctb" (
+ version = "%{version}%"
+ description = "Hardware in OCaml - delimcc based testbenches"
+ requires = "hardcaml delimcc"
+ archive(byte) = "HardCamlCCTB.cma"
+ archive(byte, plugin) = "HardCamlCCTB.cma"
+ archive(native) = "HardCamlCCTB.cmxa"
+ archive(native, plugin) = "HardCamlCCTB.cmxs"
+ exists_if = "HardCamlCCTB.cma"
+)
+
+
+
