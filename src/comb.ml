@@ -759,10 +759,11 @@ struct
         | _ -> failwith ("Invalid verilog style constant bad control character " ^ s)
 
     let const b = 
-        try
-            try constv b
-            with _ -> constb b
-        with _ -> failwith ("Cant convert constant " ^ b ^ " using verilog or binary formatting")
+      let b = String.filter ((<>)'_') b in
+      try
+        try constv b
+        with _ -> constb b
+      with _ -> failwith ("Cant convert constant " ^ b ^ " using verilog or binary formatting")
 
     let rec srand bits = 
         if bits <= 16 then consti bits (Random.int (1 lsl bits))
