@@ -1,3 +1,10 @@
+(*
+  > utop
+  $ #require "hardcaml,ppx_deriving_hardcaml,ppx_let";;
+  $ #use "test/recipes.ml";;
+  $ Test_mult.test ();;
+  $ Test_sha1.test ();;
+*)
 open HardCaml
 open Signal.Comb
 open Recipe
@@ -5,21 +12,37 @@ open Monad
 
 module B = Bits.Comb.IntbitsList
 module S = Cyclesim.Api
-module Vcd = Vcd_ext.Make(B)
+module Vcd = Vcd.Gtkwave(B)
 
+module Let_syntax = struct
+  type 'a t = 'a recipe
+  let return x = Monad.return
+  let bind e f = Monad.bind e f
+end
 module Test_mult = struct
 
   (* interface to the serial multiplier *)
-  module I = interface
-    start[1] a[8] b[8]
+  module I = struct
+    type 'a t = {
+      start : 'a[@bits 1]; 
+      a : 'a[@bits 8];
+      b : 'a[@bits 8];
+    }[@@deriving hardcaml]
   end
 
-  module O = interface
-    fin[1] mult[8]
+  module O = struct
+    type 'a t = {
+      fin : 'a[@bits 1];
+      mult : 'a[@bits 8];
+    }[@@deriving hardcaml]
   end
 
-  module State = interface
-    a[8] b[8] acc[8]
+  module State = struct
+    type 'a t = {
+      a : 'a[@bits 8];
+      b : 'a[@bits 8];
+      acc : 'a[@bits 8];
+    }[@@deriving hardcaml]
   end
   module SState = Same(State)
 
@@ -31,7 +54,7 @@ module Test_mult = struct
 
   let mult a_in b_in = 
     let open State in
-    perform 
+    (*perform 
       (* create registers *)
       state <-- SState.newVar();
       (* set inputs and clear accumulator *)
@@ -42,6 +65,17 @@ module Test_mult = struct
       (* return output *)
       acc <-- SVar.read state.acc;
       return acc
+    *)
+    let%bind state = SState.newVar () in
+    let%bind () = SState.apply (fun _ -> { a=a_in; b=b_in; acc=zero 8 }) state in
+    (* serial multiplier *)
+    let%bind () = 
+      SVar.while_ (fun b -> b <>:. 0) state.b 
+        SState.(apply step state)
+    in
+    (* return output *)
+    let%bind acc = SVar.read state.acc in
+    return acc
 
   let top i = 
     let fin, mult = follow i.I.start @@ mult i.I.a i.I.b in
@@ -53,7 +87,7 @@ module Test_mult = struct
 
   let test () =
     let open I in
-    let circ,sim,i,o = G.make "serial_mult" top in
+    let circ,sim,i,o,_ = G.make "serial_mult" top in
     (*let () = Rtl.Verilog.write print_string circ*) 
 
     let sim = Vcd.gtkwave ~args:"-S test/gwShowall.tcl" sim in
@@ -75,53 +109,64 @@ end
 (* need arrays, indexed by signals, to complete this *)
 module Test_sha1 = struct
 
-  module I = interface
-    start[1] d[32] d_valid[1]
+  module I = struct
+    type 'a t = {
+      start : 'a[@bits 1];
+      d : 'a[@bits 32];
+      d_valid : 'a[@bits 1];
+    }[@@deriving hardcaml]
   end
 
-  module O = interface
-    fin[1] hash{|5|}[32] redundant[1]
+  module O = struct
+    type 'a t = {
+      fin : 'a[@bits 1];
+      hash : 'a array[@length 5][@bits 32];
+      redundant : 'a[@bits 1];
+    }[@@deriving hardcaml]
   end
 
-  module State = interface
-    counter[7] h{|5|}[32] (*w{|16|}[32]*)
+  module State = struct
+    type 'a t = {
+      counter : 'a[@bits 7];
+      h : 'a array[@length 5][@bits 32];
+      (*w{|16|}[32]*)
+    }[@@deriving hardcaml]
   end
   module SState = Same(State)
 
   let sha1 i = 
     let open I in
     let open State in
-    perform
-      state <-- SState.newVar();
-      (* reset state *)
-      SState.apply (fun _ -> 
-        { 
-          counter=zero 7; 
-          h=Array.map (consti32 32) 
-            [| 0x67452301l; 0xEFCDAB89l; 0x98BADCFEl; 0x10325476l; 0xC3D2E1F0l |];
-          (*w=Array.init 16 (fun _ -> consti 32 0);*)
-        }) state;
-      SVar.while_ (fun s -> s <:. 16) state.counter
-        begin perform
-          (SVar.apply (fun d -> d +:. 1) state.counter);
-        end;
-      SState.while_ (fun s -> s.counter <:. 20) state
-        begin perform
-          SVar.apply (fun d -> d +:. 1) state.counter;
-        end;
-      SState.while_ (fun s -> s.counter <:. 40) state
-        begin perform
-          SVar.apply (fun d -> d +:. 1) state.counter;
-        end;
-      SState.while_ (fun s -> s.counter <:. 60) state
-        begin perform
-          SVar.apply (fun d -> d +:. 1) state.counter;
-        end;
-      SState.while_ (fun s -> s.counter <:. 80) state
-        begin perform
-          SVar.apply (fun d -> d +:. 1) state.counter;
-        end;
-      SState.read state
+    let%bind state = SState.newVar() in
+    (* reset state *)
+    let%bind () = SState.apply (fun _ -> 
+      { 
+        counter=zero 7; 
+        h=Array.map (consti32 32) 
+          [| 0x67452301l; 0xEFCDAB89l; 0x98BADCFEl; 0x10325476l; 0xC3D2E1F0l |];
+        (*w=Array.init 16 (fun _ -> consti 32 0);*)
+      }) state in
+    let%bind () = SVar.while_ (fun s -> s <:. 16) state.counter
+      begin 
+        (SVar.apply (fun d -> d +:. 1) state.counter);
+      end in
+    let%bind () = SState.while_ (fun s -> s.counter <:. 20) state
+      begin 
+        SVar.apply (fun d -> d +:. 1) state.counter;
+      end in
+    let%bind () = SState.while_ (fun s -> s.counter <:. 40) state
+      begin 
+        SVar.apply (fun d -> d +:. 1) state.counter;
+      end in
+    let%bind () = SState.while_ (fun s -> s.counter <:. 60) state
+      begin 
+        SVar.apply (fun d -> d +:. 1) state.counter;
+      end in
+    let%bind () = SState.while_ (fun s -> s.counter <:. 80) state
+      begin 
+        SVar.apply (fun d -> d +:. 1) state.counter;
+      end in
+    SState.read state
 
   let top i = 
     let fin, state = follow i.I.start @@ sha1 i in
@@ -135,7 +180,7 @@ module Test_sha1 = struct
 
   let test () =
     let open I in
-    let circ,sim,i,o = G.make "sha1" top in
+    let circ,sim,i,o,_ = G.make "sha1" top in
 
     let sim = Vcd.gtkwave ~args:"-S test/gwShowall.tcl" sim in
     let enable = S.in_port sim "enable" in
