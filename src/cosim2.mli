@@ -87,10 +87,10 @@ module Modelsim : sig
   val compile : string list -> string -> unit
 
   (** load vvp file into simulator along with vpi object *)
-  val load_sim : string -> unit
+  val load_sim : ?opts:string -> string -> unit
 
   (** compile circuit and load simulation *)
-  val compile_and_load_sim : ?dump_file:string -> Circuit.t -> unit
+  val compile_and_load_sim : ?dump_file:string -> ?opts:string -> Circuit.t -> unit
 
 end
 
@@ -107,10 +107,11 @@ module Make(B : Comb.S) : sig
     B.t Cyclesim.Api.cyclesim
 
   (** create simulator from hardcaml circuit *)
-  val make : ?dump_file:string -> Circuit.t -> B.t Cyclesim.Api.cyclesim
+  val make : ?dump_file:string -> ?opts:string -> Circuit.t -> B.t Cyclesim.Api.cyclesim
 
   (** load icarus vvp simulation *) 
   val load : 
+    ?opts:string ->
     clocks:(string * int) list -> resets:(string * int) list -> 
     inputs:(string * int) list -> outputs:(string * int) list ->
     string -> B.t Cyclesim.Api.cyclesim

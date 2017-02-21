@@ -53,29 +53,45 @@ module Comms = struct
   (* send value stored in byte buffer *)
   let send sock bytes = ignore @@ write sock bytes 0 (Bytes.length bytes)
 
+  let add_int b v = 
+    for i=0 to 3 do
+      Buffer.add_char b (Char.of_byte ((v lsr (i*8)) land 255));
+    done
+
   let send_int = 
-    let b = Bytes.create 4 in
+    let b = Buffer.create 4 in
     (fun socket v ->
-      for i=0 to 3 do
-        Bytes.set b i (Char.of_byte ((v lsr (i*8)) land 255));
-      done;
-      send socket b)
+      Buffer.reset b;
+      add_int b v;
+      send socket (Buffer.to_bytes b))
+
+  let add_int32 b v = 
+    for i=0 to 3 do
+      Buffer.add_char b (Char.of_byte Int32.(to_int (logand (shift_right v (i*8)) 255l)));
+    done
 
   let send_int32 = 
-    let b = Bytes.create 4 in
+    let b = Buffer.create 4 in
     (fun socket v ->
-      for i=0 to 3 do
-        Bytes.set b i (Char.of_byte Int32.(to_int (logand (shift_right v (i*8)) 255l)));
-      done;
-      send socket b)
+      Buffer.reset b;
+      add_int32 b v;
+      send socket (Buffer.to_bytes b))
+
+  let add_int64 b v = 
+    for i=0 to 7 do
+      Buffer.add_char b (Char.of_byte Int64.(to_int (logand (shift_right v (i*8)) 255L)));
+    done
 
   let send_int64 =
-    let b = Bytes.create 8 in
+    let b = Buffer.create 8 in
     (fun socket v ->
-      for i=0 to 7 do
-        Bytes.set b i (Char.of_byte Int64.(to_int (logand (shift_right v (i*8)) 255L)));
-      done;
-      send socket b)
+      Buffer.reset b;
+      add_int64 b v;
+      send socket (Buffer.to_bytes b))
+
+  let add_string b s = 
+    add_int b (String.length s);
+    Buffer.add_string b s
 
   let send_string socket str = 
     send_int socket (String.length str);
@@ -134,22 +150,26 @@ end
 let _FINISH = 0
 let _RUN = 1
 
+let buf = Buffer.create 1024
+
 let control server message = 
   match message with
   | Finish -> ignore @@ Comms.send_int server _FINISH; []
   | Run{gets;sets;delta_time} -> begin
-    ignore @@ Comms.send_int server _RUN;
-    ignore @@ Comms.send_int64 server delta_time;
-    ignore @@ Comms.send_int server (List.length sets);
-    ignore @@ Comms.send_int server (List.length gets);
+    Buffer.reset buf;
+    ignore @@ Comms.add_int buf _RUN;
+    ignore @@ Comms.add_int64 buf delta_time;
+    ignore @@ Comms.add_int buf (List.length sets);
+    ignore @@ Comms.add_int buf (List.length gets);
     List.iter 
       (fun (idx,b) -> 
-        ignore @@ Comms.send_int server idx;
-        List.iter (fun b -> ignore @@ Comms.send_int32 server b) b)
+        ignore @@ Comms.add_int buf idx;
+        List.iter (fun b -> ignore @@ Comms.add_int32 buf b) b)
       sets;
     List.iter 
-      (fun idx -> ignore @@ Comms.send_int server idx) 
+      (fun idx -> ignore @@ Comms.add_int buf idx) 
       gets;
+    Comms.send server (Buffer.to_bytes buf);
     List.map 
       (fun idx -> 
         let words = Comms.recv_int server in
@@ -261,14 +281,16 @@ module Modelsim = struct
     | Unix.WEXITED(0) -> ()
     | _ -> failwith ("Failed to compile verilog with modelsim")
    
-  let load_sim tb =  
+  let load_sim ?(opts="-c -do \"run -a\"")  tb =  
     let command = 
-      "vsim -c -pli `opam config var hardcaml-vpi:lib`/hc_mti.vpi "^tb^" -do \"run -a\""
+      "vsim -pli `opam config var hardcaml-vpi:lib`/hc_mti.vpi " ^ 
+      opts ^ " " ^
+      tb  
     in
     let _ = Unix.open_process_out command in
     ()
 
-  let compile_and_load_sim ?dump_file circuit = 
+  let compile_and_load_sim ?dump_file ?opts circuit = 
     let verilog_file_name = Filename.temp_file "hardcaml_cosim_" "_verilog" in
     let () = at_exit (fun _ -> Unix.unlink verilog_file_name) in
     (* write RTL and testbench *)
@@ -280,7 +302,7 @@ module Modelsim = struct
     let () = compile [verilog_file_name] "" in
     (* load simulation *)
     let name = Circuit.name circuit ^ "_hardcaml_testbench" in
-    load_sim name
+    load_sim ?opts name
 
 end
 
@@ -405,7 +427,7 @@ module Make(B : Comb.S) = struct
     })
 
   (* create simulator from hardcaml circuit *)
-  let make ?dump_file circuit = 
+  let make ?dump_file ?opts circuit = 
     let open Signal.Types in
 
     (* query circuit for ports *)
@@ -419,7 +441,7 @@ module Make(B : Comb.S) = struct
     let outputs = List.map get_port (Circuit.outputs circuit) in
  
     (* initialize server and simulation *)
-    let server, nets = init_sim (fun () -> SIM.compile_and_load_sim ?dump_file circuit) inputs in
+    let server, nets = init_sim (fun () -> SIM.compile_and_load_sim ?dump_file ?opts circuit) inputs in
 
     (* create simulation object *)
     let clocks, resets = derive_clocks_and_resets circuit in
@@ -434,9 +456,9 @@ module Make(B : Comb.S) = struct
     let clocks, resets = List.map (fun n -> n,1) clocks, List.map (fun n -> n,1) resets in
     make_sim_obj ~server ~clocks ~resets ~inputs ~outputs ~nets
 
-  let load ~clocks ~resets ~inputs ~outputs vvp_file =
+  let load ?opts ~clocks ~resets ~inputs ~outputs vvp_file =
     (* initialize server and simulation *)
-    let server, nets = init_sim (fun () -> SIM.load_sim vvp_file) (clocks@resets@inputs) in
+    let server, nets = init_sim (fun () -> SIM.load_sim ?opts vvp_file) (clocks@resets@inputs) in
 
     (* create simulation object *)
     make_sim_obj ~server ~clocks ~resets ~inputs ~outputs ~nets
