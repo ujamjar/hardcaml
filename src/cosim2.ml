@@ -323,7 +323,7 @@ module Make(B : Comb.S) = struct
       | h::[] -> assert (w <= 32); [B.consti32 w h]
       | h::t -> assert (w > 32); (B.consti32 32 h :: f (w-32) t)
     in
-    B.concat (List.rev (f w x))
+    B.concat (f w x)
 
   let rec read_nets server = 
     let idx = Comms.recv_int server in
