@@ -25,5 +25,10 @@
 <cctb/*.cmx> and not "cctb/HardCamlCCTB.cmx": for-pack(HardCamlCCTB)
 <cctb/*.ml{,i}>: package(delimcc)
 
+# lwt testbenches
+"lwttb": include
+<lwttb/*.cmx> and not "lwttb/HardCamlLWTTB.cmx": for-pack(HardCamlLWTTB)
+<lwttb/*.ml{,i}>: package(lwt), package(lwt.ppx)
+
 true: bin_annot, package(bytes), package(astring), safe_string
 

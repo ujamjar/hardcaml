@@ -3,4 +3,6 @@ SRC test
 PKG ctypes.foreign
 PKG astring
 PKG topkg
+PKG lwt
+PKG lwt.ppx
 B _build/src

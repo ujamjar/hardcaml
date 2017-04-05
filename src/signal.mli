@@ -522,3 +522,8 @@ end
 (** Generate register logic parameterised over reset/clear/enable types and defaults *)
 module Make_seq(S : Seq_spec) : Seq
 
+val seq_sync : clk:Types.signal -> clr:Types.signal -> (module Seq)
+val seq_async : clk:Types.signal -> rst:Types.signal -> (module Seq)
+val seq_full : clk:Types.signal -> rst:Types.signal -> clr:Types.signal -> (module Seq)
+val seq_none : clk:Types.signal -> (module Seq)
+

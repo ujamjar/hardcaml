@@ -381,20 +381,31 @@ module Make(B : Comb.S) = struct
     let clocks_1 = List.map (fun (n,_) -> find n, to_i32l B.vdd) clocks in
     let clocks_0 = List.map (fun (n,_) -> find n, to_i32l B.gnd) clocks in
     let get_outputs = List.map (fun (_,n,_,_) -> n) outputs in
+    (*let timer = ref (Unix.gettimeofday()) in
+    let upd_timer () = 
+      let time = Unix.gettimeofday() in
+      let diff = time -. !timer in
+      timer := time;
+      diff
+    in*)
     let fcycle () = 
       let set_inputs = List.map (fun (_,n,v) -> n, to_i32l !v) inputs in
       let _ = control server
         (Run { sets = clocks_1; gets = []; delta_time = 0L; })
       in
+      (*let t0 = upd_timer () in*)
       let _ = control server 
         (Run { sets = set_inputs; gets = []; delta_time = 5L; })
       in
+      (*let t1 = upd_timer () in*)
       let res = control server
         (Run { sets = clocks_0; gets = get_outputs; delta_time = 5L; })
       in
       List.iter2 
         (fun (_,n,b,v) (n',v') -> assert (n = n'); v := of_i32l b v')
-        outputs res
+        outputs res;
+      (*let t2 = upd_timer () in
+      Printf.printf "%6f %6f %6f\n%!" t0 t1 t2;*)
     in
 
     (* reset update *)

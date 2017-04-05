@@ -100,6 +100,27 @@ module Gen_cosim(B : Comb.S)(I : S)(O : S) = struct
 
 end
 
+module Gen_cosim2(B : Comb.S)(I : S)(O : S) = struct
+
+    module S = Cosim2.Make(B)
+    module Cs = Cyclesim.Api
+
+    let make name logic = 
+        let outputs = logic I.(map (fun (n,b) -> Signal.Comb.input n b) t) in 
+        let circuit = Circuit.make name 
+            (O.to_list (O.map2 (fun (n,_) s -> Signal.Comb.output n s) O.t outputs))
+        in
+        let sim = S.make 
+            ~dump_file:(name ^ ".vcd")
+            circuit in
+        let inputs = I.(map (fun (n,b) -> try Cs.in_port sim n with _ -> ref B.(zero b)) t) in
+        let outputs = O.(map (fun (n,b) -> try Cs.out_port sim n with _ -> ref B.(zero b)) t) in
+        let next = O.(map (fun (n,b) -> try Cs.out_port_next sim n with _ -> ref B.(zero b)) t) in
+        circuit, sim, inputs, outputs, next
+
+end
+
+
 module Circ(I : S)(O : S) = struct
     let make name logic = 
         let outputs = logic I.(map (fun (n,b) -> Signal.Comb.input n b) t) in 

@@ -59,6 +59,7 @@ let () =
     mlpack ~cond:(js_of_ocaml && lwt) "js/HardCamlJS" @
     mlpack ~cond:ctypes "csim/HardCamlCSim" @
     mlpack ~cond:delimcc "cctb/HardCamlCCTB" @
+    mlpack ~cond:lwt "lwttb/HardCamlLWTTB" @
     (if camlp4 then 
        [ Pkg.lib ~exts:Exts.(exts [".cmo"; ".cmx"; ".cmi"; ".cmti"]) "syntax/pa_hardcaml" ] 
      else [])

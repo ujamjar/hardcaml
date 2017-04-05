@@ -1425,3 +1425,50 @@ module Make_seq(S : Seq_spec) = struct
 
 end
 
+let seq_sync, seq_async, seq_full, seq_none = 
+  let open Types in
+  let open Seq in
+
+  let sync ~clk ~clr = 
+    let module S = Make_seq(struct
+      let reg_spec = { r_sync with reg_clock = clk; reg_clear = clr }
+      let ram_spec = r_none
+    end) in
+    (module S : Seq) 
+  in
+
+  let async ~clk ~rst = 
+    let module S = Make_seq(struct
+      let reg_spec = { r_async with reg_clock = clk; reg_reset = rst }
+      let ram_spec = r_none
+    end) in
+    (module S : Seq) 
+  in
+
+  let full ~clk ~rst ~clr = 
+    let module S = Make_seq(struct
+      let reg_spec = { r_full with reg_clock = clk; reg_reset = rst; reg_clear = clr }
+      let ram_spec = r_none
+    end) in
+    (module S : Seq) 
+  in
+
+  let none ~clk = 
+    let module S = Make_seq(struct
+      let reg_spec = { r_none with reg_clock = clk }
+      let ram_spec = r_none
+    end) in
+    (module S : Seq) 
+  in
+
+  sync, 
+  async,
+  full,
+  none
+
+
+
+
+
+
+

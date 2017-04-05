@@ -52,7 +52,7 @@ package "csim" (
 
 package "cctb" (
  version = "%{version}%"
- description = "Hardware in OCaml - delimcc based testbenches"
+ description = "Hardware in OCaml - delimcc based testbenches (experimental, optional)"
  requires = "hardcaml delimcc"
  archive(byte) = "HardCamlCCTB.cma"
  archive(byte, plugin) = "HardCamlCCTB.cma"
@@ -61,5 +61,15 @@ package "cctb" (
  exists_if = "HardCamlCCTB.cma"
 )
 
+package "lwttb" (
+ version = "%{version}%"
+ description = "Hardware in OCaml - lwt based testbenches (experimental, optional)"
+ requires = "hardcaml lwt"
+ archive(byte) = "HardCamlLWTTB.cma"
+ archive(byte, plugin) = "HardCamlLWTTB.cma"
+ archive(native) = "HardCamlLWTTB.cmxa"
+ archive(native, plugin) = "HardCamlLWTTB.cmxs"
+ exists_if = "HardCamlLWTTB.cma"
+)
 
 
