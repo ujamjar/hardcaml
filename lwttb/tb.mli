@@ -49,12 +49,22 @@ end
 
 module type S = sig
 
+  (** simulation state type *)
   type state
+
+  (** bit vector type used to implement simulator calculations *)
   type b
+
+  (** circuit inputs *)
   type 'a i
+
+  (** circuit outputs *)
   type 'a o
 
+  (* simulator reset function *)
   type reset = unit -> state
+
+  (* simulator cycle function *)
   type cycle = state -> b i -> state * b o * b o
     
   type task_req  
@@ -64,7 +74,7 @@ module type S = sig
     {
       (* mailbox variables used to synchronise to the clock cycle *)
       vreq : task_req Lwt_mvar.t;
-      vresp : b o Lwt_mvar.t;
+      vresp : (b o * b o) Lwt_mvar.t;
       (* child tasks *)
       children : t list;
       (* inputs *)
@@ -81,10 +91,10 @@ module type S = sig
   (* {2 cycles, task spawning and utility functions} *)
 
   (** cycle the clock, return circuit outputs *)
-  val cycle1 : t -> (t * b o) Lwt.t
+  val cycle1 : t -> (t * b o * b o) Lwt.t
 
   (** cycle the clock n>=1 times *)
-  val cycle : ?n:int -> t -> (t * b o) Lwt.t
+  val cycle : ?n:int -> t -> (t * b o * b o) Lwt.t
 
   (** spawn a new simulation task synchronised to each cycle *)
   val spawn : ?log:log -> task -> t -> t Lwt.t
@@ -127,7 +137,7 @@ end
 
 module Make(State : State) (B : Comb.S)(I : Interface.S)(O : Interface.S) : 
   S with type state = State.state
-      and type b = B.t 
-      and type 'a i = 'a I.t 
-      and type 'a o = 'a O.t
+     and type b = B.t 
+     and type 'a i = 'a I.t 
+     and type 'a o = 'a O.t
 
