@@ -16,68 +16,43 @@ module type S = sig
 
   type task_req  
 
-  (** simulation testbench data type *)
   type t = private
     {
-      (* mailbox variables used to synchronise to the clock cycle *)
       vreq : task_req Lwt_mvar.t;
-      vresp : b o Lwt_mvar.t;
-      (* child tasks *)
+      vresp : (b o * b o) Lwt_mvar.t;
       children : t list;
-      (* inputs *)
       inputs : b option i;
-      (* cycle logging function *)
       log : log option;
     }
 
   and log = t -> unit Lwt.t
 
-  (** type of simulation tasks synchronised to the clock *)
   type task = t -> t Lwt.t
 
-  (* {2 cycles, task spawning and utility functions} *)
+  val cycle1 : t -> (t * b o * b o) Lwt.t
 
-  (** cycle the clock, return circuit outputs *)
-  val cycle1 : t -> (t * b o) Lwt.t
+  val cycle : ?n:int -> t -> (t * b o * b o) Lwt.t
 
-  (** cycle the clock n>=1 times *)
-  val cycle : ?n:int -> t -> (t * b o) Lwt.t
-
-  (** spawn a new simulation task synchronised to each cycle *)
   val spawn : ?log:log -> task -> t -> t Lwt.t
 
-  (** [repeat n task sim] repeats the task n times *)
   val repeat : int -> task -> t -> t Lwt.t
 
-  (** [delay n task sim] delay for n cycles then run task *)
   val delay : int -> task -> t -> t Lwt.t
 
-  (** [Lwt.return] *)
   val return : 'a -> 'a Lwt.t
 
-  (** perform a simulation cycle and return *)
   val return_cycle : t -> t Lwt.t
 
-  (** {2 setting circuit inputs} *)
-
-  (** input field accessors *)
   val i : bool i i
 
-  (** input structure with all fields set to none *)
   val inone : b option i
 
-  (** set an input field *)
   val set : bool i -> b -> t -> t Lwt.t
 
-  (** set some inputs *)
   val setsome : b option i -> t -> t Lwt.t
 
-  (** set all inputs *)
   val setall : b i -> t -> t Lwt.t
 
-  (** {2 testbench simulation} *)
-
-  (** run testbench *)
   val run : ?log:log -> (reset * cycle) -> task -> unit Lwt.t
 
 end
@@ -101,7 +76,7 @@ module Make(State : State)(B : Comb.S)(I : Interface.S)(O : Interface.S) = struc
     {
       (* mailbox variables used to synchronise to the clock cycle *)
       vreq : task_req Lwt_mvar.t;
-      vresp : B.t O.t Lwt_mvar.t;
+      vresp : (B.t O.t * B.t O.t) Lwt_mvar.t;
       (* child tasks *)
       children : t list;
       (* inputs *)
@@ -143,25 +118,25 @@ module Make(State : State)(B : Comb.S)(I : Interface.S)(O : Interface.S) = struc
     (* notify parent *)
     let%lwt () = Lwt_mvar.put t.vreq (Cycle inputs) in
     (* wait for state from parent *)
-    let%lwt o = Lwt_mvar.take t.vresp in
+    let%lwt o, n = Lwt_mvar.take t.vresp in
     (* broadcast to children *)
-    let%lwt () = Lwt_list.iter_p (fun t -> Lwt_mvar.put t.vresp o) children in
+    let%lwt () = Lwt_list.iter_p (fun t -> Lwt_mvar.put t.vresp (o, n)) children in
     let t = { t with children; inputs=inone } in
-    Lwt.return (t,o)
+    Lwt.return (t, o, n)
 
   let rec cycle ?(n=1) t = 
     if n < 1 then Lwt.fail_with "cycle must be for >= 1 cycle"
     else if n = 1 then
       cycle1 t
     else
-      cycle1 t >>= fun (t,_) -> cycle ~n:(n-1) t
+      cycle1 t >>= fun (t,_,_) -> cycle ~n:(n-1) t
 
   let rec with_finish t = 
     if t.children = [] then 
       Lwt_mvar.put t.vreq Finish >> Lwt.return t
     else
       (* keep running while children are active *)
-      let%lwt t,_ = cycle1 t in
+      let%lwt t,_,_ = cycle1 t in
       with_finish t
 
   let task' ?log () = 
@@ -192,7 +167,7 @@ module Make(State : State)(B : Comb.S)(I : Interface.S)(O : Interface.S) = struc
   let rec delay n f t = 
     if n <= 0 then f t
     else
-      cycle t >>= fun (t,_) -> delay (n-1) f t
+      cycle t >>= fun (t,_,_) -> delay (n-1) f t
 
   let i = 
     I.map (fun (n,_) -> I.map (fun (m,_) -> n=m) I.t) I.t
@@ -207,7 +182,7 @@ module Make(State : State)(B : Comb.S)(I : Interface.S)(O : Interface.S) = struc
 
   let return = Lwt.return
 
-  let return_cycle sim = cycle1 sim >>= fun (sim,_) -> return sim
+  let return_cycle sim = cycle1 sim >>= fun (sim,_,_) -> return sim
 
   let run ?log (reset, cycle) task =
  
@@ -224,9 +199,9 @@ module Make(State : State)(B : Comb.S)(I : Interface.S)(O : Interface.S) = struc
                              | Some(d) -> d) prev inputs
         in
         (* simulation cycle *)
-        let sim,_,o = cycle sim inputs in
+        let sim, o, n = cycle sim inputs in
         (* send back outputs *)
-        let%lwt () = Lwt_mvar.put t.vresp o in
+        let%lwt () = Lwt_mvar.put t.vresp (o, n) in
         (* loop *)
         loop inputs sim
       end

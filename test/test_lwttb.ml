@@ -39,13 +39,13 @@ let test_cntr sim =
   let%lwt sim = set i.clr B.gnd sim in
   let%lwt sim = set i.ena B.vdd sim in
   let print sim = 
-    let%lwt sim,o = cycle sim in
+    let%lwt sim,_,o = cycle sim in
     let%lwt () = Lwt_io.printf "%i\n" (B.to_int o.cnt) in
     return sim
   in
   let%lwt sim = repeat 5 print sim in
   let%lwt sim = set i.clr B.vdd sim in
-  let%lwt sim,_ = cycle sim in
+  let%lwt sim,_,_ = cycle sim in
   let%lwt sim = set i.clr B.gnd sim in
   let%lwt sim = repeat 5 print sim in
   return sim
@@ -79,7 +79,7 @@ let test_spawner sim =
 
   let%lwt sim = repeat 5
     (fun sim -> 
-      cycle1 sim >>= fun (sim,o) -> 
+      cycle1 sim >>= fun (sim,_,o) -> 
       Lwt_io.printf "[%i]\n" (B.to_int o.cnt) >> 
       return sim) sim 
   in
