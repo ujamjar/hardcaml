@@ -1146,12 +1146,12 @@ module Statemachine = struct
         failwith "couldn't find state"
     in
     let next_state s = state_var $== (state_val s) in
-    let state_var = state_var#q (*-- "state_binary"*) in
     let switch cases = 
-      g_switch (state_var) 
+      g_switch (state_var#q) 
         (List.map (fun (s, c) -> state_val s, c) cases)
     in
-    (fun s -> state_val s ==: state_var),
+    state_var,
+    (fun s -> state_val s ==: state_var#q),
     switch, next_state
 
   let statemachine_onehot rspec enable states = 
@@ -1181,14 +1181,14 @@ module Statemachine = struct
         failwith "couldn't find state"
     in
     let next_state s = state_var $== snd (state_val s) in
-    let state_var = state_var#q (*-- "state_onehot"*) in
     let switch cases = 
       g_proc
         (List.map (fun (s, c) ->
           let i, _ = state_val s in
-          g_when (bit state_var i) c) cases)
+          g_when (bit state_var#q i) c) cases)
     in
-    (fun s -> bit state_var (fst (state_val s))),
+    state_var,
+    (fun s -> bit state_var#q (fst (state_val s))),
     switch, next_state
 
   let statemachine_gray rspec enable states = 
@@ -1213,19 +1213,23 @@ module Statemachine = struct
         failwith "couldn't find state"
     in
     let next_state s = state_var $== (state_val s) in
-    let state_var = state_var#q (*-- "state_gray"*) in
     let switch cases = 
-      g_switch state_var 
+      g_switch state_var#q
         (List.map (fun (s, c) -> state_val s, c) cases)
     in
-    (fun s -> state_val s ==: state_var),
+    state_var,
+    (fun s -> state_val s ==: state_var#q),
     switch, next_state
 
-  let statemachine ?(encoding=`binary) = 
+  let statemachinev ?(encoding=`binary) = 
     match encoding with
     | `binary -> statemachine_binary
     | `onehot -> statemachine_onehot
     | `gray -> statemachine_gray 
+
+  let statemachine ?encoding s e l = 
+    let _,a,b,c = statemachinev ?encoding s e l in
+    a,b,c
 
 end
 
@@ -1275,11 +1279,21 @@ module type Seq = sig
         ?ge:signal ->
         n:int -> e:signal -> int -> variable
 
+    val statemachinev : 
+        ?clk:signal -> ?clkl:signal ->
+        ?r:signal -> ?rl:signal -> ?rv:signal ->
+        ?c:signal -> ?cl:signal -> ?cv:signal ->
+        ?ge:signal ->
+        ?encoding:[ `binary | `onehot | `gray ] ->
+        e:signal -> 'a list -> 
+        (variable * ('a -> signal) * ('a cases -> statement) * ('a -> statement))
+
     val statemachine : 
         ?clk:signal -> ?clkl:signal ->
         ?r:signal -> ?rl:signal -> ?rv:signal ->
         ?c:signal -> ?cl:signal -> ?cv:signal ->
         ?ge:signal ->
+        ?encoding:[ `binary | `onehot | `gray ] ->
         e:signal -> 'a list -> 
         (('a -> signal) * ('a cases -> statement) * ('a -> statement))
 
@@ -1379,14 +1393,22 @@ module Make_seq(S : Seq_spec) = struct
         ?ge ~n ~e w =
         let spec = make_spec ?clk ?clkl ?r ?rl ?rv ?c ?cl ?cv ?ge S.reg_spec in
         Guarded.g_pipeline n spec e w
+
+    let statemachinev
+        ?clk ?clkl 
+        ?r ?rl ?rv 
+        ?c ?cl ?cv 
+        ?ge ?encoding ~e states =
+        let spec = make_spec ?clk ?clkl ?r ?rl ?rv ?c ?cl ?cv ?ge S.reg_spec in
+        Statemachine.statemachinev ?encoding spec e states
  
     let statemachine
         ?clk ?clkl 
         ?r ?rl ?rv 
         ?c ?cl ?cv 
-        ?ge ~e states =
+        ?ge ?encoding ~e states =
         let spec = make_spec ?clk ?clkl ?r ?rl ?rv ?c ?cl ?cv ?ge S.reg_spec in
-        Statemachine.statemachine spec e states
+        Statemachine.statemachine ?encoding spec e states
  
     let memory
         ?clk ?clkl 

@@ -15,6 +15,21 @@ module type Rtl_S = sig
   val write : (string -> unit) -> Circuit.t -> unit
 end
 
+module type OrderedString = (Map.OrderedType with type t = string)
+
+(* control mapping of signals to their (various) names *)
+module type SignalNaming = sig
+    (* identifier case sensitivity *)
+    module Case : OrderedString
+    (* given a name, turn it into a legal identifier *)
+    val prefix : string
+    val reserved : string list
+    val legalize : string -> string
+end
+
+module VerilogNames : SignalNaming
+module VhdlNames : SignalNaming
+
 (** VHDL generation *)
 module Vhdl : Rtl_S
 

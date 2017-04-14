@@ -422,6 +422,15 @@ end
 (** (revised) statemachine generator *)
 module Statemachine : sig
 
+  val statemachinev : ?encoding:[ `binary | `onehot | `gray ] ->
+    Types.register ->
+    Types.signal ->
+    'a list ->
+    Guarded.variable *                          (* state variable *)
+    ('a -> Types.signal) *                      (* is_state *)
+    ('a Guarded.cases -> Guarded.statement) *   (* switch *)
+    ('a -> Guarded.statement)                   (* next *)
+
   val statemachine : ?encoding:[ `binary | `onehot | `gray ] ->
     Types.register ->
     Types.signal ->
@@ -478,11 +487,21 @@ module type Seq = sig
         ?ge:signal ->
         n:int -> e:signal -> int -> variable
 
+    val statemachinev : 
+        ?clk:signal -> ?clkl:signal ->
+        ?r:signal -> ?rl:signal -> ?rv:signal ->
+        ?c:signal -> ?cl:signal -> ?cv:signal ->
+        ?ge:signal ->
+        ?encoding:[ `binary | `onehot | `gray ] ->
+        e:signal -> 'a list -> 
+        (variable * ('a -> signal) * ('a cases -> statement) * ('a -> statement))
+
     val statemachine : 
         ?clk:signal -> ?clkl:signal ->
         ?r:signal -> ?rl:signal -> ?rv:signal ->
         ?c:signal -> ?cl:signal -> ?cv:signal ->
         ?ge:signal ->
+        ?encoding:[ `binary | `onehot | `gray ] ->
         e:signal -> 'a list -> 
         (('a -> signal) * ('a cases -> statement) * ('a -> statement))
 
