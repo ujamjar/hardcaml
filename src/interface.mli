@@ -67,6 +67,99 @@ module Hier(I : S)(O : S) : sig
     Signal.Comb.t I.t -> Signal.Comb.t O.t
 end
 
+module type Ex = sig
+
+  type 'a x
+
+  val t : (string * int) x
+  val to_list : 'a x -> 'a list
+
+  val mapname : (string -> 'a) -> 'a x
+  val mapbits : (int -> 'a) -> 'a x
+
+  val zip2 : 'a x -> 'b x -> ('a * 'b) x
+  val zip3 : 'a x -> 'b x -> 'c x -> ('a * 'b * 'c) x
+  val zip4 : 'a x -> 'b x -> 'c x -> 'd x -> ('a * 'b * 'c * 'd) x
+  val zip5 : 'a x -> 'b x -> 'c x -> 'd x -> 'e x -> ('a * 'b * 'c * 'd * 'e) x
+  val zip6 : 'a x -> 'b x -> 'c x -> 'd x -> 'e x -> 'f x -> ('a * 'b * 'c * 'd * 'e * 'f) x
+
+  val map : 
+    ('a -> 'b) -> 
+    'a x -> 'b x
+  val map2 : 
+    ('a -> 'b -> 'c) ->
+    'a x -> 'b x -> 'c x
+  val map3 : 
+    ('a -> 'b -> 'c -> 'd) ->
+    'a x -> 'b x -> 'c x -> 'd x
+  val map4 : 
+    ('a -> 'b -> 'c -> 'd -> 'e) ->
+    'a x -> 'b x -> 'c x -> 'd x -> 'e x
+  val map5 : 
+    ('a -> 'b -> 'c -> 'd -> 'e -> 'f) ->
+    'a x -> 'b x -> 'c x -> 'd x -> 'e x -> 'f x
+  val map6 : 
+    ('a -> 'b -> 'c -> 'd -> 'e -> 'f -> 'g) ->
+    'a x -> 'b x -> 'c x -> 'd x -> 'e x -> 'f x -> 'g x
+
+  val offsets : ?rev:bool -> unit -> int x
+
+  module type S = sig
+
+    type b
+    type ifs 
+
+    val wire : unit -> ifs
+    val wiren : unit -> ifs
+    val consti : int -> ifs
+    val zero : ifs
+    val one : ifs
+    val ones : ifs
+
+    val (&:) : ifs -> ifs -> ifs
+    val (|:) : ifs -> ifs -> ifs
+    val (^:) : ifs -> ifs -> ifs
+    val (~:) : ifs -> ifs
+
+    val ( +: ) : ifs -> ifs -> ifs
+    val ( -: ) : ifs -> ifs -> ifs
+    val ( *: ) : ifs -> ifs -> ifs
+    val ( *+ ) : ifs -> ifs -> ifs
+
+    val pack : ?rev:bool -> ifs -> b
+    val unpack : ?rev:bool -> b -> ifs
+
+    module L : sig
+      type 'a l = 'a list x
+      val empty : unit -> 'a l
+      val rev : 'a l -> 'a l
+      val map : ('a x -> 'b x) -> 'a l -> 'b l
+      val cons : 'a x -> 'a l -> 'a l
+      val hd : 'a l -> 'a x
+      val tl : 'a l -> 'a l
+      val of_list : 'a x list -> 'a l
+      val to_list : 'a l -> 'a x list
+    end
+
+    val mux : b -> ifs list -> ifs
+    val mux2 : b -> ifs -> ifs -> ifs
+    val concat : ifs list -> ifs
+    val select : int -> int -> ifs -> ifs
+    val msb : ifs -> ifs
+    val msbs : ifs -> ifs
+    val lsb : ifs -> ifs
+    val lsbs : ifs -> ifs
+  
+  end
+
+  module Make(B : Comb.S) : S
+    with type b = B.t
+    and  type ifs = B.t x
+  
+end
+
+module Ex(X : S) : Ex with type 'a x = 'a X.t
+
 open Signal.Types
 
 type param = string * int

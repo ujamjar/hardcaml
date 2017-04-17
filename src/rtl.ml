@@ -308,7 +308,7 @@ module SignalNameManager(S : SignalNaming) = struct
         }
 
     let add_inst iname signal nm = 
-        let nm, name = mangle ("the_" ^ iname) nm in
+        let nm, name = mangle iname nm in
         { nm with inst_labels = UidMap.add (uid signal) name nm.inst_labels }
 
     (* add signals names to map; deal with special cases *)
@@ -319,7 +319,7 @@ module SignalNameManager(S : SignalNaming) = struct
         let nm = 
             match signal with
             | Signal_mem(_) -> add_mem signal nm
-            | Signal_inst(_,_,i) -> add_inst i.inst_name signal nm
+            | Signal_inst(_,_,i) -> add_inst i.inst_instance signal nm
             | _ -> nm
         in
         nm

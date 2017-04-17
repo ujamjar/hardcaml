@@ -91,6 +91,7 @@ sig
     and instantiation = 
         {
             inst_name : string;                          (* name of circuit *)
+            inst_instance : string;                      (* instantiation label *)
             inst_generics : (string * parameter) list;   (* [ "ram_type" => ParamString("auto"); ] *)
             inst_inputs : (string * signal) list;        (* name and input signal *)
             inst_outputs : (string * (int * int)) list;  (* name, width and low index of output *)
@@ -241,7 +242,7 @@ sig
 
     val (==>) : 'a -> 'b -> 'a * 'b
 
-    val inst : ?lib:string -> ?arch:string ->
+    val inst : ?lib:string -> ?arch:string -> ?instance:string -> 
                string -> (string * parameter) list -> 
                (string * signal) list -> (string * int) list ->
                instobj

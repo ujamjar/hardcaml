@@ -84,6 +84,7 @@ struct
     and instantiation = 
         {
             inst_name : string;                          (* name of circuit *)
+            inst_instance : string;                      (* instantiation label *)
             inst_generics : (string * parameter) list;   (* [ "ram_type" => ParamString("auto"); ] *)
             inst_inputs : (string * signal) list;        (* name and input signal *)
             inst_outputs : (string * (int * int)) list;  (* name, width and low index of output *)
@@ -238,6 +239,7 @@ struct
                         true
                     | Signal_inst(_,_,i0),Signal_inst(_,_,i1) -> 
                         (i0.inst_name=i1.inst_name) &&
+                        (i0.inst_instance=i1.inst_instance) &&
                         (i0.inst_generics=i1.inst_generics) &&
                         (i0.inst_outputs=i1.inst_outputs)
                         (* inst_inputs=??? *)
@@ -744,7 +746,7 @@ struct
 
     let (==>) a b = a,b
 
-    let inst ?(lib="work") ?(arch="rtl") name generics inputs outputs = 
+    let inst ?(lib="work") ?(arch="rtl") ?instance name generics inputs outputs = 
         let width = List.fold_left (fun a (_,i) -> a+i) 0 outputs in
         let deps = List.map snd inputs in
         let outputs,_ = List.fold_left (fun (o,a) (n,w) -> (n,(w,a))::o, a+w) ([],0) outputs in
@@ -753,6 +755,7 @@ struct
             new_id(),
             {
                 inst_name = name;
+                inst_instance = (match instance with None -> "the_" ^ name | Some(i) -> i);
                 inst_generics = generics;
                 inst_inputs = inputs;
                 inst_outputs = outputs;
