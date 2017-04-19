@@ -245,6 +245,7 @@ module type Ex = sig
 
     val pack : ?rev:bool -> ifs -> b
     val unpack : ?rev:bool -> b -> ifs
+    val width : unit -> int
 
     module L : sig
       type 'a l = 'a list t
@@ -336,6 +337,7 @@ module Ex(X : S) = struct
 
     val pack : ?rev:bool -> ifs -> b
     val unpack : ?rev:bool -> b -> ifs
+    val width : unit -> int
 
     module L : sig
       type 'a l = 'a list t
@@ -394,6 +396,8 @@ module Ex(X : S) = struct
       in
       let s = f 0 (if rev then to_list t else List.rev (to_list t)) in
       mapname (fun n -> List.assoc n s)
+    let width () =
+      to_list t |> List.map (fun (_, b) -> b) |> List.fold_left (+) 0
 
     module L = struct
 

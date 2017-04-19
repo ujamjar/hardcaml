@@ -147,6 +147,7 @@ module type Ex = sig
 
     val pack : ?rev:bool -> ifs -> b
     val unpack : ?rev:bool -> b -> ifs
+    val width : unit -> int
 
     module L : sig
       type 'a l = 'a list t
