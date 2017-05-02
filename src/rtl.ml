@@ -292,7 +292,7 @@ module SignalNameManager(S : SignalNaming) = struct
         | a::b -> failwith ("port has multiple names " ^ sep ", " (a::b))
 
     let add_mem signal nm = 
-        let name = List.hd (names_of_signal signal) in
+        let name = List.hd (names_of_signal signal) in (* XXX check: may need to legalize these names *)
         let nm, name_arr = mangle (name ^ "_mem") nm in
         let nm, name_typ = mangle (name ^ "_type") nm in
         let nm, name_t1 = mangle (name ^ "_blk") nm in
@@ -308,6 +308,7 @@ module SignalNameManager(S : SignalNaming) = struct
         }
 
     let add_inst iname signal nm = 
+        let iname = S.legalize iname in
         let nm, name = mangle iname nm in
         { nm with inst_labels = UidMap.add (uid signal) name nm.inst_labels }
 

@@ -747,6 +747,10 @@ struct
     let (==>) a b = a,b
 
     let inst ?(lib="work") ?(arch="rtl") ?instance name generics inputs outputs = 
+        (* filter empty/0 width IOs *)
+        (*let inputs = List.filter (fun (_,s) -> s <> Signal_empty) inputs in
+        let outputs = List.filter (fun (_,b) -> b <> 0) outputs in*)
+
         let width = List.fold_left (fun a (_,i) -> a+i) 0 outputs in
         let deps = List.map snd inputs in
         let outputs,_ = List.fold_left (fun (o,a) (n,w) -> (n,(w,a))::o, a+w) ([],0) outputs in
@@ -1490,10 +1494,4 @@ let seq_sync, seq_async, seq_full, seq_none =
   async,
   full,
   none
-
-
-
-
-
-
 
