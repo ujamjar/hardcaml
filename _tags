@@ -31,4 +31,4 @@
 <lwttb/*.ml{,i}>: package(lwt), package(lwt.ppx)
 
 true: bin_annot, package(bytes), package(astring), safe_string
-
+true: optimize(2)

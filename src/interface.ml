@@ -157,9 +157,9 @@ end
 module Hier(I : S)(O : S) = struct
     module C = Circ(I)(O)
     module I = Inst(I)(O)
-    let make db name logic =
+    let make ?check_names db name logic =
         let circuit = C.make name logic in
-        let name = Circuit.Hierarchy.add db circuit in
+        let name = Circuit.Hierarchy.add ?check_names db circuit in
         I.make name
 end
 

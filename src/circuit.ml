@@ -245,11 +245,19 @@ let signal_of_uid circuit uid = UidMap.find uid circuit.circ_id_to_sig
 
 let signal_map c = c.circ_id_to_sig
 
-let structural_compare c0 c1 = 
+let structural_compare ?check_names c0 c1 = 
     try 
+        (* outputs, including names, are the same *)
+        List.fold_left2 
+          (fun b o0 o1 -> b && names o0 = names o1 && width o0 = width o1) 
+          true (outputs c0) (outputs c1) &&
+        (* inputs, including names, are the same *)
+        List.fold_left2 
+          (fun b i0 i1 -> b && names i0 = names i1 && width i0 = width i1) 
+          true (inputs c0) (inputs c1) &&
         (* check full structural comparision from each output *)
         List.fold_left2 
-            (fun b s t -> b && (Signal.Types.structural_compare s t))
+            (fun b s t -> b && (Signal.Types.structural_compare ?check_names s t))
             true (outputs c0) (outputs c1)
     with Not_found ->
         false
@@ -412,7 +420,7 @@ struct
     
     (* add a circuit to the database, and return an instantiation for it,
      * with a possibly mangled name *)
-    let add database circ = 
+    let add ?check_names database circ = 
         let name = name circ in
         (* find the existing circuits which started off with this 
          * (un-mangled) name *)
@@ -425,7 +433,7 @@ struct
                 match e with
                 | [] -> raise Not_found
                 | e'::t ->
-                    if structural_compare e'.circ circ then
+                    if structural_compare ?check_names e'.circ circ then
                         e'
                     else
                         find t

@@ -62,7 +62,8 @@ module Inst(I : S)(O : S) : sig
 end
 
 module Hier(I : S)(O : S) : sig
-  val make : Circuit.Hierarchy.database -> string -> 
+  val make : 
+    ?check_names:bool -> Circuit.Hierarchy.database -> string -> 
     (Signal.Comb.t I.t -> Signal.Comb.t O.t) ->
     Signal.Comb.t I.t -> Signal.Comb.t O.t
 end

@@ -235,11 +235,12 @@ struct
                         true
                     | Signal_mem(_,_,_,m0),Signal_mem(_,_,_,m1) -> 
                         m0.mem_size=m1.mem_size
+                    (* XXX check if inputs have same names ? *)
                     | Signal_wire(_,_),Signal_wire(_,_) -> 
                         true
                     | Signal_inst(_,_,i0),Signal_inst(_,_,i1) -> 
                         (i0.inst_name=i1.inst_name) &&
-                        (i0.inst_instance=i1.inst_instance) &&
+                        (*i0.inst_instance=i1.inst_instance &&*)
                         (i0.inst_generics=i1.inst_generics) &&
                         (i0.inst_outputs=i1.inst_outputs)
                         (* inst_inputs=??? *)

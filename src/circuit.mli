@@ -103,7 +103,7 @@ val find_signals_by_name : string -> Signal.Types.signal list ->
     Signal.Types.signal list
 
 (** compare 2 circuits to see if they are the same *)
-val structural_compare : t -> t -> bool
+val structural_compare : ?check_names:bool -> t -> t -> bool
 
 (*
 module Plugin :
@@ -147,7 +147,7 @@ sig
     val empty : unit -> database
 
     (* take a circuit, and return a (mangled) name for it *)
-    val add : database -> t -> string
+    val add : ?check_names:bool -> database -> t -> string
 
     (* return the circuit matching the (mangled) name *)
     val get : database -> string -> t option
