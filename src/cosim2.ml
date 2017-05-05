@@ -283,7 +283,7 @@ module Modelsim(V : sig val vpi : string end)  = struct
    
   let load_sim ?(opts="-c -do \"run -a\"")  tb =  
     let command = 
-      "vsim -pli `opam config var hardcaml-vpi:lib`/hc_mti.vpi " ^ 
+      "vsim -pli `opam config var hardcaml-vpi:lib`/" ^ V.vpi ^ " " ^ 
       opts ^ " " ^
       tb  
     in
