@@ -68,25 +68,12 @@ val write_testbench_from_circuit : ?dump_file:string -> (string -> unit) -> Circ
 (** find clocks and resets in a hardcaml circuit *)
 val derive_clocks_and_resets : Circuit.t -> string list * string list
 
-module Icarus : sig
+module type Simulator = sig
 
-  (** compile verilog files to a vvp simulation object *)
+  (** compile verilog files *)
   val compile : string list -> string -> unit
 
-  (** load vvp file into simulator along with vpi object *)
-  val load_sim : string -> unit
-
-  (** compile circuit and load simulation *)
-  val compile_and_load_sim : ?dump_file:string -> Circuit.t -> unit
-
-end
-
-module Modelsim : sig
-
-  (** compile verilog files to a vvp simulation object *)
-  val compile : string list -> string -> unit
-
-  (** load vvp file into simulator along with vpi object *)
+  (** load simulation along with vpi object *)
   val load_sim : ?opts:string -> string -> unit
 
   (** compile circuit and load simulation *)
@@ -94,7 +81,13 @@ module Modelsim : sig
 
 end
 
-module Make(B : Comb.S) : sig
+module Icarus : Simulator
+
+module Mti32 : Simulator
+
+module Mti64 : Simulator
+
+module Make(SIM : Simulator)(B : Comb.S) : sig
   
   val init_sim : (unit -> unit) -> (string * int) list -> 
     Unix.file_descr * (string * (int * int)) list

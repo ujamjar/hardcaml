@@ -248,7 +248,7 @@ module Icarus = struct
     | Unix.WEXITED(0) -> ()
     | _ -> failwith ("Failed to compile verilog to vvp")
 
-  let load_sim vvp_file = 
+  let load_sim ?opts vvp_file = 
     let command = 
       "LD_LIBRARY_PATH=$LD_LIBRARY_PATH:`ocamlc -where` vvp " ^
         "-M`opam config var hardcaml-vpi:lib` " ^
@@ -257,7 +257,7 @@ module Icarus = struct
     let _ = Unix.open_process_out command in
     ()
 
-  let compile_and_load_sim ?dump_file circuit =
+  let compile_and_load_sim ?dump_file ?opts circuit =
     let verilog_file_name = Filename.temp_file "hardcaml_cosim_" "_verilog" in
     let vvp_file_name = Filename.temp_file "hardcaml_cosim_" "_vvp" in
     let () = at_exit (fun _ -> Unix.unlink verilog_file_name; Unix.unlink vvp_file_name) in
@@ -273,7 +273,7 @@ module Icarus = struct
 
 end
 
-module Modelsim = struct
+module Modelsim(V : sig val vpi : string end)  = struct
 
   (* we'll assume vlib work has been performed already *)
   let compile verilog _ = 
@@ -306,7 +306,16 @@ module Modelsim = struct
 
 end
 
-module Make(B : Comb.S) = struct
+module type Simulator = sig
+  val compile : string list -> string -> unit
+  val load_sim : ?opts:string -> string -> unit
+  val compile_and_load_sim : ?dump_file:string -> ?opts:string -> Circuit.t -> unit
+end
+
+module Mti32 = Modelsim(struct let vpi = "hc_mti.vpi" end)
+module Mti64 = Modelsim(struct let vpi = "hc_mti64.vpi" end)
+
+module Make(SIM : Simulator)(B : Comb.S) = struct
   
   let to_i32l x = 
     let rec f x = 
@@ -332,8 +341,6 @@ module Make(B : Comb.S) = struct
       let name = Comms.recv_string server in
       let width = Comms.recv_int server in
       (name,(idx,width)) :: read_nets server
-
-  module SIM = Modelsim
 
   let init_sim start_sim inputs = 
     (* create server *)

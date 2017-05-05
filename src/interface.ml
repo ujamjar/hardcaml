@@ -100,9 +100,9 @@ module Gen_cosim(B : Comb.S)(I : S)(O : S) = struct
 
 end
 
-module Gen_cosim2(B : Comb.S)(I : S)(O : S) = struct
+module Gen_cosim2(SIM : Cosim2.Simulator)(B : Comb.S)(I : S)(O : S) = struct
 
-    module S = Cosim2.Make(B)
+    module S = Cosim2.Make(SIM)(B)
     module Cs = Cyclesim.Api
 
     let make name logic = 

@@ -42,7 +42,7 @@ module Gen_cosim(B : Comb.S)(I : S)(O : S) : sig
     (Circuit.t * B.t Cyclesim.Api.cyclesim * B.t ref I.t * B.t ref O.t * B.t ref O.t)
 end
 
-module Gen_cosim2(B : Comb.S)(I : S)(O : S) : sig
+module Gen_cosim2(SIM : Cosim2.Simulator)(B : Comb.S)(I : S)(O : S) : sig
   val make : string -> (Signal.Comb.t I.t -> Signal.Comb.t O.t) ->
     (Circuit.t * B.t Cyclesim.Api.cyclesim * B.t ref I.t * B.t ref O.t * B.t ref O.t)
 end
