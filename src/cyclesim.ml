@@ -362,8 +362,13 @@ module Make(Bits : Comb.S) = struct
                 let d = UidMap.find (uid (List.hd (deps signal))) data_map in
                 (fun () ->
                     (* XXX memories can have resets/clear etc as well *)
-                    if Bits.to_int !we = 1 then
-                        mem.(Bits.to_int !w) <- !d
+                    if Bits.to_int !we = 1 then begin
+                      let w = Bits.to_int !w in
+                      if w >= m.mem_size then
+                        ()
+                      else
+                        mem.(w) <- !d
+                    end
                 )
             | _ -> failwith "error while compiling mem update"
         in
@@ -835,8 +840,14 @@ module MakeRaw(Bits : Bits.Raw.S) = struct
         let d = UidMap.find (uid (List.hd (deps signal))) data_map in
         (fun () ->
            (* XXX memories can have resets/clear etc as well *)
-           if Bits.to_int we = 1 then
-             Bits.copy mem.(Bits.to_int w) d
+           if Bits.to_int we = 1 then begin
+             let w = Bits.to_int w in
+             if w >= m.mem_size then 
+               (*Printf.printf "memory write out of bounds %i/%i\n" w m.mem_size*)
+               ()
+             else
+               Bits.copy mem.(w) d
+           end
         )
       | _ -> failwith "error while compiling mem update"
     in
@@ -882,11 +893,7 @@ module MakeRaw(Bits : Bits.Raw.S) = struct
 
     log "ports";
     let in_ports, out_ports, out_ports_cur, internal_ports = 
-      io_ports ~copy:(fun (n,p) -> n, zero (Bits.width p)) circuit data_map internal_ports
-    in
-
-    let task_out_ports_cur = 
-      (fun () -> List.iter2 (fun (_,pc) (_,pn) -> Bits.copy pc pn) out_ports_cur out_ports) 
+      io_ports ~copy:(fun (n,p) -> n, p) circuit data_map internal_ports
     in
 
     log "done";
@@ -901,22 +908,39 @@ module MakeRaw(Bits : Bits.Raw.S) = struct
       let t = List.map (fun t -> task t) tasks in
       fun () -> List.iter (fun t -> t ()) t
     in
-    let add_out_ref o = List.map (fun (n,b) -> n, ref b) o in
+
     let in_ports, in_ports_task = 
       let i = List.map (fun (n,b) -> n, ref (zero (Bits.width b))) in_ports in
       let t () = List.iter2 (fun (_,tgt) (_,src) -> Bits.copy tgt !src) in_ports i in
       i, t
     in
 
+    let out_ports_ref ports = 
+      let p = List.map (fun (n,s) -> n, ref (zero (Bits.width s))) ports in
+      let task () = 
+        List.iter2 
+          (fun (_,rf) (_,v) -> 
+            let d = Bits.create (Bits.width v) in
+            Bits.copy d v;
+            rf := d) 
+          p ports
+      in
+      p, task
+    in
+
+    let out_ports_cur, out_ports_cur_task = out_ports_ref out_ports in
+    let out_ports, out_ports_task = out_ports_ref out_ports in
+    let internal_ports, internal_ports_task = out_ports_ref internal_ports in
+
     {
       sim_in_ports = in_ports;
-      sim_out_ports = add_out_ref out_ports_cur;
-      sim_out_ports_next = add_out_ref out_ports;
-      sim_internal_ports = add_out_ref internal_ports;
+      sim_out_ports = out_ports_cur;
+      sim_out_ports_next = out_ports;
+      sim_internal_ports = internal_ports;
       sim_cycle_check = task tasks_check;
-      sim_cycle_comb0 = tasks [[in_ports_task]; tasks_comb; tasks_regs; [task_out_ports_cur]];
+      sim_cycle_comb0 = tasks [[in_ports_task]; tasks_comb; tasks_regs; [out_ports_cur_task; internal_ports_task]];
       sim_cycle_seq = task tasks_seq;
-      sim_cycle_comb1 = task tasks_comb;
+      sim_cycle_comb1 = tasks [tasks_comb; [ out_ports_task ]];
       sim_reset = task resets;
       sim_lookup_signal;
       sim_lookup_reg;
