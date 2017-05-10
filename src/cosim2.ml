@@ -244,9 +244,10 @@ let derive_clocks_and_resets circuit =
 module Icarus = struct
 
   let compile verilog vvp = 
-    match Unix.system ("iverilog -o " ^ vvp ^ " " ^ (String.concat ~sep:" " verilog)) with
+    let cmd_line = "iverilog -o " ^ vvp ^ " " ^ (String.concat ~sep:" " verilog) in
+    match Unix.system cmd_line with
     | Unix.WEXITED(0) -> ()
-    | _ -> failwith ("Failed to compile verilog to vvp")
+    | _ -> failwith ("Failed to compile verilog to vvp: " ^ cmd_line)
 
   let load_sim ?opts vvp_file = 
     let command = 
