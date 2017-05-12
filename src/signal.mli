@@ -449,93 +449,110 @@ end
 
 module type Seq = sig
 
-    open Types
+  open Types
 
-    val reg : 
-        ?clk:signal -> ?clkl:signal ->
-        ?r:signal -> ?rl:signal -> ?rv:signal ->
-        ?c:signal -> ?cl:signal -> ?cv:signal ->
-        ?ge:signal ->
-        e:signal -> signal -> signal
+  val reg : 
+    ?clk:signal -> ?clkl:signal ->
+    ?r:signal -> ?rl:signal -> ?rv:signal ->
+    ?c:signal -> ?cl:signal -> ?cv:signal ->
+    ?ge:signal ->
+    e:signal -> signal -> signal
 
-    val reg_fb : 
-        ?clk:signal -> ?clkl:signal ->
-        ?r:signal -> ?rl:signal -> ?rv:signal ->
-        ?c:signal -> ?cl:signal -> ?cv:signal ->
-        ?ge:signal ->
-        e:signal -> w:int -> (signal -> signal) -> signal
+  val reg_fb : 
+    ?clk:signal -> ?clkl:signal ->
+    ?r:signal -> ?rl:signal -> ?rv:signal ->
+    ?c:signal -> ?cl:signal -> ?cv:signal ->
+    ?ge:signal ->
+    e:signal -> w:int -> (signal -> signal) -> signal
 
-    val pipeline : 
-        ?clk:signal -> ?clkl:signal ->
-        ?r:signal -> ?rl:signal -> ?rv:signal ->
-        ?c:signal -> ?cl:signal -> ?cv:signal ->
-        ?ge:signal ->
-        n:int -> e:signal -> signal -> signal
+  val pipeline : 
+    ?clk:signal -> ?clkl:signal ->
+    ?r:signal -> ?rl:signal -> ?rv:signal ->
+    ?c:signal -> ?cl:signal -> ?cv:signal ->
+    ?ge:signal ->
+    n:int -> e:signal -> signal -> signal
 
-    open Guarded
+  open Guarded
 
-    val g_reg : 
-        ?clk:signal -> ?clkl:signal ->
-        ?r:signal -> ?rl:signal -> ?rv:signal ->
-        ?c:signal -> ?cl:signal -> ?cv:signal ->
-        ?ge:signal ->
-        e:signal -> int -> variable
+  val g_reg : 
+    ?clk:signal -> ?clkl:signal ->
+    ?r:signal -> ?rl:signal -> ?rv:signal ->
+    ?c:signal -> ?cl:signal -> ?cv:signal ->
+    ?ge:signal ->
+    e:signal -> int -> variable
 
-    val g_pipeline : 
-        ?clk:signal -> ?clkl:signal ->
-        ?r:signal -> ?rl:signal -> ?rv:signal ->
-        ?c:signal -> ?cl:signal -> ?cv:signal ->
-        ?ge:signal ->
-        n:int -> e:signal -> int -> variable
+  val g_pipeline : 
+    ?clk:signal -> ?clkl:signal ->
+    ?r:signal -> ?rl:signal -> ?rv:signal ->
+    ?c:signal -> ?cl:signal -> ?cv:signal ->
+    ?ge:signal ->
+    n:int -> e:signal -> int -> variable
 
-    val statemachinev : 
-        ?clk:signal -> ?clkl:signal ->
-        ?r:signal -> ?rl:signal -> ?rv:signal ->
-        ?c:signal -> ?cl:signal -> ?cv:signal ->
-        ?ge:signal ->
-        ?encoding:[ `binary | `onehot | `gray ] ->
-        e:signal -> 'a list -> 
-        (variable * ('a -> signal) * ('a cases -> statement) * ('a -> statement))
+  val statemachinev : 
+    ?clk:signal -> ?clkl:signal ->
+    ?r:signal -> ?rl:signal -> ?rv:signal ->
+    ?c:signal -> ?cl:signal -> ?cv:signal ->
+    ?ge:signal ->
+    ?encoding:[ `binary | `onehot | `gray ] ->
+    e:signal -> 'a list -> 
+    (variable * ('a -> signal) * ('a cases -> statement) * ('a -> statement))
 
-    val statemachine : 
-        ?clk:signal -> ?clkl:signal ->
-        ?r:signal -> ?rl:signal -> ?rv:signal ->
-        ?c:signal -> ?cl:signal -> ?cv:signal ->
-        ?ge:signal ->
-        ?encoding:[ `binary | `onehot | `gray ] ->
-        e:signal -> 'a list -> 
-        (('a -> signal) * ('a cases -> statement) * ('a -> statement))
+  val statemachine : 
+    ?clk:signal -> ?clkl:signal ->
+    ?r:signal -> ?rl:signal -> ?rv:signal ->
+    ?c:signal -> ?cl:signal -> ?cv:signal ->
+    ?ge:signal ->
+    ?encoding:[ `binary | `onehot | `gray ] ->
+    e:signal -> 'a list -> 
+    (('a -> signal) * ('a cases -> statement) * ('a -> statement))
 
-    val memory : 
-        ?clk:signal -> ?clkl:signal ->
-        ?r:signal -> ?rl:signal -> ?rv:signal ->
-        ?c:signal -> ?cl:signal -> ?cv:signal ->
-        ?ge:signal ->
-        int -> we:signal -> wa:signal -> d:signal -> ra:signal -> signal
+  val memory : 
+    ?clk:signal -> ?clkl:signal ->
+    ?r:signal -> ?rl:signal -> ?rv:signal ->
+    ?c:signal -> ?cl:signal -> ?cv:signal ->
+    ?ge:signal ->
+    int -> we:signal -> wa:signal -> d:signal -> ra:signal -> signal
 
-    val ram_wbr : 
-        ?clk:signal -> ?clkl:signal ->
-        ?r:signal -> ?rl:signal -> ?rv:signal ->
-        ?c:signal -> ?cl:signal -> ?cv:signal ->
-        ?ge:signal ->
-        int -> we:signal -> wa:signal -> d:signal -> re:signal -> ra:signal -> signal
+  val ram_wbr : 
+    ?clk:signal -> ?clkl:signal ->
+    ?r:signal -> ?rl:signal -> ?rv:signal ->
+    ?c:signal -> ?cl:signal -> ?cv:signal ->
+    ?ge:signal ->
+    int -> we:signal -> wa:signal -> d:signal -> re:signal -> ra:signal -> signal
 
-    val ram_rbw : 
-        ?clk:signal -> ?clkl:signal ->
-        ?r:signal -> ?rl:signal -> ?rv:signal ->
-        ?c:signal -> ?cl:signal -> ?cv:signal ->
-        ?ge:signal ->
-        int -> we:signal -> wa:signal -> d:signal -> re:signal -> ra:signal -> signal
+  val ram_rbw : 
+    ?clk:signal -> ?clkl:signal ->
+    ?r:signal -> ?rl:signal -> ?rv:signal ->
+    ?c:signal -> ?cl:signal -> ?cv:signal ->
+    ?ge:signal ->
+    int -> we:signal -> wa:signal -> d:signal -> re:signal -> ra:signal -> signal
 
-    val multi_ram_wbr : ?priority_write:bool -> 
-      rd:signal Multiram.read array ->
-      wr:signal Multiram.write array ->
-      int -> signal array
+  val multi_ram_wbr : ?priority_write:bool -> 
+    rd:signal Multiram.read array ->
+    wr:signal Multiram.write array ->
+    int -> signal array
 
-    val multi_ram_rbw : ?priority_write:bool -> 
-      rd:signal Multiram.read array ->
-      wr:signal Multiram.write array ->
-      int -> signal array
+  val multi_ram_rbw : ?priority_write:bool -> 
+    rd:signal Multiram.read array ->
+    wr:signal Multiram.write array ->
+    int -> signal array
+
+  val fifo : 
+    ?clk:signal -> ?clkl:signal ->
+    ?r:signal -> ?rl:signal -> ?rv:signal ->
+    ?c:signal -> ?cl:signal -> ?cv:signal ->
+    ?ge:signal ->
+    ?overflow_check:bool -> ?underflow_check:bool -> ?showahead:bool ->
+    ?nearly_empty:int -> ?nearly_full:int ->
+    wr:signal -> d:signal -> rd:signal -> int ->
+    <
+      q : signal;
+      full : signal;
+      empty : signal;
+      nearly_full : signal;
+      nearly_empty : signal;
+      used : signal;
+    >
 
 end
 

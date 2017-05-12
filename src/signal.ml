@@ -1248,210 +1248,303 @@ end
 
 module type Seq = sig
 
-    open Types
+  open Types
 
-    val reg : 
-        ?clk:signal -> ?clkl:signal ->
-        ?r:signal -> ?rl:signal -> ?rv:signal ->
-        ?c:signal -> ?cl:signal -> ?cv:signal ->
-        ?ge:signal ->
-        e:signal -> signal -> signal
+  val reg : 
+    ?clk:signal -> ?clkl:signal ->
+    ?r:signal -> ?rl:signal -> ?rv:signal ->
+    ?c:signal -> ?cl:signal -> ?cv:signal ->
+    ?ge:signal ->
+    e:signal -> signal -> signal
 
-    val reg_fb : 
-        ?clk:signal -> ?clkl:signal ->
-        ?r:signal -> ?rl:signal -> ?rv:signal ->
-        ?c:signal -> ?cl:signal -> ?cv:signal ->
-        ?ge:signal ->
-        e:signal -> w:int -> (signal -> signal) -> signal
+  val reg_fb : 
+    ?clk:signal -> ?clkl:signal ->
+    ?r:signal -> ?rl:signal -> ?rv:signal ->
+    ?c:signal -> ?cl:signal -> ?cv:signal ->
+    ?ge:signal ->
+    e:signal -> w:int -> (signal -> signal) -> signal
 
-    val pipeline : 
-        ?clk:signal -> ?clkl:signal ->
-        ?r:signal -> ?rl:signal -> ?rv:signal ->
-        ?c:signal -> ?cl:signal -> ?cv:signal ->
-        ?ge:signal ->
-        n:int -> e:signal -> signal -> signal
+  val pipeline : 
+    ?clk:signal -> ?clkl:signal ->
+    ?r:signal -> ?rl:signal -> ?rv:signal ->
+    ?c:signal -> ?cl:signal -> ?cv:signal ->
+    ?ge:signal ->
+    n:int -> e:signal -> signal -> signal
 
-    open Guarded
+  open Guarded
 
-    val g_reg : 
-        ?clk:signal -> ?clkl:signal ->
-        ?r:signal -> ?rl:signal -> ?rv:signal ->
-        ?c:signal -> ?cl:signal -> ?cv:signal ->
-        ?ge:signal ->
-        e:signal -> int -> variable
+  val g_reg : 
+    ?clk:signal -> ?clkl:signal ->
+    ?r:signal -> ?rl:signal -> ?rv:signal ->
+    ?c:signal -> ?cl:signal -> ?cv:signal ->
+    ?ge:signal ->
+    e:signal -> int -> variable
 
-    val g_pipeline : 
-        ?clk:signal -> ?clkl:signal ->
-        ?r:signal -> ?rl:signal -> ?rv:signal ->
-        ?c:signal -> ?cl:signal -> ?cv:signal ->
-        ?ge:signal ->
-        n:int -> e:signal -> int -> variable
+  val g_pipeline : 
+    ?clk:signal -> ?clkl:signal ->
+    ?r:signal -> ?rl:signal -> ?rv:signal ->
+    ?c:signal -> ?cl:signal -> ?cv:signal ->
+    ?ge:signal ->
+    n:int -> e:signal -> int -> variable
 
-    val statemachinev : 
-        ?clk:signal -> ?clkl:signal ->
-        ?r:signal -> ?rl:signal -> ?rv:signal ->
-        ?c:signal -> ?cl:signal -> ?cv:signal ->
-        ?ge:signal ->
-        ?encoding:[ `binary | `onehot | `gray ] ->
-        e:signal -> 'a list -> 
-        (variable * ('a -> signal) * ('a cases -> statement) * ('a -> statement))
+  val statemachinev : 
+    ?clk:signal -> ?clkl:signal ->
+    ?r:signal -> ?rl:signal -> ?rv:signal ->
+    ?c:signal -> ?cl:signal -> ?cv:signal ->
+    ?ge:signal ->
+    ?encoding:[ `binary | `onehot | `gray ] ->
+    e:signal -> 'a list -> 
+    (variable * ('a -> signal) * ('a cases -> statement) * ('a -> statement))
 
-    val statemachine : 
-        ?clk:signal -> ?clkl:signal ->
-        ?r:signal -> ?rl:signal -> ?rv:signal ->
-        ?c:signal -> ?cl:signal -> ?cv:signal ->
-        ?ge:signal ->
-        ?encoding:[ `binary | `onehot | `gray ] ->
-        e:signal -> 'a list -> 
-        (('a -> signal) * ('a cases -> statement) * ('a -> statement))
+  val statemachine : 
+    ?clk:signal -> ?clkl:signal ->
+    ?r:signal -> ?rl:signal -> ?rv:signal ->
+    ?c:signal -> ?cl:signal -> ?cv:signal ->
+    ?ge:signal ->
+    ?encoding:[ `binary | `onehot | `gray ] ->
+    e:signal -> 'a list -> 
+    (('a -> signal) * ('a cases -> statement) * ('a -> statement))
 
-    val memory : 
-        ?clk:signal -> ?clkl:signal ->
-        ?r:signal -> ?rl:signal -> ?rv:signal ->
-        ?c:signal -> ?cl:signal -> ?cv:signal ->
-        ?ge:signal ->
-        int -> we:signal -> wa:signal -> d:signal -> ra:signal -> signal
+  val memory : 
+    ?clk:signal -> ?clkl:signal ->
+    ?r:signal -> ?rl:signal -> ?rv:signal ->
+    ?c:signal -> ?cl:signal -> ?cv:signal ->
+    ?ge:signal ->
+    int -> we:signal -> wa:signal -> d:signal -> ra:signal -> signal
 
-    val ram_wbr : 
-        ?clk:signal -> ?clkl:signal ->
-        ?r:signal -> ?rl:signal -> ?rv:signal ->
-        ?c:signal -> ?cl:signal -> ?cv:signal ->
-        ?ge:signal ->
-        int -> we:signal -> wa:signal -> d:signal -> re:signal -> ra:signal -> signal
+  val ram_wbr : 
+    ?clk:signal -> ?clkl:signal ->
+    ?r:signal -> ?rl:signal -> ?rv:signal ->
+    ?c:signal -> ?cl:signal -> ?cv:signal ->
+    ?ge:signal ->
+    int -> we:signal -> wa:signal -> d:signal -> re:signal -> ra:signal -> signal
 
-    val ram_rbw : 
-        ?clk:signal -> ?clkl:signal ->
-        ?r:signal -> ?rl:signal -> ?rv:signal ->
-        ?c:signal -> ?cl:signal -> ?cv:signal ->
-        ?ge:signal ->
-        int -> we:signal -> wa:signal -> d:signal -> re:signal -> ra:signal -> signal
+  val ram_rbw : 
+    ?clk:signal -> ?clkl:signal ->
+    ?r:signal -> ?rl:signal -> ?rv:signal ->
+    ?c:signal -> ?cl:signal -> ?cv:signal ->
+    ?ge:signal ->
+    int -> we:signal -> wa:signal -> d:signal -> re:signal -> ra:signal -> signal
 
-    val multi_ram_wbr : ?priority_write:bool -> 
-      rd:signal Multiram.read array ->
-      wr:signal Multiram.write array ->
-      int -> signal array
+  val multi_ram_wbr : ?priority_write:bool -> 
+    rd:signal Multiram.read array ->
+    wr:signal Multiram.write array ->
+    int -> signal array
 
-    val multi_ram_rbw : ?priority_write:bool -> 
-      rd:signal Multiram.read array ->
-      wr:signal Multiram.write array ->
-      int -> signal array
+  val multi_ram_rbw : ?priority_write:bool -> 
+    rd:signal Multiram.read array ->
+    wr:signal Multiram.write array ->
+    int -> signal array
+
+  val fifo : 
+    ?clk:signal -> ?clkl:signal ->
+    ?r:signal -> ?rl:signal -> ?rv:signal ->
+    ?c:signal -> ?cl:signal -> ?cv:signal ->
+    ?ge:signal ->
+    ?overflow_check:bool -> ?underflow_check:bool -> ?showahead:bool ->
+    ?nearly_empty:int -> ?nearly_full:int ->
+    wr:signal -> d:signal -> rd:signal -> int ->
+    <
+      q : signal;
+      full : signal;
+      empty : signal;
+      nearly_full : signal;
+      nearly_empty : signal;
+      used : signal;
+    >
 
 end
 
 module Make_seq(S : Seq_spec) = struct
 
-    let make_spec 
-        ?clk ?clkl 
-        ?r ?rl ?rv 
-        ?c ?cl ?cv 
-        ?ge spec =
-        let sel a b = 
-            match a with
-            | None -> b
-            | Some(x) -> x
-        in
-        Types.({
-            reg_clock       = sel clk  spec.reg_clock;
-            reg_clock_level = sel clkl spec.reg_clock_level;
-            reg_reset       = sel r    spec.reg_reset;
-            reg_reset_level = sel rl   spec.reg_reset_level;
-            reg_reset_value = sel rv   spec.reg_reset_value;
-            reg_clear       = sel c    spec.reg_clear;
-            reg_clear_level = sel cl   spec.reg_clear_level;
-            reg_clear_value = sel cv   spec.reg_clear_value;
-            reg_enable      = sel ge   spec.reg_enable;
-        })
+  let make_spec 
+      ?clk ?clkl 
+      ?r ?rl ?rv 
+      ?c ?cl ?cv 
+      ?ge spec =
+    let sel a b = 
+      match a with
+      | None -> b
+      | Some(x) -> x
+    in
+    Types.({
+        reg_clock       = sel clk  spec.reg_clock;
+        reg_clock_level = sel clkl spec.reg_clock_level;
+        reg_reset       = sel r    spec.reg_reset;
+        reg_reset_level = sel rl   spec.reg_reset_level;
+        reg_reset_value = sel rv   spec.reg_reset_value;
+        reg_clear       = sel c    spec.reg_clear;
+        reg_clear_level = sel cl   spec.reg_clear_level;
+        reg_clear_value = sel cv   spec.reg_clear_value;
+        reg_enable      = sel ge   spec.reg_enable;
+      })
 
-    let reg 
-        ?clk ?clkl 
-        ?r ?rl ?rv 
-        ?c ?cl ?cv 
-        ?ge ~e d =
-        let spec = make_spec ?clk ?clkl ?r ?rl ?rv ?c ?cl ?cv ?ge S.reg_spec in
-        Seq.reg spec e d
+  let reg 
+      ?clk ?clkl 
+      ?r ?rl ?rv 
+      ?c ?cl ?cv 
+      ?ge ~e d =
+    let spec = make_spec ?clk ?clkl ?r ?rl ?rv ?c ?cl ?cv ?ge S.reg_spec in
+    Seq.reg spec e d
 
-    let reg_fb 
-        ?clk ?clkl 
-        ?r ?rl ?rv 
-        ?c ?cl ?cv 
-        ?ge ~e ~w f =
-        let spec = make_spec ?clk ?clkl ?r ?rl ?rv ?c ?cl ?cv ?ge S.reg_spec in
-        Seq.reg_fb spec e w f
+  let reg_fb 
+      ?clk ?clkl 
+      ?r ?rl ?rv 
+      ?c ?cl ?cv 
+      ?ge ~e ~w f =
+    let spec = make_spec ?clk ?clkl ?r ?rl ?rv ?c ?cl ?cv ?ge S.reg_spec in
+    Seq.reg_fb spec e w f
 
-    let pipeline 
-        ?clk ?clkl 
-        ?r ?rl ?rv 
-        ?c ?cl ?cv 
-        ?ge ~n ~e d =
-        let spec = make_spec ?clk ?clkl ?r ?rl ?rv ?c ?cl ?cv ?ge S.reg_spec in
-        Seq.pipeline n spec e d
+  let pipeline 
+      ?clk ?clkl 
+      ?r ?rl ?rv 
+      ?c ?cl ?cv 
+      ?ge ~n ~e d =
+    let spec = make_spec ?clk ?clkl ?r ?rl ?rv ?c ?cl ?cv ?ge S.reg_spec in
+    Seq.pipeline n spec e d
 
-    let g_reg
-        ?clk ?clkl 
-        ?r ?rl ?rv 
-        ?c ?cl ?cv 
-        ?ge ~e w =
-        let spec = make_spec ?clk ?clkl ?r ?rl ?rv ?c ?cl ?cv ?ge S.reg_spec in
-        Guarded.g_reg spec e w
+  let g_reg
+      ?clk ?clkl 
+      ?r ?rl ?rv 
+      ?c ?cl ?cv 
+      ?ge ~e w =
+    let spec = make_spec ?clk ?clkl ?r ?rl ?rv ?c ?cl ?cv ?ge S.reg_spec in
+    Guarded.g_reg spec e w
 
-    let g_pipeline 
-        ?clk ?clkl 
-        ?r ?rl ?rv 
-        ?c ?cl ?cv 
-        ?ge ~n ~e w =
-        let spec = make_spec ?clk ?clkl ?r ?rl ?rv ?c ?cl ?cv ?ge S.reg_spec in
-        Guarded.g_pipeline n spec e w
+  let g_pipeline 
+      ?clk ?clkl 
+      ?r ?rl ?rv 
+      ?c ?cl ?cv 
+      ?ge ~n ~e w =
+    let spec = make_spec ?clk ?clkl ?r ?rl ?rv ?c ?cl ?cv ?ge S.reg_spec in
+    Guarded.g_pipeline n spec e w
 
-    let statemachinev
-        ?clk ?clkl 
-        ?r ?rl ?rv 
-        ?c ?cl ?cv 
-        ?ge ?encoding ~e states =
-        let spec = make_spec ?clk ?clkl ?r ?rl ?rv ?c ?cl ?cv ?ge S.reg_spec in
-        Statemachine.statemachinev ?encoding spec e states
- 
-    let statemachine
-        ?clk ?clkl 
-        ?r ?rl ?rv 
-        ?c ?cl ?cv 
-        ?ge ?encoding ~e states =
-        let spec = make_spec ?clk ?clkl ?r ?rl ?rv ?c ?cl ?cv ?ge S.reg_spec in
-        Statemachine.statemachine ?encoding spec e states
- 
-    let memory
-        ?clk ?clkl 
-        ?r ?rl ?rv 
-        ?c ?cl ?cv 
-        ?ge  
-        size ~we ~wa ~d ~ra =
-        let spec = make_spec ?clk ?clkl ?r ?rl ?rv ?c ?cl ?cv ?ge S.ram_spec in
-        Seq.memory ~size ~spec ~we ~w:wa ~d ~r:ra
+  let statemachinev
+      ?clk ?clkl 
+      ?r ?rl ?rv 
+      ?c ?cl ?cv 
+      ?ge ?encoding ~e states =
+    let spec = make_spec ?clk ?clkl ?r ?rl ?rv ?c ?cl ?cv ?ge S.reg_spec in
+    Statemachine.statemachinev ?encoding spec e states
 
-    let ram_wbr 
-        ?clk ?clkl 
-        ?r ?rl ?rv 
-        ?c ?cl ?cv 
-        ?ge  
-        size ~we ~wa ~d ~re ~ra =
-        let spec = make_spec ?clk ?clkl ?r ?rl ?rv ?c ?cl ?cv ?ge S.ram_spec in
-        Seq.ram_wbr ~size ~spec ~we ~wa ~d ~re ~ra
+  let statemachine
+      ?clk ?clkl 
+      ?r ?rl ?rv 
+      ?c ?cl ?cv 
+      ?ge ?encoding ~e states =
+    let spec = make_spec ?clk ?clkl ?r ?rl ?rv ?c ?cl ?cv ?ge S.reg_spec in
+    Statemachine.statemachine ?encoding spec e states
 
-    let ram_rbw 
-        ?clk ?clkl 
-        ?r ?rl ?rv 
-        ?c ?cl ?cv 
-        ?ge  
-        size ~we ~wa ~d ~re ~ra =
-        let spec = make_spec ?clk ?clkl ?r ?rl ?rv ?c ?cl ?cv ?ge S.ram_spec in
-        Seq.ram_rbw ~size ~spec ~we ~wa ~d ~re ~ra
+  let memory
+      ?clk ?clkl 
+      ?r ?rl ?rv 
+      ?c ?cl ?cv 
+      ?ge  
+      size ~we ~wa ~d ~ra =
+    let spec = make_spec ?clk ?clkl ?r ?rl ?rv ?c ?cl ?cv ?ge S.ram_spec in
+    Seq.memory ~size ~spec ~we ~w:wa ~d ~r:ra
 
-    let multi_ram_wbr ?priority_write ~rd ~wr size =
-        Multiram.ram ?priority_write ~ram:(Seq.ram_wbr ~spec:S.ram_spec)
-          ~size ~spec:S.reg_spec ~wr ~rd
+  let ram_wbr 
+      ?clk ?clkl 
+      ?r ?rl ?rv 
+      ?c ?cl ?cv 
+      ?ge  
+      size ~we ~wa ~d ~re ~ra =
+    let spec = make_spec ?clk ?clkl ?r ?rl ?rv ?c ?cl ?cv ?ge S.ram_spec in
+    Seq.ram_wbr ~size ~spec ~we ~wa ~d ~re ~ra
 
-    let multi_ram_rbw ?priority_write ~rd ~wr size =
-        Multiram.ram ?priority_write ~ram:(Seq.ram_rbw ~spec:S.ram_spec)
-          ~size ~spec:S.reg_spec ~wr ~rd
+  let ram_rbw 
+      ?clk ?clkl 
+      ?r ?rl ?rv 
+      ?c ?cl ?cv 
+      ?ge  
+      size ~we ~wa ~d ~re ~ra =
+    let spec = make_spec ?clk ?clkl ?r ?rl ?rv ?c ?cl ?cv ?ge S.ram_spec in
+    Seq.ram_rbw ~size ~spec ~we ~wa ~d ~re ~ra
+
+  let multi_ram_wbr ?priority_write ~rd ~wr size =
+    Multiram.ram ?priority_write ~ram:(Seq.ram_wbr ~spec:S.ram_spec)
+      ~size ~spec:S.reg_spec ~wr ~rd
+
+  let multi_ram_rbw ?priority_write ~rd ~wr size =
+    Multiram.ram ?priority_write ~ram:(Seq.ram_rbw ~spec:S.ram_spec)
+      ~size ~spec:S.reg_spec ~wr ~rd
+
+
+  let fifo 
+      ?clk ?clkl 
+      ?r ?rl ?rv 
+      ?c ?cl ?cv 
+      ?ge  
+      ?(overflow_check=true) ?(underflow_check=true) ?(showahead=false)
+      ?nearly_empty ?nearly_full
+      ~wr ~d ~rd depth = 
+    let open Comb in
+
+    let reg ?cv ~e d = reg ?clk ?clkl ?r ?rl ?rv ?c ?cl ?cv ?ge ~e d in
+
+    let abits = Utils.clog2 depth in
+    let ubits = Utils.nbits depth in
+
+    (* get nearly full/empty levels *)
+    let nearly_empty = match nearly_empty with None -> 1 | Some(x) -> x in
+    let nearly_full = match nearly_full with None -> depth-1 | Some(x) -> x in
+
+    let empty, full = wire 1, wire 1 in
+    
+    (* safe rd/wr signals assuming fifo neither full or empty *)
+    let rd = if underflow_check then (rd &: ~: empty) -- "RD_INT" else rd in
+    let wr = if overflow_check then (wr &: ~: full) -- "WR_INT" else wr in
+
+    (* read or write, but not both *)
+    let e = rd ^: wr in
+
+    (* fill level of fifo *)
+    let used = wire ubits in
+    let used_next = 
+      mux2 e
+        (mux2 rd (used -:. 1) (used +:. 1))
+        used (* read+write, or none *)
+    in
+    used <== reg ~e (used_next -- "USED_NEXT");
+
+    (* full empty flags *)
+    empty <== reg ~e ~cv:vdd (used_next ==:. 0);
+    full <== reg ~e (used_next ==:. depth);
+
+    (* nearly full/empty flags *)
+    let nearly_empty = reg ~e ~cv:vdd (used_next <:. nearly_empty) in
+    let nearly_full = reg ~e (used_next >=:. nearly_full) in
+
+    (* read/write addresses within fifo *)
+    let addr_count e name = 
+      let a = wire abits in
+      let an = mod_counter (depth-1) a in
+      a <== reg ~e an;
+      a -- name, an -- (name ^ "_NEXT")
+    in
+    let ra,ra_n = addr_count rd "READ_ADDRESS" in
+    let wa,_ = addr_count wr "WRITE_ADDRESS" in
+
+    (* fifo memory *)
+    let q = 
+      if showahead then
+        let re = (rd |: (wr &: empty)) -- "RE" in
+        let ra = (mux2 rd ra_n ra) -- "RA" in
+        ram_wbr ?clk ?clkl ?ge ~we:wr ~re ~wa ~ra ~d depth 
+      else
+        ram_rbw ?clk ?clkl ?ge ~we:wr ~re:rd ~wa ~ra ~d depth 
+    in
+
+    object
+      method q = q
+      method full = full
+      method empty = empty
+      method nearly_full = nearly_full
+      method nearly_empty = nearly_empty
+      method used = used
+    end
+
 
 end
 
