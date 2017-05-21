@@ -11,7 +11,7 @@ depends: [
   "base-bytes" 
   "base-unix" 
   "hardcaml"
-  "js_of_ocaml"
+  "js_of_ocaml" { >= "3.0" }
 ]
 available: [ ocaml-version >= "4.01.0" ]
 name: "hardcaml-js"
