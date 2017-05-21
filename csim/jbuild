@@ -1,0 +1,6 @@
+(jbuild_version 1)
+
+(library
+ ((name "HardCamlCSim")
+  (public_name "hardcaml-csim")
+  (libraries (hardcaml ctypes.foreign))))
