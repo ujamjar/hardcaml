@@ -1,5 +1,3 @@
-open HardCaml
-
 module type S = functor (B : Bits.Ext.Comb.S) -> sig
   val make : Circuit.t -> B.t Cyclesim.Api.cyclesim
 end
