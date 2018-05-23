@@ -1,4 +1,10 @@
-# HardCaml 
+# Hardcaml Has A New Home!
+
+Hardcaml is now developed at [Jane Street](https://github.com/janestreet/hardcaml)!
+
+The various hardcaml libraries that lived under the ujamjar organisation will be released under Jane Street in the coming months. 
+
+# Deprecated version
 
 [![Build Status](https://travis-ci.org/ujamjar/hardcaml.svg?branch=master)](https://travis-ci.org/ujamjar/hardcaml)
 
