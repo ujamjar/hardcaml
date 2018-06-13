@@ -1,0 +1,8 @@
+(jbuild_version 1)
+
+(library
+ ((name "HardCamlJS")
+  (public_name "hardcaml-js")
+  (libraries (hardcaml js_of_ocaml))
+  (preprocess (pps (js_of_ocaml-ppx)))))
+

@@ -108,8 +108,8 @@ module Gui = struct
 
   let line ~(ctx:D.canvasRenderingContext2D Js.t) ~x0 ~y0 ~x1 ~y1 = 
       let f = float_of_int in
-      ctx##moveTo(f x0, f y0);
-      ctx##lineTo(f x1, f y1)
+      ctx##(moveTo (f x0) (f y0));
+      ctx##(lineTo (f x1) (f y1))
 
   let delta d = 
       let len = Array.length d in
@@ -166,7 +166,7 @@ module Gui = struct
       let rec text dotted x str w = 
           let jstr = if dotted then jstr (str^"..") else jstr str in
           let max_w = float (w * sx - 4) in
-          let w' = ctx##measureText(jstr)##width in
+          let w' = ctx##(measureText jstr)##.width in
           if w' > max_w then begin
               (* if too wide, then shorten the string by 1 char, and
                 append a dot - keep shortening until the string
@@ -176,7 +176,7 @@ module Gui = struct
                   text true x (String.Sub.to_string @@ String.sub str ~start:0 ~stop:(len-1)) w
               end
           end else
-              ctx##fillText (jstr, float (x*sx+ox+2), float (oy+2))
+              ctx##(fillText jstr (float (x*sx+ox+2)) (float (oy+2)))
       in
       let rec render first (p_d, p_t) next = 
           match next with
@@ -208,11 +208,11 @@ module Gui = struct
   let mk_canvas width height = 
       let d = D.document in
       let canvas = D.createCanvas d in
-      let style = canvas##style in
-      canvas##width <- width;
-      canvas##height <- height;
-      style##width <- jstri width;
-      style##height <- jstri height;
+      let style = canvas##.style in
+      canvas##.width := width;
+      canvas##.height := height;
+      style##.width := jstri width;
+      style##.height := jstri height;
       canvas
 
   let select (d:exarray) ofs n = 
@@ -239,31 +239,31 @@ module Gui = struct
       let d = D.document in
       let table = D.createTable d in
       let tbody = D.createTbody d in
-      table##className <- jstr "wave-table";
+      table##.className := jstr "wave-table";
       Dom.appendChild table tbody;
 
       (* create header row with the buttons *)
       let create_header () = 
           let trow = D.createTr d in
           let td = D.createTd d in 
-          td##className <- jstr "wave-name";
-          td##innerHTML <- jstr "cycle";
+          td##.className := jstr "wave-name";
+          td##.innerHTML := jstr "cycle";
           Dom.appendChild trow td;
           
           let tdc = D.createTd d in 
-          tdc##className <- jstr "wave-data";
-          tdc##innerHTML <- jstr "0";
+          tdc##.className := jstr "wave-data";
+          tdc##.innerHTML := jstr "0";
           Dom.appendChild trow tdc;
 
           let td = D.createTd d in
           let buttons = 
               List.map (fun (title, url, id, margin) ->
                   let i = D.createInput ~_type:(jstr "image") d in
-                  let s = i##style in
-                  i##title <- jstr title;
-                  i##src <- jstr url;
-                  i##alt <- jstr id;
-                  s##marginLeft <- jstr margin;
+                  let s = i##.style in
+                  i##.title := jstr title;
+                  i##.src := jstr url;
+                  i##.alt := jstr id;
+                  s##.marginLeft := jstr margin;
                   Dom.appendChild td i;
                   id, i
               ) [
@@ -304,47 +304,47 @@ module Gui = struct
 
           (* name *)
           let td = D.createTd d in
-          td##className <- jstr "wave-name";
-          td##innerHTML <- jstr 
+          td##.className := jstr "wave-name";
+          td##.innerHTML := jstr 
               (if data.nbits = 1 then data.name
               else data.name ^ "[" ^ string_of_int data.nbits ^ "]");
           Dom.appendChild trow td;
 
           (* value *)
           let tdv = D.createTd d in
-          tdv##className <- jstr "wave-data";
-          tdv##innerHTML <- jstr "XXX";
+          tdv##.className := jstr "wave-data";
+          tdv##.innerHTML := jstr "XXX";
           Dom.appendChild trow tdv;
 
           let td = D.createTd d in
           let canvas = mk_canvas width height in
-          let ctx = canvas##getContext (D._2d_) in
+          let ctx = canvas##(getContext (D._2d_)) in
 
           (* default settings *)
-          ctx##textBaseline <- jstr "top";
-          ctx##textAlign <- jstr "left";
-          ctx##font <- jstr (string_of_int (w_height-(2*margin)) ^ 
+          ctx##.textBaseline := jstr "top";
+          ctx##.textAlign := jstr "left";
+          ctx##.font := jstr (string_of_int (w_height-(2*margin)) ^ 
                                   "px sans-serif");
           let clear () = 
-              ctx##fillStyle <- jstr "white";
-              ctx##fillRect (0., 0., float width, float height);
+              ctx##.fillStyle := jstr "white";
+              ctx##(fillRect (0.) (0.) (float width) (float height));
           in
           (* draw grid *)
           let grid () = 
-              ctx##beginPath();
-              ctx##strokeStyle <- jstr "lightgray";
+              ctx##beginPath;
+              ctx##.strokeStyle := jstr "lightgray";
               vlines ctx (!w_width) height !n;
-              ctx##stroke();
-              ctx##closePath();
+              ctx##stroke;
+              ctx##closePath;
           in
           (* render waves *)
           let render () = 
               clear ();
               grid ();
-              ctx##fillStyle <- jstr "black";
-              ctx##beginPath();
-              ctx##strokeStyle <- jstr "black";
-              ctx##lineWidth <- 1.5;
+              ctx##.fillStyle := jstr "black";
+              ctx##beginPath;
+              ctx##.strokeStyle := jstr "black";
+              ctx##.lineWidth := 1.5;
               (if data.nbits = 1 then
                   render_1 (0,margin) (!w_width,w_height) !n ctx 
                       (select data.data !ofs !n)
@@ -352,8 +352,8 @@ module Gui = struct
                   let str = B.to_string in (* XXX data.str *)
                   render_n str (0,margin) (!w_width,w_height) !n ctx 
                       (select data.data !ofs !n));
-              ctx##stroke();
-              ctx##closePath()
+              ctx##stroke;
+              ctx##closePath
           in
 
           Dom.appendChild td canvas;
@@ -374,17 +374,17 @@ module Gui = struct
           Array.iter (fun (v,_,_,d) ->
               let l = length d.data in
               (*v##innerHTML <- jstr (d.str (get d.data (min (l-1) x)))*)
-              v##innerHTML <- jstr (B.to_string (get d.data (min (l-1) x)))
+              v##.innerHTML := jstr (B.to_string (get d.data (min (l-1) x)))
           ) waves
       in
       let onclick c =
-          c##onclick <- D.handler (fun e ->
+          c##.onclick := D.handler (fun e ->
               let clientLeft = 
                   int_of_float 
                       ((Js.to_float 
-                          c##getBoundingClientRect()##left) +. 0.5) in
-              let x = ((e##clientX - clientLeft) / !w_width) + !ofs in
-              cycle##innerHTML <- jstri x;
+                          c##getBoundingClientRect##.left) +. 0.5) in
+              let x = ((e##.clientX - clientLeft) / !w_width) + !ofs in
+              cycle##.innerHTML := jstri x;
               set_values x;
               Js._false)
       in
@@ -417,7 +417,7 @@ module Gui = struct
               with _ -> failwith ("assoc: " ^ id) *)
               myassoc id events
           in
-          b##onclick <- ev
+          b##.onclick := ev
       ) buttons;
 
       set_values 0;

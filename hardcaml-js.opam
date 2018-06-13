@@ -1,0 +1,20 @@
+opam-version: "1.2"
+maintainer: "andy.ray@ujamjar.com"
+authors: "andy.ray@ujamjar.com"
+homepage: "https://github.com/ujamjar/hardcaml"
+dev-repo: "https://github.com/ujamjar/hardcaml"
+bug-reports: "https://github.com/ujamjar/hardcaml/issues"
+build: [ ["jbuilder" "build" "-p" name "-j" jobs] ]
+depends: [
+  "ocamlfind" {build}
+  "jbuilder" {build & >= "1.0+beta8"}
+  "base-bytes" 
+  "base-unix" 
+  "hardcaml"
+  "js_of_ocaml" { >= "3.0" }
+]
+available: [ ocaml-version >= "4.01.0" ]
+name: "hardcaml-js"
+version: "1.3.0"
+license: "ISC"
+

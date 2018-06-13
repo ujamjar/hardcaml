@@ -106,21 +106,20 @@ module Make(State : State)(B : Comb.S)(I : Interface.S)(O : Interface.S) = struc
 
   let cycle1 t = 
     (* wait for active children to notify *)
-    let%lwt children = Lwt_list.filter_map_p 
+    Lwt_list.filter_map_p 
       (fun t -> 
         Lwt_mvar.take t.vreq >>= function Cycle i -> Lwt.return_some (t,i)
                                         | Finish -> Lwt.return_none) 
-      t.children 
-    in
+      t.children >>= fun children ->
     let children = List.map fst children and inputs = List.map snd children in
     let inputs = List.fold_left merge t.inputs inputs in
-    let%lwt () = dolog t children inputs in
+    dolog t children inputs >>= fun () ->
     (* notify parent *)
-    let%lwt () = Lwt_mvar.put t.vreq (Cycle inputs) in
+    Lwt_mvar.put t.vreq (Cycle inputs) >>= fun () ->
     (* wait for state from parent *)
-    let%lwt o, n = Lwt_mvar.take t.vresp in
+    Lwt_mvar.take t.vresp >>= fun (o, n) ->
     (* broadcast to children *)
-    let%lwt () = Lwt_list.iter_p (fun t -> Lwt_mvar.put t.vresp (o, n)) children in
+    Lwt_list.iter_p (fun t -> Lwt_mvar.put t.vresp (o, n)) children >>= fun () ->
     let t = { t with children; inputs=inone } in
     Lwt.return (t, o, n)
 
@@ -133,11 +132,10 @@ module Make(State : State)(B : Comb.S)(I : Interface.S)(O : Interface.S) = struc
 
   let rec with_finish t = 
     if t.children = [] then 
-      Lwt_mvar.put t.vreq Finish >> Lwt.return t
+      Lwt_mvar.put t.vreq Finish >>= fun () -> Lwt.return t
     else
       (* keep running while children are active *)
-      let%lwt t,_,_ = cycle1 t in
-      with_finish t
+      cycle1 t >>= fun (t,_,_) -> with_finish t
 
   let task' ?log () = 
     {
@@ -160,9 +158,7 @@ module Make(State : State)(B : Comb.S)(I : Interface.S)(O : Interface.S) = struc
 
   let rec repeat n f t = 
     if n <= 0 then Lwt.return t
-    else
-      let%lwt t = f t in
-      repeat (n-1) f t
+    else f t >>= fun t -> repeat (n-1) f t
 
   let rec delay n f t = 
     if n <= 0 then f t
@@ -190,7 +186,7 @@ module Make(State : State)(B : Comb.S)(I : Interface.S)(O : Interface.S) = struc
     let () = async task t in
 
     let rec loop prev sim = 
-      match%lwt Lwt_mvar.take t.vreq with
+      Lwt_mvar.take t.vreq >>= function
       | Cycle inputs -> begin
         (* apply inputs *)
         let inputs = 
@@ -201,7 +197,7 @@ module Make(State : State)(B : Comb.S)(I : Interface.S)(O : Interface.S) = struc
         (* simulation cycle *)
         let sim, o, n = cycle sim inputs in
         (* send back outputs *)
-        let%lwt () = Lwt_mvar.put t.vresp (o, n) in
+        Lwt_mvar.put t.vresp (o, n) >>= fun () ->
         (* loop *)
         loop inputs sim
       end

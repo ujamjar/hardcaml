@@ -1,0 +1,7 @@
+(jbuild_version 1)
+
+(library
+ ((name HardCaml)
+  (public_name hardcaml)
+  (libraries (astring unix dynlink num bigarray))))
+
