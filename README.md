@@ -2,7 +2,7 @@
 
 Hardcaml is now developed at [Jane Street](https://github.com/janestreet/hardcaml)!
 
-The various hardcaml libraries that lived under the ujamjar organisation will be released under Jane Street in the coming months. 
+Various hardcaml libraries that lived under the ujamjar organisation have been updated, improved and released by Jane Street. 
 
 # Deprecated version
 
